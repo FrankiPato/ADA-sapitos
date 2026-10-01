@@ -1,0 +1,68 @@
+Proyecto ADAP:
+
+	*** APP DE GESTION DE FACTURAS PARA EMPRESAS *** 
+
+- El sistema debe
+	* Hacer seguimiento de los pagos (notificaciones)
+	* Avisar cuando se está retrasando un pago ( Se le avisa cada ciertos dias, lo que permita el limite legal el retraso de un pago y ya ajustamos nosotros, suelen ser 5 dias)
+	* Generar facturas
+	* Manualmente podremos registrar a un nuevo cliente(empresa)  ->>> detalle importante, podemos hacerlo por importacion de CSV mas facil y "automatico"
+		y tambien podrá darse de baja pero cuando no queden facturas registradas por pagar
+	* Ser responsivo -> Cuando nos metamos en ordenador o movil, debe ajustarse a cada uno
+	* Ser intuitivo y simple, centrarnos en lo que tiene que funcionar
+	* Validar transacciones (debemos tener una conexion a Stripe para validar los pagos)
+	* Modificar facturas ya creadas, ***Antes de que se paguen***
+	* Generar un informe, sea semanal o mensual, dashboard solo visible por el admin
+	* se pasan facturas a dia 1, pero si se hace un dia 22 por ejemplo, se hace lo que quede hasta el dia 1 (puntual) y ya se empieza el dia 1 con nueva factura (recurrente)
+
+
+
+- ROLES:
+
+	- Lector: Tendra acceso restringido a lo que puede o no hacer, de ahi que se llame mas bien lector, podra editar cosas que no tengan riesgos y suyas unicamente
+	
+	- Admin: Mayores privilegios, pero sin tocar lo crítico
+
+	- Superadmin: Controlará practicamente todo
+
+	**** Login-> Usuario(dgfsdfg@turbineh.com) + Contraseña
+
+
+	1. Reglas de Negocio (RN)
+
+Son las políticas de la empresa que rigen cómo opera el dominio, independientes de la informática:
+
+RN-01 (Facturación recurrente mensual): Todas las facturas recurrentes se consolidan y emiten el día 1 de cada mes.   
+RN-02 (Prorrateo por alta extemporánea): Si un cliente inicia servicio entre días distintos al 1 (ej. día 22), se factura el tramo proporcional restante hasta fin de mes y se engancha al ciclo regular el día 1 del siguiente mes.   
+RN-03 (Ventana de cobro y mora): El plazo reglamentario de pago es de 5 días desde la emisión. Tras superar este periodo sin convalidación de pago, la factura pasa a estado impagada.   
+RN-04 (Supresión de cuenta por deuda): Un cliente solo puede solicitar la baja del sistema si el saldo adeudado es cero.   
+RN-05 (Retención legal de datos): La información fiscal y de cobro de los clientes se conservará durante el periodo legalmente estipulado tras el fin del contrato.   
+
+	2. Requisitos Funcionales (RF)
+
+Módulo 1: Gestión de Clientes y Accesos
+RF-01.1 (Alta de Clientes): El sistema debe permitir al Administrador registrar clientes manualmente introduciendo NIF empresarial, nombre de empresa y correo electrónico.   
+RF-01.2 (Importación Masiva): El sistema debe permitir la carga masiva de clientes mediante la importación de archivos CSV.   
+RF-01.3 (Validación de Dominio Corporativo): El sistema debe verificar que los correos electrónicos asignados a los usuarios internos correspondan al dominio corporativo @turbineh.   
+RF-01.4 (Baja de Cliente): El sistema permitirá procesar la baja de un cliente previa comprobación automática del cumplimiento de la RN-04.   
+
+Módulo 2: Gestión e Impresión de Facturas
+RF-02.1 (Tipos de Facturación): El sistema debe permitir la creación de facturas de cobro único (puntuales) y de cobro periódico (recurrentes).   
+RF-02.2 (Cálculo Automático de Prorrateo): El sistema calculará el importe proporcional en facturas recurrentes según la RN-02.   
+RF-02.3 (Búsqueda y Filtrado): El cliente y el administrador deben poder buscar facturas por cliente, intervalo de fechas y estado.   
+RF-02.4 (Edición Restringida de Facturas): El sistema permitirá modificar facturas pendientes de pago únicamente al rol Superadministrador. Facturas abonadas no podrán ser modificadas.   
+
+Módulo 3: Pasarela de Cobro y Seguimiento
+RF-03.1 (Integración con Pasarela): El sistema debe comunicarse con Stripe para iniciar cobros y verificar su validación.   
+RF-03.2 (Recordatorios Automáticos de Pago): El sistema enviará avisos periódicos al cliente durante los 5 días de margen de pago.   
+RF-03.3 (Gestión de Alertas de Impagados): El sistema notificar al Administrador de forma automática cuando expire la ventana de 5 días sin abonar la factura (según RN-03).   
+
+Módulo 4: Informes y Cuadro de Mando
+RF-04.1 (Dashboard Administrativo): El sistema ofrecerá un cuadro de mando exclusivo para el Administrador con métricas clave de facturación.   
+RF-04.2 (Generación de Informes): El sistema generará reportes consolidados con periodicidad semanal, mensual y anual.   
+
+	3. Requisitos No Funcionales (RNF)
+
+RNF-01 (Usabilidad / Responsive): La interfaz web debe ser responsiva y adaptarse a navegadores de escritorio y dispositivos móviles.   
+RNF-02 (Seguridad y Permisos): Control de acceso basado en roles (RBAC) categorizando a Superadmin, Admin, Lector y Cliente.   
+RNF-03 (Despliegue): El sistema debe permitir su instalación en entorno servidor local (on-premises).   RNF-04 (Rendimiento): El tiempo de respuesta en búsquedas y carga del dashboard no debe superar los 2 segundos bajo carga media.
