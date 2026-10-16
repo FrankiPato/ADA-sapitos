@@ -86,11 +86,12 @@ Los requisitos de usuario se han separado de los requisitos funcionales, expres�
 | UR-12 | Usuarios | No poder acceder al sistema cuando su cuenta se encuentre inactiva | Segunda Reunión |
 | UR-13 | Administrador | Poder asociar una misma persona de contacto a varias empresas cliente | Segunda Reunión |
 | UR-14 | Usuarios autorizados | Poder consultar los destinatarios a los que se envió una factura en el momento de su envío | Segunda Reunión |
-| UR-15 | Poder consultar la situación de las empresas cliente sin tener que acceder individualmente a cada una | Segunda Reunión |
-| UR-16 | Poder consultar y gestionar los datos comerciales y fiscales de una empresa cliente | Segunda Reunión |
-| UR-17 | Poder configurar las series de facturación y las tablas de tarifas | Segunda Reunión |
-| UR-18 | Poder revisar el cálculo del prorrateo antes de confirmar el alta de una empresa cliente | Segunda Reunión |
-| UR-19 | Poder aprobar o rechazar cambios económicos que requieran autorización | Segunda Reunión |
+| UR-15 | Administrador | Poder consultar el estado de las empresas cliente sin tener que abrir cada una individualmente | Segunda Reunión |
+| UR-16 | Usuarios autorizados | Poder consultar y gestionar por separado los datos comerciales y fiscales de una empresa cliente | Segunda Reunión |
+| UR-17 | Superadmin | Poder configurar las series de facturación y las tablas de tarifas | Segunda Reunión |
+| UR-18 | Usuarios autorizados | Poder consultar el importe prorrateado antes de confirmar el alta de una empresa cliente | Segunda Reunión |
+| UR-19 | Administrador | Poder aprobar o rechazar los cambios económicos que requieran autorización | Segunda Reunión |
+
 
 ## 4. Requisitos del sistema
 
@@ -239,10 +240,10 @@ Se documentan aquí las decisiones que se pueden identificar en la Primera Reuni
 | A-05 | Se considera que los informes podrán generarse con periodicidad mensual y anual | La Primera Reunión establece expresamente ambas periodicidades | FR-45, FR-46 |
 | A-06 | Se considera que una empresa cliente puede tener varias personas de contacto asociadas | La Primera Reunión contempla que una misma empresa puede tener distintas personas de contacto para diferentes gestiones, como contratación, administración o seguimiento de impagos | BR-01, FR-13 a FR-18 |
 | A-07 | Se considera que una empresa cliente constituye una única entidad dentro del sistema, independientemente del número de personas de contacto asociadas | La Primera Reunión indica que no se debe duplicar una misma empresa cuando existan varias personas de contacto | BR-01, FR-13 a FR-19 |
-| A-08 | La relación comercial de una empresa cliente se gestionará de forma independiente de sus facturas y no implicará necesariamente un contrato de duración determinada | Segunda Reunión | BR-12, FR-52 |
-| A-09 | La gestoría se encargará de las particularidades fiscales complejas; la aplicación almacenará los datos necesarios para clientes internacionales sin implementar toda la lógica fiscal internacional | Segunda Reunión | FR-54, FR-55 |
-| A-10 | Los tramos de facturación anual y sus tarifas serán configurables y no estarán definidos de forma fija en el código | Segunda Reunión | FR-56, FR-57 |
-| A-11 | Los estados de las facturas representarán su ciclo de vida real; los estados indicados inicialmente no constituyen necesariamente una lista cerrada | Segunda Reunión | FR-63 |
+| A-08 | La relación comercial de una empresa cliente se gestionará de forma independiente de sus facturas y no implicará necesariamente un contrato de duración determinada | La Segunda Reunión distingue las condiciones comerciales de las facturas y no establece que la relación deba tener una duración fija | BR-12, FR-52 |
+| A-09 | La gestoría se encargará de las particularidades fiscales complejas; la aplicación almacenará los datos necesarios para clientes internacionales sin implementar toda la lógica fiscal internacional | La Segunda Reunión indica que se deben contemplar clientes internacionales, pero que la aplicación no tiene que resolver toda su fiscalidad | FR-54, FR-55 |
+| A-10 | Los tramos de facturación anual y sus tarifas serán configurables y no estarán definidos de forma fija en el código | La Segunda Reunión establece que el Superadmin deberá poder modificar la tabla de tarifas sin alterar las facturas históricas | BR-13, FR-56, FR-57 |
+| A-11 | Los estados de las facturas representarán su ciclo de vida real; los estados indicados inicialmente no constituyen necesariamente una lista cerrada | La Segunda Reunión identifica distintos estados de las facturas, pero deja abierta la definición definitiva del ciclo de vida | BR-15, FR-63 |
 
 ## 7. Dudas, ambigüedades y cuestiones pendientes
 
