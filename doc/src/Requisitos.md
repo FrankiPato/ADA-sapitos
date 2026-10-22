@@ -1,325 +1,541 @@
-# Requisitos
 
-## 1. Contexto y alcance
+================================================================================
+1. CONTEXTO Y ALCANCE
+================================================================================
 
-### 1.1. Objetivo del sistema
+1.1. OBJETIVO
 
-El sistema tiene como objetivo proporcionar una aplicación para gestionar las empresas cliente de la empresa y la información relacionada con su facturación y sus pagos.
+Turbine es una empresa de IA en fase inicial (7 personas) cuyo modelo de negocio es
+una suscripción mensual cuyo importe depende del rango de facturación anual del
+cliente. A la suscripción se suman servicios adicionales facturados puntualmente.
+Actualmente la facturación y el cobro son manuales, lo que no es sostenible para
+aspirar a miles de clientes y a un departamento administrativo dedicado.
 
-El sistema permitirá gestionar empresas cliente, generar y consultar facturas puntuales y recurrentes, realizar el seguimiento de los pagos, controlar los retrasos y proporcionar información e informes que faciliten la gestión administrativa.
+El sistema es una aplicación web de uso interno, independiente de Brain, que
+permite registrar clientes, generar facturas puntuales y recurrentes, y hacer
+seguimiento automatizado de cobros, con integración con Stripe (simulado) y
+distintos niveles de acceso por rol.
 
-Además, el sistema deberá integrarse con Stripe para validar los pagos realizados por las empresas cliente y deberá proporcionar diferentes niveles de acceso en función del rol de cada usuario.
+Criterios de éxito (Alejandro Ruiz):
+- Rapidez y sencillez: mínimo número de clics.
+- Movilidad: uso desde cualquier dispositivo.
+- Fluidez de la información: ningún dato relevante deja de llegar a la persona
+  correcta.
+- Automatización confiable y explicable.
 
-### 1.2. Alcance
+1.2. ALCANCE
 
-El sistema será responsable de:
+DENTRO DEL ALCANCE:
+- Gestión de clientes (empresas), contactos y suscripción.
+- Facturas puntuales y recurrentes, con PDF y numeración.
+- Envío automático de facturas y recordatorios (email/WhatsApp simulados).
+- Detección de cobros vía Stripe (simulado), con posibilidad de otras fuentes.
+- Seguimiento de impagos, incidencias, pausas y bajas.
+- Gestión de usuarios internos, roles y asignación de clientes.
+- Notificaciones internas, dashboard e informes.
+- Configuración, auditoría y copias de seguridad.
+- API documentada para sistemas externos.
+- Acceso desde ordenador, tablet y móvil.
+- Seguridad, integridad y conservación de la información.
+- Despliegue on-premises y disponibilidad en horario laboral.
 
-- Gestionar las cuentas de los usuarios y sus permisos.
-- Gestionar diferentes roles de usuario.
-- Recoger y guardar información de un acuerdo/ficha comercial o suscripción.
-- Gestionar la información de las empresas cliente.
-- Gestionar las personas de contacto asociadas a las empresas cliente.
-- Generar y gestionar facturas puntuales y recurrentes.
-- Calcular la facturación proporcional de las empresas cliente que se incorporen durante un mes.
-- Controlar el estado de las facturas y de los pagos.
-- Integrarse con Stripe para iniciar y validar los pagos.
-- Enviar recordatorios y notificaciones relacionados con los pagos.
-- Generar informes sobre facturación y pagos.
-- Proporcionar un cuadro de mando para usuarios administrativos autorizados.
-- Permitir el acceso desde ordenador, tablet y dispositivos móviles.
-- Garantizar la seguridad, integridad y conservación de la información.
+FUERA DEL ALCANCE:
+- Integración con Brain.
+- El sistema no cobra: solo consulta si una factura está pagada.
+- Acceso de clientes de Turbine a la app (uso interno; ver D-01).
+- Chat propio (comunicaciones por email/WhatsApp).
+- Integración con Verifactu (lo lleva la gestoría).
+- Fiscalidad internacional completa (solo datos no limitados a España).
+- Usuario para la gestoría (se le envía paquete exportado).
+- Pagos fraccionados.
+- Ampliaciones opcionales aplazadas: presupuestos, varias sociedades emisoras,
+  centros de coste, conversión de monedas, objetivos de facturación, cierre de
+  periodos, fusión de duplicados, importación de facturas antiguas, rol externo
+  para gestoría, IA, delegación temporal, adjuntos, etiquetas, favoritos, filtros
+  guardados, acciones masivas, menciones, informes programados, alertas
+  configurables, preferencias de canal, calendario laboral, reasignación de
+  aprobaciones, notas restringidas, pruebas de plantillas y excepción de no
+  prorrateo.
 
-La Primera Reunión no especifica funcionalidades ajenas a la gestión de empresas cliente, facturación, pagos, usuarios e información administrativa, por lo que dichas funcionalidades quedan fuera del alcance definido.
+1.3. ACTORES Y PARTES INTERESADAS
 
-### 1.3. Actores y partes interesadas
-
-| Actor / stakeholder | Descripción | Intereses principales |
-|---|---|---|
-| Superadmin | Usuario con los mayores privilegios de gestión del sistema | Gestionar el sistema y disponer de los mayores privilegios de administración |
-| Admin | Usuario con funciones administrativas | Gestionar empresas cliente, facturas, pagos e información administrativa según sus permisos |
-| Lector | Usuario con acceso principalmente a la consulta de información | Consultar información sin realizar operaciones críticas |
-| Cliente | Usuario asociado a una empresa cliente que utiliza el sistema para consultar información relacionada con su propia empresa y sus facturas | Consultar sus facturas y recibir información relacionada con pagos y vencimientos |
-| Empresa | Organización que utiliza el sistema para gestionar sus empresas cliente, facturación y pagos | Facilitar y mejorar la gestión administrativa y el seguimiento de los cobros |
-| Empresa cliente | Empresa que mantiene una relación comercial con la Empresa y cuyos servicios, facturas y pagos se gestionan mediante el sistema | Consultar sus facturas y recibir información relacionada con pagos y vencimientos |
-| Persona de contacto | Persona asociada a una empresa cliente que actúa como contacto para determinadas gestiones | Recibir o proporcionar información relacionada con la relación comercial y administrativa |
-| Stripe | Sistema externo utilizado para gestionar y validar pagos | Proporcionar confirmación de los pagos realizados |
-
-## 2. Requisitos de negocio
-
-Los siguientes requisitos representan las necesidades y objetivos de negocio identificados en la Primera Reunión.
-
-| ID | Requisito | Fuente |
-|---|---|---|
-| BR-01 | Gestionar las empresas cliente y la información necesaria para su facturación | Primera Reunión |
-| BR-02 | Gestionar facturas puntuales y recurrentes | Primera Reunión |
-| BR-03 | Generar mensualmente las facturas recurrentes correspondientes | Primera Reunión |
-| BR-04 | Aplicar una facturación proporcional a las empresas cliente que se incorporen durante un mes | Primera Reunión |
-| BR-05 | Realizar un seguimiento de los pagos y del estado de las facturas de cada empresa cliente | Primera Reunión |
-| BR-06 | Controlar los plazos de pago y detectar los retrasos | Primera Reunión |
-| BR-07 | Integrarse con Stripe para validar los pagos realizados | Primera Reunión |
-| BR-08 | Impedir la baja de una empresa cliente cuando tenga facturas pendientes de pago o saldo adeudado | Primera Reunión |
-| BR-09 | Proporcionar información e informes sobre facturación y pagos para facilitar la gestión administrativa | Primera Reunión |
-| BR-10 | Permitir el uso del sistema desde ordenador, tablet y dispositivos móviles | Primera Reunión |
-| BR-11 | Proporcionar una interfaz sencilla e intuitiva centrada en la gestión de empresas cliente, facturas y pagos | Primera Reunión |
-| BR-12 | Gestionar la relación comercial con cada empresa cliente de forma independiente de sus facturas | Segunda Reunión |
-| BR-13 | Permitir la revisión periódica de las tarifas según el rango de facturación anual de cada empresa cliente | Segunda Reunión |
-| BR-14 | Permitir excepciones comerciales, como descuentos temporales, meses gratuitos y precios pactados para servicios adicionales | Segunda Reunión |
-| BR-15 | Garantizar la trazabilidad y la integridad de las facturas emitidas | Segunda Reunión |
-
-## 3. Requisitos de usuario
-
-Los requisitos de usuario se han separado de los requisitos funcionales, expresándolos desde el punto de vista de las necesidades de los distintos usuarios.
-
-| ID | Actor | Requisito | Fuente |
+| Actor / stakeholder | Tipo | Descripción | Intereses principales |
 |---|---|---|---|
-| UR-01 | Usuarios | Poder iniciar sesión mediante sus credenciales | Primera Reunión |
-| UR-02 | Usuarios | Disponer de permisos diferentes según el rol que tengan dentro del sistema | Primera Reunión |
-| UR-03 | Administrador | Poder registrar nuevas empresas cliente introduciendo sus datos fiscales y de contacto | Primera Reunión |
-| UR-04 | Usuarios autorizados | Poder consultar la información de las empresas cliente y sus facturas | Primera Reunión |
-| UR-05 | Usuarios autorizados | Poder buscar y filtrar facturas por empresa cliente, fecha y estado | Primera Reunión |
-| UR-06 | Usuarios autorizados | Poder consultar el estado de los pagos | Primera Reunión |
-| UR-07 | Clientes | Recibir avisos relacionados con el estado y vencimiento de las facturas de su empresa cliente | Primera Reunión |
-| UR-08 | Usuarios con permisos suficientes | Poder consultar informes sobre facturación y pagos | Primera Reunión |
-| UR-09 | Administrador | Disponer de un cuadro de mando con información sobre el estado de la facturación | Primera Reunión |
-| UR-10 | Usuarios | Poder utilizar la aplicación desde ordenador y dispositivos móviles | Primera Reunión |
-| UR-11 | Administrador | Poder desactivar el acceso de una persona que ya no pertenezca a la empresa cliente | Segunda Reunión |
-| UR-12 | Usuarios | No poder acceder al sistema cuando su cuenta se encuentre inactiva | Segunda Reunión |
-| UR-13 | Administrador | Poder asociar una misma persona de contacto a varias empresas cliente | Segunda Reunión |
-| UR-14 | Usuarios autorizados | Poder consultar los destinatarios a los que se envió una factura en el momento de su envío | Segunda Reunión |
-| UR-15 | Administrador | Poder consultar el estado de las empresas cliente sin tener que abrir cada una individualmente | Segunda Reunión |
-| UR-16 | Usuarios autorizados | Poder consultar y gestionar por separado los datos comerciales y fiscales de una empresa cliente | Segunda Reunión |
-| UR-17 | Superadmin | Poder configurar las series de facturación y las tablas de tarifas | Segunda Reunión |
-| UR-18 | Usuarios autorizados | Poder consultar el importe prorrateado antes de confirmar el alta de una empresa cliente | Segunda Reunión |
-| UR-19 | Administrador | Poder aprobar o rechazar los cambios económicos que requieran autorización | Segunda Reunión |
+| Superadministrador (Superadmin) | Actor principal | Configura el sistema y consulta auditoría; máximos privilegios | Configurar plazos, tarifas, series, plantillas; auditoría |
+| Administrador (Admin) | Actor principal | Gestiona clientes, facturas, usuarios, asignaciones y aprobaciones | Visión global de facturación y cobros |
+| Usuario operativo | Actor principal | Empleado administrativo que solo gestiona los clientes asignados (antiguo "Lector") | Gestionar rápido sus clientes, facturas y cobros |
+| Planificador del sistema | Actor secundario (sistema) | Lanza procesos automáticos (facturas del día 1, recordatorios, consulta de pagos, copias) | Procesos a tiempo, sin duplicados y con registro |
+| Stripe (simulado) | Actor secundario (sistema externo) | Informa de pagos | Proporcionar información de cobros |
+| Servicio de mensajería (simulado) | Actor secundario (sistema externo) | Entrega email/WhatsApp e informa de fallos | Entregar comunicaciones y avisar de rebotes |
+| Sistema externo vía API | Actor secundario (sistema externo) | Consulta facturas pendientes y comunica bajas | Consultar sin saltarse reglas |
+| Cliente de Turbine | Parte interesada (no usa la app) | Recibe facturas | Recibir facturas correctamente |
+| Persona de contacto | Parte interesada (no usa la app) | Contacto de la empresa cliente | Recibir o proporcionar información |
+| Gestoría | Parte interesada (no usa la app) | Asesoría externa contable/fiscal | Información contable completa |
+| Dirección de Turbine | Parte interesada | Fundador | Reducir trabajo manual y crecer |
+
+D-01 (decisión cerrada): se elimina el rol "Cliente" que aparecía en el documento
+B. La app es solo de uso interno.
 
 
-## 4. Requisitos del sistema
+================================================================================
+2. REQUISITOS DE NEGOCIO
+================================================================================
 
-### 4.1. Requisitos funcionales
+| ID | Requisito |
+|---|---|
+| BR-01 | Reducir el trabajo manual de facturación y recordatorios |
+| BR-02 | Automatizar el seguimiento de cobros para detectar pendientes e impagos |
+| BR-03 | Permitir que la administración crezca sin rehacer el sistema |
+| BR-04 | Asegurar que la información importante llega a la persona correcta |
+| BR-05 | Agilizar las tareas administrativas habituales |
+| BR-06 | Poder gestionar la administración desde cualquier lugar y dispositivo |
+| BR-07 | Conocer en todo momento la situación financiera (facturado, cobrado, pendiente) |
+| BR-08 | Cumplir obligaciones de facturación y mantener trazabilidad de documentos |
+| BR-09 | Proteger los datos de los clientes |
+| BR-10 | Mantener la gestión separada de Brain y preparada para cambios futuros |
+| BR-11 | Gestionar las empresas cliente y su información de facturación |
+| BR-12 | Gestionar la relación comercial de cada cliente independientemente de sus facturas |
+| BR-13 | Permitir la revisión periódica de tarifas según rango de facturación anual |
+| BR-14 | Permitir excepciones comerciales (descuentos, meses gratuitos, precios pactados) |
+| BR-15 | Garantizar trazabilidad e integridad de las facturas emitidas |
+| BR-16 | Proporcionar una interfaz sencilla e intuitiva centrada en clientes, facturas y pagos |
 
-| ID | Requisito | Relacionado con |
+D-02 (decisión cerrada): la baja con facturas pendientes se permite; las deudas se
+siguen reclamando (prevalece A sobre B).
+
+
+================================================================================
+3. REQUISITOS DE USUARIO
+================================================================================
+
+| ID | Actor | Requisito |
 |---|---|---|
-| FR-01 | El sistema deberá permitir crear cuentas de usuario | UR-01, UR-02 |
-| FR-02 | El sistema deberá permitir a los usuarios iniciar sesión mediante usuario y contraseña | UR-01 |
-| FR-03 | El sistema deberá almacenar las contraseñas de forma segura | UR-01 |
-| FR-04 | El sistema deberá denegar el acceso cuando el usuario introduzca credenciales incorrectas | UR-01 |
-| FR-05 | El sistema deberá controlar el acceso a las funcionalidades según el rol del usuario | UR-02 |
-| FR-06 | Los usuarios internos deberán utilizar cuentas asociadas al dominio corporativo establecido por la empresa | UR-01 |
-| FR-07 | El sistema deberá contemplar los roles Superadmin, Admin, Lector y Cliente | UR-02 |
-| FR-08 | El Superadmin tendrá los mayores privilegios de gestión del sistema | UR-02 |
-| FR-09 | El Admin tendrá acceso a las funciones administrativas que le correspondan, sin acceso a las operaciones reservadas al Superadmin | UR-02 |
-| FR-10 | El Lector tendrá acceso restringido principalmente a la consulta de información y a modificaciones que no impliquen operaciones críticas | UR-02 |
-| FR-11 | El Cliente solo podrá acceder a la información y funcionalidades relacionadas con su propia empresa cliente y sus facturas | UR-02 |
-| FR-12 | El sistema deberá impedir que un usuario acceda a funcionalidades para las que no tenga permisos | UR-02 |
-| FR-13 | El sistema deberá permitir dar de alta nuevas empresas cliente | UR-03 |
-| FR-14 | El sistema deberá permitir introducir el NIF de la empresa cliente | UR-03 |
-| FR-15 | El sistema deberá permitir introducir el nombre de la empresa cliente | UR-03 |
-| FR-16 | El sistema deberá permitir introducir el correo electrónico de la empresa cliente | UR-03 |
-| FR-17 | El sistema deberá permitir consultar la información de las empresas cliente | UR-04 |
-| FR-18 | El sistema deberá permitir modificar la información de una empresa cliente cuando el usuario disponga de permisos suficientes | UR-03, UR-04 |
-| FR-19 | El sistema deberá permitir dar de baja a una empresa cliente cuando no existan facturas pendientes de pago o saldo adeudado | UR-03 |
-| FR-20 | El sistema podrá permitir la importación masiva de empresas cliente mediante archivos CSV | UR-03 |
-| FR-21 | El sistema deberá permitir generar facturas puntuales | UR-04 |
-| FR-22 | El sistema deberá permitir generar facturas recurrentes | UR-04 |
-| FR-23 | El sistema deberá generar las facturas recurrentes correspondientes al ciclo mensual el día 1 de cada mes | UR-04 |
-| FR-24 | El sistema deberá calcular automáticamente el importe proporcional cuando una empresa cliente se incorpore durante el transcurso de un mes | UR-04 |
-| FR-25 | El sistema deberá permitir consultar las facturas asociadas a cada empresa cliente | UR-04 |
-| FR-26 | El sistema deberá permitir buscar y filtrar facturas por empresa cliente, intervalo de fechas y estado | UR-05 |
-| FR-27 | El sistema deberá permitir modificar una factura pendiente de pago únicamente a los usuarios con permisos suficientes | UR-04 |
-| FR-28 | El sistema no deberá permitir modificar una factura que haya sido abonada | UR-04 |
-| FR-29 | El sistema deberá registrar si una factura está pendiente de pago | UR-06 |
-| FR-30 | El sistema deberá registrar la confirmación de un pago | UR-06 |
-| FR-31 | El sistema deberá detectar las facturas cuyo plazo de pago haya expirado sin haberse confirmado el pago | UR-06, UR-07 |
-| FR-32 | El sistema deberá cambiar el estado de la factura cuando se considere impagada | UR-06, UR-07 |
-| FR-33 | El sistema deberá integrarse con Stripe | BR-07 |
-| FR-34 | El sistema deberá poder iniciar el proceso de cobro mediante Stripe | BR-07 |
-| FR-35 | El sistema deberá recibir y registrar la confirmación del pago proporcionada por Stripe | BR-07 |
-| FR-36 | El sistema deberá asociar cada pago con la factura correspondiente | UR-06 |
-| FR-37 | El sistema deberá actualizar el estado de la factura cuando el pago haya sido validado correctamente | UR-06 |
-| FR-38 | El sistema deberá enviar recordatorios de pago mientras la factura permanezca pendiente | UR-07 |
-| FR-39 | El sistema deberá enviar los recordatorios de forma periódica durante el plazo establecido | UR-07 |
-| FR-40 | El sistema deberá controlar el plazo de pago establecido en 5 días desde la emisión de la factura | BR-06 |
-| FR-41 | El sistema deberá identificar como impagada una factura que supere dicho plazo sin confirmación del pago | BR-06 |
-| FR-42 | El sistema deberá notificar al Administrador cuando una factura pase a estado de impago | UR-07 |
-| FR-43 | El sistema deberá proporcionar un cuadro de mando destinado a los usuarios administrativos autorizados | UR-09 |
-| FR-44 | El cuadro de mando deberá mostrar información relevante sobre facturación y pagos | UR-09 |
-| FR-45 | El sistema deberá permitir generar informes sobre la actividad de facturación | UR-08 |
-| FR-46 | El sistema deberá permitir generar informes con periodicidad mensual y anual | UR-08 |
-| FR-47 | El acceso al cuadro de mando y a los informes deberá estar restringido según los permisos del usuario | UR-08, UR-09 |
-| FR-48 | El sistema deberá permitir asociar varias personas de contacto a una misma empresa cliente | BR-01 |
-| FR-48 | El sistema deberá permitir marcar como inactiva una persona de contacto que ya no pertenezca a la empresa cliente | UR-11 |
-| FR-49 | El sistema no deberá permitir el inicio de sesión a las personas de contacto que se encuentren en estado inactivo | UR-12 |
-| FR-50 | El sistema deberá permitir asociar una misma persona de contacto a varias empresas cliente | UR-13 |
-| FR-51 | El sistema deberá conservar los destinatarios a los que se envió cada factura en el momento de su envío, independientemente de los cambios posteriores en las personas de contacto de la empresa cliente | UR-14 |
-| FR-52 | El sistema deberá permitir registrar la fecha de inicio, el servicio o plan contratado, la tarifa acordada, el responsable comercial interno, las condiciones de pago y la documentación comercial asociada a cada empresa cliente | BR-12 |
-| FR-53 | El sistema deberá permitir adjuntar documentos firmados externamente al registro comercial de una empresa cliente | BR-12 |
-| FR-54 | El sistema deberá permitir almacenar el nombre comercial, la razón social, el identificador fiscal, la dirección fiscal, el país, la moneda y los datos de contacto de cada empresa cliente | UR-16 |
-| FR-55 | El sistema deberá permitir seleccionar los impuestos de las facturas entre las opciones previamente configuradas | UR-16 |
-| FR-56 | El sistema deberá permitir configurar los tramos de facturación anual y las tarifas correspondientes a cada tramo | BR-13 |
-| FR-57 | El sistema deberá permitir al Superadmin modificar la tabla de tarifas sin alterar los importes de las facturas históricas | BR-13 |
-| FR-58 | El sistema deberá detectar cuándo corresponde revisar la tarifa de un cliente y proponer un tramo según su facturación anual verificada | BR-13 |
-| FR-59 | El sistema deberá registrar quién ha aprobado un cambio de tarifa, cuándo se ha aprobado y cuáles eran el precio anterior y el nuevo | BR-13 |
-| FR-60 | El sistema deberá permitir solicitar cambios económicos, como descuentos o modificaciones de precios, y gestionar su aprobación según los permisos establecidos | BR-14 |
-| FR-61 | El sistema deberá permitir configurar los umbrales y las condiciones que determinan si un cambio económico requiere la aprobación del Admin o del Superadmin | BR-14 |
-| FR-62 | El sistema deberá mantener pendientes de aprobación las facturas que incluyan cambios económicos o condiciones excepcionales que requieran autorización, indicando el motivo de la aprobación pendiente | UR-19 |
-| FR-63 | El sistema deberá gestionar los estados del ciclo de vida de una factura, incluyendo borrador, aprobada o lista para emitir, emitida, enviada, vencida, pagada, parcialmente conciliada, anulada y rectificada, según corresponda | BR-15 |
-| FR-64 | El sistema deberá impedir la modificación silenciosa de facturas emitidas y mantener la trazabilidad de los cambios relevantes | BR-15 |
-| FR-65 | El sistema deberá permitir gestionar las rectificaciones de facturas emitidas mediante facturas rectificativas o el procedimiento equivalente que corresponda | BR-15 |
-| FR-66 | El sistema deberá asignar a cada factura emitida un número único dentro de su serie y evitar duplicidades incluso cuando se emitan varias facturas simultáneamente | BR-15 |
-| FR-67 | El sistema deberá permitir al Superadmin configurar las series de facturación disponibles | UR-17 |
-| FR-68 | El sistema deberá permitir eliminar borradores de facturas que todavía no se hayan emitido, bajo las restricciones establecidas y dejando registro de la operación cuando sea necesario | BR-15 |
-| FR-69 | El sistema deberá permitir dar de baja lógicamente a empresas cliente conservando su historial, sus relaciones y sus registros asociados | BR-15 |
-| FR-70 | El sistema deberá mostrar el importe prorrateado correspondiente al primer periodo de facturación antes de confirmar el alta de una empresa cliente | UR-18 |
-| FR-71 | El sistema deberá permitir registrar excepciones comerciales en las que la facturación comience el mes siguiente sin aplicar prorrateo | BR-14 |
-| FR-72 | El sistema deberá permitir reintentar el envío de una factura ya emitida sin generar otra factura ni asignarle un nuevo número | BR-15 |
+| UR-01 | Usuario interno | Acceder de forma segura con cuenta corporativa |
+| UR-02 | Administrador | Dar de alta/desactivar usuarios y decidir qué clientes ve cada uno |
+| UR-03 | Administrador, Usuario operativo | Registrar y mantener clientes con datos fiscales y suscripción |
+| UR-04 | Administrador, Usuario operativo | Importar clientes desde CSV sin errores |
+| UR-05 | Administrador, Usuario operativo | Crear facturas puntuales y configurar facturación recurrente |
+| UR-06 | Administrador, Usuario operativo | Revisar factura antes de emitir y corregir errores sin alterar emitidas |
+| UR-07 | Administrador, Usuario operativo | Que facturas y recordatorios lleguen automáticamente y saber si se entregaron |
+| UR-08 | Administrador, Usuario operativo | Saber qué facturas están cobradas, pendientes o vencidas |
+| UR-09 | Administrador, Usuario operativo | Gestionar situaciones excepcionales de cobro (disputas, incidencias, importes distintos) |
+| UR-10 | Administrador, Usuario operativo | Gestionar pausas, bajas y reactivaciones sin perder datos ni deudas |
+| UR-11 | Usuario interno | Recibir avisos y ver tareas pendientes en una pantalla |
+| UR-12 | Usuario interno | Encontrar rápidamente clientes o facturas |
+| UR-13 | Administrador | Consultar situación financiera vía dashboard e informes, y exportarlos |
+| UR-14 | Administrador, Superadmin | Aprobar o rechazar operaciones económicas sensibles |
+| UR-15 | Administrador | Revisar anualmente el rango de tarifa de cada cliente |
+| UR-16 | Superadmin | Configurar parámetros del sistema sin modificar código |
+| UR-17 | Superadmin | Consultar quién hizo cada acción y cuándo, y comprobar procesos automáticos |
+| UR-18 | Sistema externo vía API | Consultar facturas pendientes y comunicar bajas |
+| UR-19 | Usuarios | Disponer de permisos diferentes según rol |
+| UR-20 | Administrador | Consultar el estado de los clientes en listado sin abrir cada ficha |
+| UR-21 | Usuarios autorizados | Consultar y gestionar por separado datos comerciales y fiscales |
+| UR-22 | Administrador | Asociar una misma persona de contacto a varias empresas |
+| UR-23 | Usuarios autorizados | Consultar destinatarios de una factura en el momento del envío |
 
 
+================================================================================
+4. REQUISITOS DEL SISTEMA
+================================================================================
 
+4.1. REQUISITOS FUNCIONALES
 
+--- Usuarios y acceso ---
 
+| ID | Requisito |
+|---|---|
+| FR-01 | Acceso mediante email y contraseña, rechazando emails fuera del dominio corporativo |
+| FR-02 | Recuperar contraseña mediante enlace que caduque |
+| FR-03 | Cerrar sesión automáticamente tras inactividad |
+| FR-04 | Permitir al administrador crear, modificar y desactivar usuarios (sin autorregistro); al desactivar, cerrar sesiones y conservar registro de acciones |
+| FR-05 | Asignar a cada usuario uno de los tres roles: Superadmin, Admin o Usuario operativo |
+| FR-06 | Permitir al administrador asignar y desasignar clientes a cada usuario operativo |
+| FR-07 | Impedir que un usuario operativo acceda a clientes o facturas no asignados, incluso escribiendo la URL directamente |
+| FR-08 | Impedir el acceso a funcionalidades para las que el usuario no tenga permisos |
 
+--- Clientes y contactos ---
 
-### 4.2. Requisitos no funcionales
+| ID | Requisito |
+|---|---|
+| FR-09 | Crear, consultar, modificar y dar de baja empresas cliente |
+| FR-10 | Guardar de cada cliente: nombre comercial, razón social, ID fiscal, dirección fiscal, país, moneda, sector y responsable interno |
+| FR-11 | Avisar si ya existe un cliente con el mismo ID fiscal |
+| FR-12 | Conservar los datos de clientes dados de baja en lugar de borrarlos |
+| FR-13 | Asociar varias personas de contacto a una empresa, indicando función (facturación, impagos…), y marcar contacto como inactivo sin perder registro de facturas enviadas |
+| FR-14 | Notificar si se intenta eliminar el único contacto de facturación de un cliente activo |
+| FR-15 | Mostrar historial de cada cliente: alta, facturas, pagos, incidencias, cambios de tarifa y bajas |
+| FR-16 | Permitir asociar una misma persona de contacto a varias empresas cliente |
+| FR-17 | Conservar los destinatarios a los que se envió cada factura en el momento del envío, independientemente de cambios posteriores en contactos |
+| FR-18 | Almacenar datos comerciales (fecha inicio, plan, tarifa, responsable comercial, condiciones de pago) separados de los fiscales |
+| FR-19 | Mostrar el estado de las empresas cliente en un listado sin abrir cada ficha |
+| FR-20 | Permitir adjuntar documentos firmados externamente al registro comercial (APLAZADO a versión futura) |
 
-Los requisitos no funcionales se han reformulado para incluir, cuando es posible, un criterio que permita verificar su cumplimiento. La Primera Reunión define las categorías de seguridad, control de acceso, protección de contraseñas, multiplataforma, usabilidad, escalabilidad, concurrencia, rendimiento, disponibilidad, despliegue, integridad, mantenibilidad y retención.
+--- Suscripción ---
+
+| ID | Requisito |
+|---|---|
+| FR-21 | Registrar la suscripción con fecha de inicio, tarifa mensual y condiciones de pago |
+| FR-22 | Mostrar el importe prorrateado del primer mes antes de confirmar el alta |
+| FR-23 | Permitir indicar fecha de inicio futura, sin generar facturas hasta esa fecha |
+| FR-24 | Permitir condiciones de pago particulares por cliente (p. ej., a 30 días) por encima de las generales |
+| FR-25 | Impedir activar suscripción si faltan datos fiscales obligatorios, indicando cuáles |
+
+--- Facturas ---
+
+| ID | Requisito |
+|---|---|
+| FR-26 | Crear facturas puntuales con una o varias líneas (concepto, cantidad, precio, descuento, impuesto) |
+| FR-27 | Ofrecer catálogo de conceptos frecuentes con precio orientativo modificable |
+| FR-28 | Generar automáticamente (día 1 del mes) las facturas de suscripciones activas |
+| FR-29 | Generar, en la fecha de inicio, factura proporcional por los días restantes del mes |
+| FR-30 | No generar facturas a clientes pausados, pendientes de activación o dados de baja |
+| FR-31 | Si falla la generación de una factura, continuar con el resto y avisar al responsable |
+| FR-32 | Mostrar vista previa de la factura antes de emitir |
+| FR-33 | Impedir emitir factura si falta dato fiscal obligatorio, indicando cuál |
+| FR-34 | Permitir modificar o eliminar factura solo en borrador |
+| FR-35 | Al emitir, asignar número único y correlativo dentro de su serie, evitando duplicidades incluso en emisiones simultáneas |
+| FR-36 | Generar PDF con imagen corporativa, datos fiscales, líneas, impuestos, total y datos de soporte |
+| FR-37 | Conservar el PDF de cada factura emitida sin cambios, aunque se modifiquen plantilla o logo |
+| FR-38 | Permitir crear factura rectificativa a partir de una emitida, manteniendo vínculo |
+| FR-39 | Filtrar facturas por estado, tipo (puntual/recurrente), cliente y fecha |
+| FR-40 | Permitir reintentar el envío de una factura ya emitida sin generar otra ni nuevo número |
+| FR-41 | Permitir seleccionar impuestos entre opciones preconfiguradas |
+| FR-42 | Gestionar estados del ciclo de vida: borrador, pendiente de aprobación, emitida, enviada, vencida, pagada, envío fallido, disputa, pagada parcialmente, rectificada, anulada, incobrable |
+| FR-43 | Impedir modificación silenciosa de facturas emitidas y mantener trazabilidad de cambios |
+| FR-44 | Permitir eliminar borradores no emitidos bajo restricciones y dejando registro |
+
+--- Envío y recordatorios ---
+
+| ID | Requisito |
+|---|---|
+| FR-45 | Enviar automáticamente cada factura emitida, con PDF, por email a contactos de facturación y por WhatsApp a contactos con consentimiento |
+| FR-46 | Incluir email y teléfono de soporte de Turbine en todas las comunicaciones |
+| FR-47 | Registrar cada envío con canal, destinatario, fecha y resultado |
+| FR-48 | Si un envío falla o rebota, avisar al responsable y permitir corregir contacto y reenviar sin crear nueva factura |
+| FR-49 | Enviar recordatorios automáticos: antes del vencimiento (día 3), el día del vencimiento y periódicos (cada X días) hasta el pago, calculando fechas según condiciones del cliente |
+| FR-50 | Dejar de enviar recordatorios cuando la factura quede pagada |
+| FR-51 | Usar plantillas editables en español e inglés con datos del cliente, número, importe y vencimiento |
+
+--- Cobros ---
+
+| ID | Requisito |
+|---|---|
+| FR-52 | Consultar periódicamente pagos en Stripe (simulado) y recibir avisos de pago |
+| FR-53 | Asociar cada pago a su factura y marcarla como pagada cuando coincida |
+| FR-54 | Ignorar avisos de pago repetidos (idempotencia) |
+| FR-55 | Si un pago no tiene referencia clara o puede corresponder a varias facturas, dejarlo pendiente para asociación manual |
+| FR-56 | Si importe pagado difiere del de la factura, registrar diferencia y dejar pendiente de revisión sin marcar como pagada |
+| FR-57 | Permitir asociar manualmente un pago a una factura y deshacer asociación incorrecta, registrando quién y por qué |
+| FR-58 | Calcular saldo de cada cliente: total facturado, cobrado y pendiente (teniendo en cuenta rectificativas) |
+| FR-59 | Permitir pausar recordatorios de factura en disputa, indicando motivo y fecha de revisión, avisando al responsable |
+| FR-60 | Permitir abrir incidencias internas sobre cliente o factura (responsable, estado, comentarios, resolución), pudiendo pausar recordatorios |
+| FR-61 | Permitir a un administrador declarar factura incobrable, con motivo y aprobación, sin marcarla como pagada |
+
+--- Bajas, pausas y revisión anual ---
+
+| ID | Requisito |
+|---|---|
+| FR-62 | Permitir pausar suscripción con motivo, fecha de inicio y fecha prevista de reactivación, avisando al responsable |
+| FR-63 | Permitir registrar solicitud de baja de cliente, manualmente o vía API |
+| FR-64 | Al hacerse efectiva la baja, dejar de generar facturas recurrentes |
+| FR-65 | Si el cliente dado de baja tiene facturas pendientes, mantener recordatorios hasta pago |
+| FR-66 | Permitir reactivar cliente dado de baja usando ficha anterior, sin duplicado |
+| FR-67 | Mostrar anualmente lista de clientes cuyo rango de tarifa debe revisarse, permitir introducir facturación anual indicando fuente y fecha, y proponer rango |
+| FR-68 | El cambio de tarifa debe aprobarse antes de aplicarse, aplicarse desde fecha y no modificar facturas anteriores |
+| FR-69 | Registrar quién aprobó un cambio de tarifa, cuándo y precios anterior y nuevo |
+| FR-70 | Permitir configurar tramos de facturación anual y tarifas correspondientes |
+| FR-71 | Permitir al Superadmin modificar tabla de tarifas sin alterar importes de facturas históricas |
+| FR-72 | Permitir registrar excepciones comerciales (descuentos temporales, meses gratuitos, precios pactados) |
+
+--- Aprobaciones, notificaciones y pantalla de trabajo ---
+
+| ID | Requisito |
+|---|---|
+| FR-73 | Exigir aprobación de administrador para operaciones económicas sensibles (descuentos, cambios manuales de importe, facturas puntuales sobre umbral…), sin exigirla para recurrentes de suscripción ya aprobada |
+| FR-74 | Ofrecer bandeja de aprobaciones con estado (pendiente/aprobada/rechazada) y comentario del aprobador |
+| FR-75 | Impedir que un usuario apruebe su propia solicitud cuando el importe supere el umbral |
+| FR-76 | Enviar notificaciones internas al responsable ante pagos, vencimientos, envíos fallidos, disputas, revisiones anuales y aprobaciones resueltas; permitir marcar leídas/resueltas |
+| FR-77 | Mostrar pantalla de trabajo diario con facturas próximas a vencer, vencidas, pagos pendientes de asociar, envíos fallidos y aprobaciones pendientes |
+| FR-78 | Configurar umbrales y condiciones que determinan si un cambio económico requiere aprobación de Admin o Superadmin |
+
+--- Dashboard, informes, búsqueda e importación ---
+
+| ID | Requisito |
+|---|---|
+| FR-79 | Mostrar solo a administradores dashboard con facturado, cobrado, pendiente y vencido por semana, mes, trimestre y año; tiempo medio de cobro; clientes con mayor deuda; previsión de ingresos recurrentes del mes siguiente |
+| FR-80 | Permitir pulsar en cada cifra del dashboard para ver facturas que la componen |
+| FR-81 | Generar informes filtrados por periodo, cliente, responsable, país, sector, estado y tipo de factura |
+| FR-82 | Exportar informes a CSV y PDF, incluyendo solo datos que el usuario pueda ver |
+| FR-83 | Generar paquete mensual o trimestral para la gestoría con facturas emitidas, rectificativas, cobros y PDF |
+| FR-84 | Búsqueda global por nombre, razón social, ID fiscal, contacto, email o número de factura |
+| FR-85 | Filtrar clientes por ubicación, sector y estado |
+| FR-86 | Importar clientes desde CSV con vista previa, señalando filas con errores o ID fiscal duplicado, e importando solo filas válidas |
+| FR-87 | Guardar resumen de cada importación con filas creadas, rechazadas y motivo |
+
+--- Configuración, auditoría y API ---
+
+| ID | Requisito |
+|---|---|
+| FR-88 | Permitir al Superadmin configurar plazo de pago por defecto, cadencia de recordatorios, dominio de correo permitido, datos fiscales de Turbine, logo, series, impuestos, rangos de tarifa y umbrales de aprobación. Cambios aplican solo a futuro |
+| FR-89 | Registrar en auditoría acciones importantes (altas/cambios de clientes y datos fiscales, emisión, aprobaciones, asociación de pagos, cambios de permisos y configuración) y permitir consultarla y filtrarla |
+| FR-90 | Registrar cada ejecución de procesos automáticos (elementos procesados, fallos, motivo) y mostrar pantalla de estado con última generación, mensajes pendientes, errores recientes y última copia |
+| FR-91 | Ofrecer API para consultar si un cliente tiene facturas pendientes |
+| FR-92 | Permitir que sistema externo comunique por API solicitud de baja, que el sistema registrará para gestionarla con sus reglas |
+| FR-93 | La API debe exigir autenticación y aplicar los mismos permisos y reglas que la aplicación |
+| FR-94 | El sistema deberá guardar automáticamente el borrador de los formularios en edición (facturas puntuales, datos de clientes, suscripción) para evitar la pérdida de información por cierres accidentales, permitiendo recuperar el borrador al reabrir el formulario. |
+| FR-95 | El sistema deberá permitir deshacer acciones inmediatas de edición o cambio de estado accidental antes de su confirmación definitiva, al menos en: edición de borradores, cambios de estado de cliente y asociación/desasociación de pagos. El undo no aplicará a facturas emitidas y quedará registrado en auditoría. |
+
+4.2. REQUISITOS NO FUNCIONALES
 
 | ID | Categoría | Requisito | Criterio verificable |
 |---|---|---|---|
-| NFR-01 | Seguridad | La información sensible, incluyendo credenciales, información fiscal, facturación y pagos, deberá almacenarse y transmitirse utilizando mecanismos de seguridad adecuados | Las credenciales y datos sensibles no deberán almacenarse ni transmitirse sin los mecanismos de protección definidos para el sistema |
-| NFR-02 | Control de acceso | El sistema deberá utilizar un mecanismo de control de acceso basado en roles | Un usuario no deberá poder acceder a funcionalidades que no correspondan a su rol |
-| NFR-03 | Seguridad | Las contraseñas no deberán almacenarse en texto plano | La información almacenada correspondiente a las contraseñas no deberá permitir obtener directamente la contraseña original |
-| NFR-04 | Compatibilidad / Responsive | El sistema deberá visualizarse correctamente en móvil, tablet y ordenador | Las principales funcionalidades deberán poder utilizarse desde los tres tipos de dispositivo |
-| NFR-05 | Usabilidad | La interfaz deberá ser sencilla, intuitiva y estar centrada en las funcionalidades principales | Las funcionalidades principales de empresas cliente, facturas y pagos deberán poder utilizarse sin conocimientos técnicos específicos |
-| NFR-06 | Escalabilidad | El sistema deberá poder almacenar información de múltiples empresas cliente, facturas y pagos sin que el crecimiento normal de los datos impida el funcionamiento de las funcionalidades principales | El crecimiento de empresas cliente, facturas y pagos no deberá impedir el funcionamiento de las funcionalidades principales |
-| NFR-07 | Concurrencia | El sistema deberá soportar el acceso simultáneo de varios usuarios sin provocar inconsistencias en la información almacenada | Las operaciones simultáneas no deberán generar datos inconsistentes |
-| NFR-08 | Rendimiento | Las operaciones habituales de consulta, búsqueda y navegación deberán ejecutarse de forma fluida | Las operaciones habituales deberán poder ejecutarse sin bloquear las funciones básicas del sistema |
-| NFR-09 | Rendimiento | Las operaciones que requieran un procesamiento elevado, como la generación de informes o facturas masivas, no deberán bloquear las funciones básicas del sistema | La generación de informes o facturas masivas no deberá impedir el uso de las funciones básicas |
-| NFR-10 | Disponibilidad | El sistema deberá estar disponible durante el horario de funcionamiento establecido por la empresa, salvo durante tareas programadas de mantenimiento | El sistema deberá estar disponible durante el horario establecido excepto durante los mantenimientos programados |
-| NFR-11 | Despliegue | El sistema deberá permitir su instalación y ejecución en un entorno de servidor local (on-premises) | La aplicación deberá poder instalarse y ejecutarse en un servidor local |
-| NFR-12 | Integridad | El sistema deberá mantener la coherencia entre empresas cliente, facturas y pagos | Las operaciones no deberán producir registros inconsistentes entre empresas cliente, facturas y pagos |
-| NFR-13 | Mantenibilidad | El sistema deberá estar estructurado de forma que sus componentes puedan mantenerse, corregirse y ampliarse sin afectar innecesariamente al resto de funcionalidades | Los cambios o correcciones de un componente no deberán requerir modificaciones innecesarias en el resto del sistema |
-| NFR-14 | Retención | Los datos relacionados con empresas cliente, facturación y pagos deberán conservarse durante el periodo que corresponda conforme a las obligaciones legales y fiscales aplicables | La información deberá conservarse durante el periodo legal o fiscal que corresponda |
-| NFR-15 | Independencia | La aplicación administrativa deberá ser independiente de Brain y de su interfaz, de forma que pueda seguir funcionando aunque Brain deje de estar disponible | La aplicación deberá poder utilizarse sin depender de Brain |
-| NFR-16 | Usabilidad | La aplicación deberá permitir realizar las operaciones administrativas habituales con pocos pasos y sin navegación innecesaria | Las operaciones habituales deberán poder completarse sin recorrer pantallas innecesarias |
-| NFR-17 | Integridad | El sistema deberá garantizar la unicidad de la numeración de las facturas incluso cuando se produzcan emisiones simultáneas | Las emisiones simultáneas no deberán generar números de factura duplicados |
+| NFR-01 | Usabilidad | Operaciones habituales rápidas y con mínimo de clics | Crear cliente con suscripción o factura puntual en menos de 1 minuto |
+| NFR-02 | Usabilidad | Usuario con conocimiento administrativo puede usar la app sin formación previa | Da de alta cliente y suscripción sin ayuda |
+| NFR-03 | Usabilidad | Mensajes de error comprensibles, indicando campo y motivo | Sin códigos técnicos; indican campo afectado |
+| NFR-04 | Usabilidad | Interfaz coherente; confirmación solo en acciones irreversibles o masivas. La interfaz no deberá hacer uso de pop-ups o ventanas emergentes modales intrusivas para acciones rutinarias | Botones principales siempre en la misma posición; solo se confirma en acciones irreversibles o masivas; las acciones rutinarias no abren modales bloqueantes y los avisos se muestran como toasts/banners no bloqueantes |
+| NFR-05 | Portabilidad | App web responsive usable en ordenador, tablet y móvil | Mínimo 360 px sin scroll horizontal |
+| NFR-06 | Compatibilidad | Funciona en navegadores actuales (incl. Android/iOS); CSV conserva tildes; PDF se abre con cualquier lector | Verificado en versiones actuales |
+| NFR-07 | Accesibilidad | Campos con etiqueta, contraste suficiente, uso con teclado | Todos los campos etiquetados y navegables |
+| NFR-08 | Rendimiento | Búsquedas y apertura de fichas < 2 s con miles de clientes | Medido en conexión normal |
+| NFR-09 | Rendimiento | Tareas pesadas en segundo plano sin bloquear la app | Generación masiva e informes en background |
+| NFR-10 | Escalabilidad | Soporta miles de clientes, cientos de miles de facturas y decenas de usuarios | Listados paginados |
+| NFR-11 | Fiabilidad | Operaciones y procesos automáticos no duplican resultados | Idempotencia en generación, envío y pagos |
+| NFR-12 | Fiabilidad | Fallo de un elemento no detiene el proceso completo | Error registrado y resto continúa |
+| NFR-13 | Consistencia | Edición concurrente: el segundo usuario recibe aviso | No sobrescribe cambios |
+| NFR-14 | Exactitud | Importes con 2 decimales exactos; PDF, BD y dashboard coinciden | Cifras idénticas en todas las vistas |
+| NFR-15 | Seguridad | Solo usuarios autenticados y con permiso acceden a recursos | Rechazo también por URL directa o API |
+| NFR-16 | Seguridad | Contraseñas hasheadas, HTTPS, sin claves en repositorio, facturas con sesión/permiso o enlaces caducables | Verificado en auditoría de seguridad |
+| NFR-17 | Seguridad | Bloqueo temporal tras varios intentos fallidos seguidos | Cuenta bloqueada temporalmente |
+| NFR-18 | Seguridad | Diseño preparado para añadir doble factor en el futuro | Sin rehacer el acceso |
+| NFR-19 | Privacidad | Solo datos necesarios para facturar; sin marketing; anonimización sin invalidar facturas | Datos mínimos y anonimizables |
+| NFR-20 | Trazabilidad | De cada factura pagada se consulta el pago que lo justifica; de cada envío fallido, el motivo | Consultable en ficha |
+| NFR-21 | Auditoría | Registro de auditoría no editable ni borrable | Ningún usuario puede modificarlo |
+| NFR-22 | Recuperabilidad | Copia de seguridad automática diaria y restauración probada | Restauración verificada al menos una vez |
+| NFR-23 | Internacionalización | Comunicaciones en español e inglés; fechas con zona horaria; datos fiscales no asumen formato español | Plantillas y campos adaptados |
+| NFR-24 | Interoperabilidad | Sustituir Stripe simulado por real o añadir otra fuente sin modificar el resto | Cambio aislado |
+| NFR-25 | Interoperabilidad | API documentada con operaciones, entradas y respuestas | Documentación publicada |
+| NFR-26 | Mantenibilidad | Código con convenciones documentadas para otro equipo | Convenciones publicadas |
+| NFR-27 | Mantenibilidad | Pruebas automáticas de prorrateo, generación mensual, vencimientos, impuestos, permisos y conciliación | Suite de pruebas existente |
+| NFR-28 | Despliegue | Software libre, configuración separada del código y guía de puesta en marcha reproducible | Guía publicada |
+| NFR-29 | Privacidad | Datos ficticios para pruebas y demostraciones | Dataset de prueba |
+| NFR-30 | Independencia de IA | Facturación, vencimientos y cobros con reglas fijas; IA opcional y desactivable | Reglas deterministas |
+| NFR-31 | Disponibilidad | Disponible en horario de funcionamiento establecido, salvo mantenimientos programados | Horario definido por la empresa |
+| NFR-32 | Despliegue | Instalación y ejecución on-premises en servidor local | Instalable en servidor local |
+| NFR-33 | Privacidad / Uso | Las métricas de tiempo y uso registradas deberán enfocarse en la optimización del sistema y no en la fiscalización o evaluación punitiva del rendimiento de los empleados | La auditoría e informes no generan rankings ni alertas de productividad individual de los usuarios |
+| NFR-34 | Usabilidad | La interfaz no deberá hacer uso de pop-ups o ventanas emergentes modales intrusivas para acciones rutinarias | Las confirmaciones y avisos informativos se realizan mediante notificaciones no bloqueantes (toasts/banners) que no interrumpen la navegación |
 
-## 5. Reglas de negocio
 
-Estas reglas representan condiciones del dominio que condicionan el comportamiento del sistema.
+================================================================================
+5. REGLAS DE NEGOCIO
+================================================================================
 
 | ID | Regla |
 |---|---|
-| RB-01 | Las facturas recurrentes deberán generarse mensualmente el día 1 de cada mes. |
-| RB-02 | Cuando una empresa cliente se incorpore durante el transcurso de un mes, deberá facturarse proporcionalmente el periodo restante hasta finalizar dicho mes. |
-| RB-03 | A partir del mes siguiente a la incorporación, la empresa cliente comenzará el ciclo normal de facturación el día 1. |
-| RB-04 | Una empresa cliente no podrá darse de baja mientras tenga facturas pendientes de pago o saldo adeudado. |
-| RB-05 | El plazo de pago establecido será de 5 días desde la emisión de la factura. |
-| RB-06 | Una factura que supere el plazo establecido sin confirmación del pago deberá identificarse como impagada. |
-| RB-07 | Una factura que haya sido abonada no podrá modificarse. |
-| RB-08 | El acceso a las funcionalidades del sistema dependerá del rol y permisos del usuario. |
-| RB-09 | Un usuario con rol Cliente solo podrá acceder a la información y funcionalidades relacionadas con su propia empresa cliente y sus facturas. |
-| RB-10 | Las tarifas de los clientes deberán revisarse anualmente según los tramos de facturación anual establecidos |
-| RB-11 | Los cambios de tarifa deberán requerir validación humana antes de aplicarse |
-| RB-12 | Los cambios económicos que superen los umbrales o cumplan las condiciones configuradas deberán requerir la aprobación correspondiente antes de aplicarse |
-| RB-13 | Las facturas recurrentes derivadas de una relación comercial aprobada deberán generarse automáticamente sin requerir una aprobación adicional |
-| RB-14 | Una factura emitida no podrá eliminarse como si nunca hubiera existido |
-| RB-15 | El número definitivo de una factura deberá asignarse de forma segura en el momento de su emisión y ser único dentro de su serie |
-| RB-16 | El cálculo del prorrateo deberá seguir una regla documentada y coherente con la duración real del mes, incluidos los casos de alta el último día del mes |
-| RB-17 | Las excepciones comerciales que permitan comenzar a facturar el mes siguiente sin prorrateo deberán quedar registradas explícitamente |
+| RB-01 | Un cliente es siempre una empresa y debe tener al menos un contacto de facturación activo para emitirle facturas |
+| RB-02 | La tarifa mensual depende del rango de facturación anual y se mantiene igual todo el año; rangos y precios configurables |
+| RB-03 | El rango de tarifa se revisa anualmente; el nuevo precio aplica desde su fecha de efecto y no modifica facturas anteriores |
+| RB-04 | Las facturas recurrentes son mensuales y se emiten el día 1 |
+| RB-05 | Alta a mitad de mes: factura proporcional = tarifa mensual × días restantes (incluido el día de alta) / días del mes. Alta el último día: se factura solo ese día |
+| RB-06 | Plazo de pago por defecto: 5 días naturales desde la emisión. Condiciones pactadas del cliente prevalecen |
+| RB-07 | Recordatorios por defecto: día de emisión, día 3, día del vencimiento y cada 3 días hasta el pago. Configurables |
+| RB-08 | Un impago nunca cancela el servicio ni sanciona; se siguen enviando recordatorios hasta pago o intervención humana |
+| RB-09 | Estados de factura: borrador, pendiente de aprobación, emitida, enviada, vencida, pagada, envío fallido, disputa, pagada parcialmente, rectificada, anulada e incobrable |
+| RB-10 | Solo se modifica o elimina una factura en borrador. Una vez emitida se corrige con factura rectificativa |
+| RB-11 | Número único y correlativo por serie, asignado al emitir. Reenviar no cambia el número |
+| RB-12 | Factura pagada solo con cobro del importe total. Diferencias quedan pendientes de revisión. Incobrable, anulada o rectificada nunca se marca pagada |
+| RB-13 | Necesitan aprobación: descuentos, cambios manuales de importe, facturas puntuales sobre umbral, rectificativas, declarar incobrable y cambios de tarifa. Recurrentes normales no |
+| RB-14 | Baja: se dejan de generar recurrentes desde la fecha de baja, pero las pendientes se siguen reclamando |
+| RB-15 | Pausa: no genera facturas nuevas, pero las anteriores siguen su proceso de cobro |
+| RB-16 | Importes con 2 decimales; cada línea redondeada al céntimo (hacia arriba en empate); total = suma de líneas redondeadas |
+| RB-17 | Cambios de configuración (plazos, tarifas, plantillas, logo) solo afectan a facturas nuevas |
+| RB-18 | Superadmin hace todo lo del Admin, además configura y consulta auditoría. Admin gestiona todo. Usuario operativo solo ve/modifica sus clientes asignados; no se asigna clientes, no cambia tarifas, no crea series ni ve dashboard |
+| RB-19 | Datos de clientes no se borran: se conservan según ley. Contactos pueden anonimizarse; facturas emitidas se conservan siempre |
+| RB-20 | Estados del cliente: pendiente de activación, activo, pausado, baja solicitada o inactivo. Solo activos generan recurrentes |
+| RB-21 | Informes y exportaciones se conservan tiempo configurable; facturas emitidas según obligación legal |
 
-## 6. Suposiciones y decisiones de análisis
 
-Se documentan aquí las decisiones que se pueden identificar en la Primera Reunión y que son necesarias para interpretar los requisitos.
+================================================================================
+6. SUPOSICIONES Y DECISIONES DE ANÁLISIS
+================================================================================
 
-| ID | Suposición o decisión | Justificación | Requisitos afectados |
-|---|---|---|---|
-| A-01 | Se considera que los roles del sistema serán Superadmin, Admin, Lector y Cliente | La Primera Reunión especifica expresamente estos cuatro roles | FR-07 a FR-12, NFR-02 |
-| A-02 | Se considera que el plazo de pago es de 5 días naturales desde la emisión de la factura, a falta de una especificación más concreta | El documento establece un plazo de 5 días, pero no especifica si se trata de días naturales o laborables | FR-40, FR-41, RB-05, RB-06 |
-| A-03 | La importación masiva mediante CSV se considera una funcionalidad opcional | La Primera Reunión utiliza explícitamente la expresión "podrá permitir" | FR-20 |
-| A-04 | Se considera que la validación realizada mediante Stripe es suficiente para confirmar un pago en el sistema | El documento establece que Stripe proporcionará la confirmación del pago | FR-33 a FR-37 |
-| A-05 | Se considera que los informes podrán generarse con periodicidad mensual y anual | La Primera Reunión establece expresamente ambas periodicidades | FR-45, FR-46 |
-| A-06 | Se considera que una empresa cliente puede tener varias personas de contacto asociadas | La Primera Reunión contempla que una misma empresa puede tener distintas personas de contacto para diferentes gestiones, como contratación, administración o seguimiento de impagos | BR-01, FR-13 a FR-18 |
-| A-07 | Se considera que una empresa cliente constituye una única entidad dentro del sistema, independientemente del número de personas de contacto asociadas | La Primera Reunión indica que no se debe duplicar una misma empresa cuando existan varias personas de contacto | BR-01, FR-13 a FR-19 |
-| A-08 | La relación comercial de una empresa cliente se gestionará de forma independiente de sus facturas y no implicará necesariamente un contrato de duración determinada | La Segunda Reunión distingue las condiciones comerciales de las facturas y no establece que la relación deba tener una duración fija | BR-12, FR-52 |
-| A-09 | La gestoría se encargará de las particularidades fiscales complejas; la aplicación almacenará los datos necesarios para clientes internacionales sin implementar toda la lógica fiscal internacional | La Segunda Reunión indica que se deben contemplar clientes internacionales, pero que la aplicación no tiene que resolver toda su fiscalidad | FR-54, FR-55 |
-| A-10 | Los tramos de facturación anual y sus tarifas serán configurables y no estarán definidos de forma fija en el código | La Segunda Reunión establece que el Superadmin deberá poder modificar la tabla de tarifas sin alterar las facturas históricas | BR-13, FR-56, FR-57 |
-| A-11 | Los estados de las facturas representarán su ciclo de vida real; los estados indicados inicialmente no constituyen necesariamente una lista cerrada | La Segunda Reunión identifica distintos estados de las facturas, pero deja abierta la definición definitiva del ciclo de vida | BR-15, FR-63 |
+| ID | Suposición o decisión |
+|---|---|
+| A-01 | Tres roles: Superadmin, Admin, Usuario operativo. Se elimina el rol Cliente (D-01). "Lector" pasa a llamarse "Usuario operativo" |
+| A-02 | "La app no puede crear clientes" se interpreta como que un cliente no puede autorregistrarse |
+| A-03 | Solo se editan borradores; las emitidas se corrigen con rectificativa |
+| A-04 | Los estados de factura son propuesta del equipo (RB-09) |
+| A-05 | Prorrateo con días reales del mes, incluyendo día de alta |
+| A-06 | Recordatorios cada 3 días tras vencimiento (configurable) |
+| A-07 | Dashboard e informes por semana, mes, trimestre y año |
+| A-08 | Stripe, email y WhatsApp simulados; email y WhatsApp unificados como "Servicio de mensajería" |
+| A-09 | Facturación anual para revisión de tarifa introducida manualmente con fuente y fecha |
+| A-10 | Importe modificable en facturas puntuales; en recurrentes viene de la suscripción y solo cambia por revisión anual o excepción aprobada |
+| A-11 | Conciliación automática solo en casos claros (misma referencia e importe); resto a revisión manual |
+| A-12 | Umbrales iniciales propuestos: 2.000 € (aprobación de puntuales) y 10.000 € (separación de funciones), configurables |
+| A-13 | Búsqueda/apertura de ficha < 2 s |
+| A-14 | Copia de seguridad automática diaria |
+| A-15 | Copias no se modifican para borrar clientes; al restaurar se reaplican anonimizaciones |
+| A-16 | Redondeo por línea al céntimo, hacia arriba en empate |
+| A-17 | Paquete para gestoría: ZIP con CSV y PDF |
+| A-18 | Actor "Planificador del sistema" para tareas automáticas |
+| A-19 | Importación CSV: solo filas válidas; las erróneas se rechazan y aparecen en resumen |
+| A-20 | Fuera de versión: ampliaciones opcionales (presupuestos, varias sociedades, centros de coste, monedas, objetivos, cierre de periodos, fusión de duplicados, importación de facturas antiguas, rol gestoría, IA) |
+| A-21 | Aplazadas: delegación temporal, adjuntos, etiquetas, favoritos, filtros guardados, acciones masivas, menciones, informes programados, alertas configurables, preferencias de canal, calendario laboral, reasignación de aprobaciones, notas restringidas, pruebas de plantillas y excepción de no prorrateo |
+| A-22 | Plazo de pago: 5 días naturales |
+| A-23 | Se incorporan on-premises y disponibilidad horaria de B |
+| A-24 | Se incorporan separación datos comerciales/fiscales y contacto compartido entre empresas de B |
+| A-25 | Documentación comercial adjunta y excepción de no prorrateo quedan documentadas pero aplazadas |
+| A-26 | Se elimina el rol Cliente de B (D-01) |
+| A-27 | Se deroga la prohibición de baja con deuda de B (D-02) |
 
-## 7. Dudas, ambigüedades y cuestiones pendientes
 
-| ID | Cuestión | Origen | Impacto | Estado / resolución |
-|---|---|---|---|---|
-| Q-01 | ¿Cuál será el medio utilizado para enviar las notificaciones y recordatorios de pago? | Primera Reunión | Afecta al mecanismo de notificaciones y a FR-38, FR-39 y FR-42 | Pendiente: el documento indica que deberá definirse durante el desarrollo |
-| Q-02 | ¿Los 5 días de plazo de pago son naturales o laborables? | Primera Reunión | Afecta al cálculo del vencimiento y a la detección de impagos | Pendiente |
-| Q-03 | ¿Qué se considera exactamente "saldo adeudado" a efectos de impedir la baja de una empresa cliente? | Primera Reunión | Afecta a la condición de baja de la empresa cliente | Pendiente |
-| Q-04 | ¿Qué información concreta deberá mostrar el cuadro de mando? | Primera Reunión | Afecta al contenido de FR-43 y FR-44 | Pendiente |
-| Q-05 | ¿Qué información concreta deberán contener los informes mensuales y anuales? | Primera Reunión | Afecta al contenido de FR-45 y FR-46 | Pendiente |
-| Q-06 | ¿Qué operaciones están reservadas exclusivamente al Superadmin? | Primera Reunión | Afecta a la diferenciación de permisos entre Superadmin y Admin | Pendiente |
-| Q-07 | ¿Qué modificaciones se consideran operaciones no críticas para el rol Lector? | Primera Reunión | Afecta a los permisos del rol Lector | Pendiente |
-| Q-08 | ¿Qué información deberá almacenarse de cada persona de contacto y qué función o tipo de contacto tendrá? | Primera Reunión | Afecta al modelo de datos y a la gestión de las empresas cliente | Pendiente |
-| Q-09 | ¿Cuál será la regla exacta de prorrateo y cómo se tratarán las altas realizadas el último día del mes? | Segunda Reunión | Afecta al cálculo de FR-24 y a RB-02 y RB-03 | Pendiente |
-| Q-10 | ¿Cuáles serán los estados definitivos de las facturas y qué transiciones estarán permitidas entre ellos? | Segunda Reunión | Afecta al ciclo de vida de las facturas | Pendiente |
-| Q-11 | ¿Qué condiciones concretas determinarán cuándo una factura o un cambio económico necesita aprobación? | Segunda Reunión | Afecta al flujo de aprobación de facturas y cambios económicos | Pendiente |
-| Q-12 | ¿Qué restricciones se aplicarán a la eliminación de borradores y a la baja lógica de empresas cliente? | Segunda Reunión | Afecta a la eliminación y conservación del historial | Pendiente |
+================================================================================
+7. DUDAS Y CUESTIONES PENDIENTES
+================================================================================
 
-## 8. Trazabilidad
+| ID | Cuestión | Estado / resolución |
+|---|---|---|
+| Q-01 | Baja con facturas pendientes | Resuelta: se permite y se sigue reclamando (RB-14) |
+| Q-02 | Baja gestionada por esta app o sistema externo | Resuelta: la registra y gestiona su efecto (FR-63, FR-92) |
+| Q-03 | Roles y permisos del "lector" | Resuelta (A-01) |
+| Q-04 | Edición de facturas hasta cambio de trimestre | Resuelta (A-03) |
+| Q-05 | "La app no puede crear clientes" | Resuelta (A-02) |
+| Q-06 | Periodos de informes | Resuelta (A-07) |
+| Q-07 | Modificación de importe de factura | Resuelta (A-10) |
+| Q-08 | Cadencia de recordatorios | Resuelta (A-06) |
+| Q-09 | Factura puntual pendiente impide baja | Resuelta: no impide; se reclama |
+| Q-10 | Tabla de tarifas actual | Pendiente de solicitar a Turbine |
+| Q-11 | Tiempo de conservación de datos | Pendiente: confirmar con gestoría; parámetro configurable |
+| Q-12 | Campos exactos del PDF | Pendiente de factura de ejemplo |
+| Q-13 | Datos fiscales obligatorios | Pendiente: inicialmente razón social, ID fiscal y dirección fiscal |
+| Q-14 | Importes concretos de aprobación y separación de funciones | Pendiente: propuesta A-12 |
+| Q-15 | Reactivación de pausa automática o confirmada | Resuelta: se avisa al responsable (FR-62) |
+| Q-16 | Consentimiento WhatsApp | Pendiente: marcado manual en ficha de contacto |
+| Q-17 | Medio de notificaciones/recordatorios | Resuelta: email y WhatsApp simulados (A-08) |
+| Q-18 | 5 días naturales o laborables | Resuelta: naturales (A-22) |
+| Q-19 | "Saldo adeudado" para impedir baja | Resuelta (D-02) |
+| Q-20 | Contenido del cuadro de mando | Resuelta (FR-79, FR-80) |
+| Q-21 | Contenido de informes mensuales/anuales | Parcialmente resuelta (FR-81, FR-82); detalle pendiente |
+| Q-22 | Operaciones exclusivas del Superadmin | Resuelta (RB-18) |
+| Q-23 | Operaciones no críticas del Usuario operativo | Resuelta (RB-18) |
+| Q-24 | Campos y función de la persona de contacto | Parcialmente resuelta (FR-13); detalle pendiente |
+| Q-25 | Estados y transiciones de factura | Resuelta (RB-09, FR-42) |
+| Q-26 | Condiciones de aprobación | Parcialmente resuelta (RB-13, FR-73, FR-78); umbrales pendientes (Q-14) |
+| Q-27 | Restricciones de eliminación de borradores y baja lógica | Resuelta (FR-34, FR-44, FR-09, RB-19) |
 
-La siguiente tabla relaciona los objetivos de negocio con las necesidades de los usuarios y los requisitos del sistema.
+
+================================================================================
+8. TRAZABILIDAD
+================================================================================
+
+8.1. NEGOCIO → USUARIO → FUNCIONAL/NO FUNCIONAL
 
 | Requisito de negocio | Requisito de usuario | Requisito funcional / no funcional |
 |---|---|---|
-| BR-01 | UR-03, UR-04, UR-11, UR-12, UR-13, UR-14, UR-15 | FR-13 a FR-20, FR-48 a FR-51, FR-54, FR-69, NFR-06, NFR-12 |
-| BR-02 | UR-04 | FR-21, FR-22, FR-25, FR-63 a FR-65, FR-68, FR-72 |
-| BR-03 | UR-04 | FR-23, RB-01 |
-| BR-04 | UR-04, UR-18 | FR-24, FR-70, FR-71, RB-02, RB-03, RB-16, RB-17 |
-| BR-05 | UR-06 | FR-29 a FR-32, FR-36, FR-37, FR-63 |
-| BR-06 | UR-07 | FR-31, FR-32, FR-38 a FR-42, RB-05, RB-06 |
-| BR-07 | UR-06 | FR-33 a FR-37 |
-| BR-08 | UR-03 | FR-19, FR-69, RB-04 |
-| BR-09 | UR-08, UR-09, UR-15 | FR-43 a FR-47 |
-| BR-10 | UR-10 | NFR-04 |
-| BR-11 | UR-04, UR-05, UR-06, UR-08, UR-09 | NFR-05, NFR-08, NFR-09, NFR-16 |
-| BR-12 | UR-16 | FR-52 a FR-55, A-08, A-09 |
-| BR-13 | UR-17 | FR-56 a FR-59, RB-10, RB-11, A-10 |
-| BR-14 | UR-19 | FR-60 a FR-62, FR-71, RB-12 |
-| BR-15 | UR-17 | FR-63 a FR-69, FR-72, NFR-17, RB-14, RB-15 |
-| — | UR-01 | FR-01 a FR-04, NFR-03 |
-| — | UR-02 | FR-05 a FR-12, NFR-02 |
-| — | UR-05 | FR-26 |
-| — | UR-07 | FR-38 a FR-42 |
-| — | UR-08 | FR-45 a FR-47 |
-| — | UR-09 | FR-43, FR-44, FR-47 |
-| — | UR-16 | FR-54, FR-55 |
-| — | UR-18 | FR-70 |
+| BR-01 | UR-05, UR-06, UR-07 | FR-21 a FR-51, FR-53 a FR-61 |
+| BR-02 | UR-08, UR-09, UR-10 | FR-52, FR-53, FR-55 a FR-78, NFR-11, NFR-22 |
+| BR-03 | UR-02, UR-04, UR-17 | FR-04 a FR-19, FR-86 a FR-90, NFR-10, NFR-13 |
+| BR-04 | UR-11, UR-14 | FR-31, FR-48, FR-76, FR-77, FR-78 |
+| BR-05 | UR-03, UR-12 | FR-09 a FR-19, FR-84, NFR-01 a NFR-04, NFR-08 |
+| BR-06 | UR-01 | FR-01 a FR-03, NFR-05 a NFR-07 |
+| BR-07 | UR-13, UR-15 | FR-79 a FR-83, NFR-15, NFR-28 |
+| BR-08 | UR-06, UR-17 | FR-35 a FR-44, FR-89, NFR-14, NFR-21 |
+| BR-09 | UR-01, UR-02 | FR-10, FR-14, NFR-16 a NFR-21 |
+| BR-10 | UR-16, UR-18 | FR-88, FR-91 a FR-93, NFR-24 a NFR-30 |
+| BR-11 | UR-03, UR-04 | FR-09 a FR-19 |
+| BR-12 | UR-21 | FR-18 |
+| BR-13 | UR-15, UR-16 | FR-67 a FR-71 |
+| BR-14 | UR-14 | FR-72, FR-73, FR-78 |
+| BR-15 | UR-17 | FR-35, FR-42 a FR-44, NFR-11 |
+| BR-16 | UR-03 a UR-09 | NFR-01 a NFR-04, NFR-08, NFR-09 |
 
-## 9. Glosario
+8.2. USUARIO → FUNCIONAL
+
+| Requisito de usuario | Requisitos funcionales |
+|---|---|
+| UR-01 | FR-01, FR-02, FR-03 |
+| UR-02 | FR-04, FR-05, FR-06, FR-07, FR-08 |
+| UR-03 | FR-09 a FR-15 |
+| UR-04 | FR-86, FR-87 |
+| UR-05 | FR-21 a FR-29 |
+| UR-06 | FR-32 a FR-38 |
+| UR-07 | FR-45 a FR-51 |
+| UR-08 | FR-39, FR-50, FR-52, FR-53, FR-58 |
+| UR-09 | FR-55 a FR-61 |
+| UR-10 | FR-12, FR-30, FR-62 a FR-66 |
+| UR-11 | FR-31, FR-48, FR-59, FR-62, FR-76, FR-77 |
+| UR-12 | FR-39, FR-84, FR-85 |
+| UR-13 | FR-79 a FR-83 |
+| UR-14 | FR-61, FR-68, FR-73, FR-74, FR-75 |
+| UR-15 | FR-67, FR-68 |
+| UR-16 | FR-51, FR-88 |
+| UR-17 | FR-04, FR-89, FR-90 |
+| UR-18 | FR-63, FR-91, FR-92, FR-93 |
+| UR-19 | FR-08 |
+| UR-20 | FR-19 |
+| UR-21 | FR-18, FR-41 |
+| UR-22 | FR-16 |
+| UR-23 | FR-17 |
+
+8.3. EJEMPLO COMPLETO: BAJA DE CLIENTE CON DEUDA
+
+| Fuente | Requisito de usuario | Requisitos funcionales | Regla de negocio | Decisión |
+|---|---|---|---|---|
+| [P098, P176–P179, A20, A75] | UR-10, UR-18 | FR-63, FR-64, FR-65, FR-92 | RB-14 | Q-01, Q-02, D-02 |
+
+
+================================================================================
+9. GLOSARIO
+================================================================================
 
 | Término | Definición |
 |---|---|
-| Empresa | Organización que utiliza el sistema para gestionar sus empresas cliente, facturación y pagos. |
-| Empresa cliente | Empresa que mantiene una relación comercial con la Empresa y para la que se gestionan servicios, facturas y pagos en el sistema. |
-| Persona de contacto | Persona asociada a una empresa cliente que puede desempeñar distintas funciones de contacto, como contratación, administración o seguimiento de impagos. |
-| Factura puntual | Factura generada de manera individual y no asociada a un ciclo recurrente. |
-| Factura recurrente | Factura que forma parte de un ciclo periódico de facturación mensual. |
-| Facturación proporcional | Importe calculado para cubrir el periodo restante del mes cuando una empresa cliente se incorpora durante el transcurso del mismo. |
-| Pago | Operación mediante la cual una empresa cliente abona el importe correspondiente a una factura. |
-| Factura pendiente | Factura cuyo pago todavía no ha sido confirmado. |
-| Factura impagada | Factura cuyo plazo de pago ha expirado sin que se haya confirmado el pago. |
-| Superadmin | Rol de usuario con los mayores privilegios de gestión del sistema. |
-| Admin | Rol de usuario con funciones administrativas, pero sin acceso a las operaciones reservadas al Superadmin. |
-| Lector | Rol con acceso principalmente a la consulta de información y a modificaciones que no impliquen operaciones críticas. |
-| Cliente (rol) | Rol que permite a un usuario acceder únicamente a la información y funcionalidades relacionadas con su propia empresa cliente y sus facturas. |
-| Stripe | Sistema externo con el que se integra la aplicación para iniciar y validar pagos. |
-| Cuadro de mando | Interfaz destinada a usuarios administrativos autorizados que muestra información relevante sobre facturación y pagos. |
-| CSV | Formato de archivo que podrá utilizarse para la importación masiva de empresas cliente. |
-| On-premises | Entorno en el que el sistema se instala y ejecuta en un servidor local de la empresa. |
-| Relación comercial | Información que recoge las condiciones acordadas entre la empresa y una empresa cliente, incluyendo el servicio contratado, la tarifa y las condiciones de pago. |
-| Datos comerciales | Información relativa a la relación comercial con una empresa cliente, como el servicio contratado, la tarifa acordada y el responsable comercial. |
-| Datos fiscales | Información utilizada para identificar fiscalmente a una empresa cliente y gestionar su facturación, como la razón social, el identificador fiscal y la dirección fiscal. |
-| Tramo de facturación anual | Intervalo de facturación anual utilizado para determinar la tarifa aplicable a una empresa cliente. |
-| Tarifa | Precio acordado para un servicio o plan contratado por una empresa cliente. |
-| Serie de facturación | Conjunto de facturas identificadas mediante una serie y una numeración propia. |
-| Factura rectificativa | Factura utilizada para corregir otra factura emitida cuando corresponda. |
-| Baja lógica | Desactivación de un registro sin eliminar físicamente su información histórica y sus relaciones asociadas. |
-| Aprobación económica | Autorización necesaria para aplicar determinados cambios económicos, como descuentos o modificaciones de tarifas. |
-| Prorrateo | Cálculo proporcional del importe correspondiente a una parte de un periodo de facturación. |
+| Turbine | Empresa que encarga y usa el sistema internamente |
+| Cliente / Empresa cliente | Empresa a la que Turbine factura. No usa la app |
+| Contacto / Persona de contacto | Persona asociada a un cliente con una función (facturación, impagos…). Puede estar en varias empresas |
+| Usuario interno | Empleado de Turbine: Superadmin, Admin o Usuario operativo |
+| Responsable interno | Usuario asignado a un cliente que gestiona sus facturas y recibe avisos |
+| Suscripción | Relación comercial mensual sin permanencia que origina las recurrentes |
+| Relación / Ficha comercial | Condiciones acordadas: servicio, tarifa, condiciones de pago, responsable y documentación |
+| Datos comerciales | Servicio, tarifa, responsable comercial |
+| Datos fiscales | Razón social, ID fiscal, dirección fiscal |
+| Rango / Tramo de facturación | Intervalo de facturación anual que determina la tarifa |
+| Factura recurrente | Factura mensual generada el día 1 desde una suscripción |
+| Factura puntual | Factura por servicio adicional creada manualmente |
+| Factura proporcional / Prorrateo | Factura por días restantes del mes al alta |
+| Borrador | Factura no emitida, modificable y eliminable |
+| Emisión | Momento en que la factura recibe número definitivo y deja de modificarse |
+| Serie | Secuencia de numeración de facturas |
+| Factura rectificativa | Factura que corrige o anula total/parcialmente una emitida, vinculada a ella |
+| Vencimiento | Fecha límite de pago (5 días naturales por defecto) |
+| Recordatorio | Mensaje sobre factura pendiente |
+| Impago | Factura vencida sin pago |
+| Factura pendiente | Factura sin pago confirmado |
+| Disputa | Cliente cuestiona factura; recordatorios pausados hasta revisión |
+| Incobrable | Factura dada por imposible de cobrar con aprobación; no es "pagada" |
+| Conciliación | Asociar pago recibido con su factura |
+| Saldo | Diferencia entre facturado y pagado |
+| Pausa | Suspensión temporal sin baja |
+| Baja | Fin de suscripción; no elimina deudas |
+| Borrado / Baja lógica | Marcar como dado de baja conservando histórico |
+| Anonimización | Eliminar datos identificativos conservando el resto |
+| Aprobación / Aprobación económica | Validación de operación sensible por Admin o Superadmin |
+| Separación de funciones | Quien solicita no puede aprobar su propia solicitud sobre umbral |
+| Auditoría | Registro no modificable de acciones y autor |
+| Planificador | Componente que lanza procesos programados |
+| Simulado | Componente que imita un servicio real para pruebas |
+| Stripe | Plataforma de pagos de Turbine |
+| API | Interfaz para comunicación con otros sistemas |
+| Dashboard / Cuadro de mando | Pantalla de indicadores financieros para administradores |
+| Responsive | Diseño adaptado a tamaño de pantalla |
+| CSV | Fichero de texto con datos separados por comas |
+| Gestoría | Asesoría externa contable/fiscal |
+| Verifactu | Sistema de verificación de la AEAT; fuera de alcance |
+| Brain | Producto principal de Turbine; independiente de esta app |
+| On-premises | Instalación en servidor local de la empresa |
+| Superadmin | Rol con máximos privilegios |
+| Admin | Rol administrativo sin operaciones exclusivas del Superadmin |
+| Usuario operativo | Antiguo "Lector"; solo gestiona clientes asignados |
+| Tarifa | Precio acordado por servicio o plan |
+
