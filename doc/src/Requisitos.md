@@ -83,22 +83,16 @@ B. La app es solo de uso interno.
 
 | ID | Requisito |
 |---|---|
-| BR-01 | Reducir el trabajo manual de facturación y recordatorios |
-| BR-02 | Automatizar el seguimiento de cobros para detectar pendientes e impagos |
-| BR-03 | Permitir que la administración crezca sin rehacer el sistema |
+| BR-01 | Reducir el trabajo manual y agilizar las tareas administrativas habituales, especialmente facturación y recordatorios |
+| BR-02 | Automatizar el seguimiento de cobros y conocer la situación financiera (facturado, cobrado y pendiente) |
+| BR-03 | Permitir el crecimiento de la administración con un sistema independiente de Brain y preparado para cambios futuros |
 | BR-04 | Asegurar que la información importante llega a la persona correcta |
-| BR-05 | Agilizar las tareas administrativas habituales |
-| BR-06 | Poder gestionar la administración desde cualquier lugar y dispositivo |
-| BR-07 | Conocer en todo momento la situación financiera (facturado, cobrado, pendiente) |
-| BR-08 | Cumplir obligaciones de facturación y mantener trazabilidad de documentos |
-| BR-09 | Proteger los datos de los clientes |
-| BR-10 | Mantener la gestión separada de Brain y preparada para cambios futuros |
-| BR-11 | Gestionar las empresas cliente y su información de facturación |
-| BR-12 | Gestionar la relación comercial de cada cliente independientemente de sus facturas |
-| BR-13 | Permitir la revisión periódica de tarifas según rango de facturación anual |
-| BR-14 | Permitir excepciones comerciales (descuentos, meses gratuitos, precios pactados) |
-| BR-15 | Garantizar trazabilidad e integridad de las facturas emitidas |
-| BR-16 | Proporcionar una interfaz sencilla e intuitiva centrada en clientes, facturas y pagos |
+| BR-05 | Permitir gestionar la administración desde cualquier lugar y dispositivo |
+| BR-06 | Cumplir las obligaciones de facturación y garantizar la trazabilidad e integridad de los documentos |
+| BR-07 | Proteger los datos de los clientes |
+| BR-08 | Gestionar las empresas cliente, sus datos de facturación y su relación comercial |
+| BR-09 | Permitir revisar tarifas por facturación anual y gestionar excepciones comerciales |
+| BR-10 | Proporcionar una interfaz sencilla e intuitiva centrada en clientes, facturas y pagos |
 
 D-02 (decisión cerrada): la baja con facturas pendientes se permite; las deudas se
 siguen reclamando (prevalece A sobre B).
@@ -111,28 +105,18 @@ siguen reclamando (prevalece A sobre B).
 | ID | Actor | Requisito |
 |---|---|---|
 | UR-01 | Usuario interno | Acceder de forma segura con cuenta corporativa |
-| UR-02 | Administrador | Dar de alta/desactivar usuarios y decidir qué clientes ve cada uno |
-| UR-03 | Administrador, Usuario operativo | Registrar y mantener clientes con datos fiscales y suscripción |
-| UR-04 | Administrador, Usuario operativo | Importar clientes desde CSV sin errores |
-| UR-05 | Administrador, Usuario operativo | Crear facturas puntuales y configurar facturación recurrente |
-| UR-06 | Administrador, Usuario operativo | Revisar factura antes de emitir y corregir errores sin alterar emitidas |
-| UR-07 | Administrador, Usuario operativo | Que facturas y recordatorios lleguen automáticamente y saber si se entregaron |
-| UR-08 | Administrador, Usuario operativo | Saber qué facturas están cobradas, pendientes o vencidas |
-| UR-09 | Administrador, Usuario operativo | Gestionar situaciones excepcionales de cobro (disputas, incidencias, importes distintos) |
-| UR-10 | Administrador, Usuario operativo | Gestionar pausas, bajas y reactivaciones sin perder datos ni deudas |
-| UR-11 | Usuario interno | Recibir avisos y ver tareas pendientes en una pantalla |
-| UR-12 | Usuario interno | Encontrar rápidamente clientes o facturas |
-| UR-13 | Administrador | Consultar situación financiera vía dashboard e informes, y exportarlos |
-| UR-14 | Administrador, Superadmin | Aprobar o rechazar operaciones económicas sensibles |
-| UR-15 | Administrador | Revisar anualmente el rango de tarifa de cada cliente |
-| UR-16 | Superadmin | Configurar parámetros del sistema sin modificar código |
-| UR-17 | Superadmin | Consultar quién hizo cada acción y cuándo, y comprobar procesos automáticos |
-| UR-18 | Sistema externo vía API | Consultar facturas pendientes y comunicar bajas |
-| UR-19 | Usuarios | Disponer de permisos diferentes según rol |
-| UR-20 | Administrador | Consultar el estado de los clientes en listado sin abrir cada ficha |
-| UR-21 | Usuarios autorizados | Consultar y gestionar por separado datos comerciales y fiscales |
-| UR-22 | Administrador | Asociar una misma persona de contacto a varias empresas |
-| UR-23 | Usuarios autorizados | Consultar destinatarios de una factura en el momento del envío |
+| UR-02 | Administrador | Gestionar usuarios, roles, permisos y asignación de clientes |
+| UR-03 | Administrador, Usuario operativo | Gestionar clientes, contactos compartidos, datos fiscales y comerciales, y suscripciones |
+| UR-04 | Administrador, Usuario operativo | Importar clientes desde CSV y conocer los errores de importación |
+| UR-05 | Administrador, Usuario operativo | Crear facturas puntuales y recurrentes, revisarlas antes de emitir y corregir errores sin alterar las emitidas |
+| UR-06 | Administrador, Usuario operativo | Enviar facturas y recordatorios automáticamente y consultar el resultado de los envíos y sus destinatarios |
+| UR-07 | Administrador, Usuario operativo | Consultar el estado de cobro y gestionar disputas, incidencias e importes distintos |
+| UR-08 | Administrador, Usuario operativo | Gestionar pausas, bajas y reactivaciones conservando datos y deudas |
+| UR-09 | Usuario interno | Recibir avisos, consultar tareas pendientes y encontrar rápidamente clientes o facturas |
+| UR-10 | Administrador | Consultar y exportar la situación financiera mediante dashboard e informes |
+| UR-11 | Administrador, Superadmin | Aprobar operaciones económicas sensibles y revisar anualmente las tarifas |
+| UR-12 | Superadmin | Configurar parámetros, consultar auditoría y comprobar procesos automáticos |
+| UR-13 | Sistema externo vía API | Consultar facturas pendientes y comunicar bajas |
 
 
 ================================================================================
@@ -145,185 +129,150 @@ siguen reclamando (prevalece A sobre B).
 
 | ID | Requisito |
 |---|---|
-| FR-01 | Acceso mediante email y contraseña, rechazando emails fuera del dominio corporativo |
-| FR-02 | Recuperar contraseña mediante enlace que caduque |
-| FR-03 | Cerrar sesión automáticamente tras inactividad |
-| FR-04 | Permitir al administrador crear, modificar y desactivar usuarios (sin autorregistro); al desactivar, cerrar sesiones y conservar registro de acciones |
-| FR-05 | Asignar a cada usuario uno de los tres roles: Superadmin, Admin o Usuario operativo |
-| FR-06 | Permitir al administrador asignar y desasignar clientes a cada usuario operativo |
-| FR-07 | Impedir que un usuario operativo acceda a clientes o facturas no asignados, incluso escribiendo la URL directamente |
-| FR-08 | Impedir el acceso a funcionalidades para las que el usuario no tenga permisos |
+| FR-01 | Gestionar el acceso seguro mediante email y contraseña corporativos, recuperación de contraseña con enlace caducable y cierre automático de sesión por inactividad |
+| FR-02 | Permitir al administrador crear, modificar y desactivar usuarios (sin autorregistro); al desactivar, cerrar sesiones y conservar registro de acciones |
+| FR-03 | Asignar a cada usuario uno de los tres roles: Superadmin, Admin o Usuario operativo |
+| FR-04 | Permitir al administrador asignar y desasignar clientes a cada usuario operativo |
+| FR-05 | Impedir que un usuario operativo acceda a clientes o facturas no asignados, incluso escribiendo la URL directamente |
+| FR-06 | Impedir el acceso a funcionalidades para las que el usuario no tenga permisos |
 
 --- Clientes y contactos ---
 
 | ID | Requisito |
 |---|---|
-| FR-09 | Crear, consultar, modificar y dar de baja empresas cliente |
-| FR-10 | Guardar de cada cliente: nombre comercial, razón social, ID fiscal, dirección fiscal, país, moneda, sector y responsable interno |
-| FR-11 | Avisar si ya existe un cliente con el mismo ID fiscal |
-| FR-12 | Conservar los datos de clientes dados de baja en lugar de borrarlos |
-| FR-13 | Asociar varias personas de contacto a una empresa, indicando función (facturación, impagos…), y marcar contacto como inactivo sin perder registro de facturas enviadas |
-| FR-14 | Notificar si se intenta eliminar el único contacto de facturación de un cliente activo |
-| FR-15 | Mostrar historial de cada cliente: alta, facturas, pagos, incidencias, cambios de tarifa y bajas |
-| FR-16 | Permitir asociar una misma persona de contacto a varias empresas cliente |
-| FR-17 | Conservar los destinatarios a los que se envió cada factura en el momento del envío, independientemente de cambios posteriores en contactos |
-| FR-18 | Almacenar datos comerciales (fecha inicio, plan, tarifa, responsable comercial, condiciones de pago) separados de los fiscales |
-| FR-19 | Mostrar el estado de las empresas cliente en un listado sin abrir cada ficha |
-| FR-20 | Permitir adjuntar documentos firmados externamente al registro comercial (APLAZADO a versión futura) |
+| FR-07 | Crear, consultar, modificar y dar de baja lógica a empresas cliente; guardar sus datos comerciales y fiscales, avisar de ID fiscal duplicado y conservar su histórico |
+| FR-08 | Gestionar contactos y sus funciones, permitir contactos compartidos entre empresas, avisar si se intenta eliminar el único contacto de facturación y conservar los destinatarios de cada envío |
+| FR-09 | Mostrar el historial del cliente con altas, facturas, pagos, incidencias, cambios de tarifa y bajas |
+| FR-10 | Almacenar datos comerciales (fecha inicio, plan, tarifa, responsable comercial, condiciones de pago) separados de los fiscales |
+| FR-11 | Mostrar el estado de las empresas cliente en un listado sin abrir cada ficha |
 
 --- Suscripción ---
 
 | ID | Requisito |
 |---|---|
-| FR-21 | Registrar la suscripción con fecha de inicio, tarifa mensual y condiciones de pago |
-| FR-22 | Mostrar el importe prorrateado del primer mes antes de confirmar el alta |
-| FR-23 | Permitir indicar fecha de inicio futura, sin generar facturas hasta esa fecha |
-| FR-24 | Permitir condiciones de pago particulares por cliente (p. ej., a 30 días) por encima de las generales |
-| FR-25 | Impedir activar suscripción si faltan datos fiscales obligatorios, indicando cuáles |
+| FR-12 | Registrar la suscripción con fecha de inicio, tarifa mensual y condiciones de pago |
+| FR-13 | Mostrar el importe prorrateado del primer mes antes de confirmar el alta |
+| FR-14 | Permitir indicar fecha de inicio futura, sin generar facturas hasta esa fecha |
+| FR-15 | Permitir condiciones de pago particulares por cliente (p. ej., a 30 días) por encima de las generales |
+| FR-16 | Impedir activar suscripción si faltan datos fiscales obligatorios, indicando cuáles |
 
 --- Facturas ---
 
 | ID | Requisito |
 |---|---|
-| FR-26 | Crear facturas puntuales con una o varias líneas (concepto, cantidad, precio, descuento, impuesto) |
-| FR-27 | Ofrecer catálogo de conceptos frecuentes con precio orientativo modificable |
-| FR-28 | Generar automáticamente (día 1 del mes) las facturas de suscripciones activas |
-| FR-29 | Generar, en la fecha de inicio, factura proporcional por los días restantes del mes |
-| FR-30 | No generar facturas a clientes pausados, pendientes de activación o dados de baja |
-| FR-31 | Si falla la generación de una factura, continuar con el resto y avisar al responsable |
-| FR-32 | Mostrar vista previa de la factura antes de emitir |
-| FR-33 | Impedir emitir factura si falta dato fiscal obligatorio, indicando cuál |
-| FR-34 | Permitir modificar o eliminar factura solo en borrador |
-| FR-35 | Al emitir, asignar número único y correlativo dentro de su serie, evitando duplicidades incluso en emisiones simultáneas |
-| FR-36 | Generar PDF con imagen corporativa, datos fiscales, líneas, impuestos, total y datos de soporte |
-| FR-37 | Conservar el PDF de cada factura emitida sin cambios, aunque se modifiquen plantilla o logo |
-| FR-38 | Permitir crear factura rectificativa a partir de una emitida, manteniendo vínculo |
-| FR-39 | Filtrar facturas por estado, tipo (puntual/recurrente), cliente y fecha |
-| FR-40 | Permitir reintentar el envío de una factura ya emitida sin generar otra ni nuevo número |
-| FR-41 | Permitir seleccionar impuestos entre opciones preconfiguradas |
-| FR-42 | Gestionar estados del ciclo de vida: borrador, pendiente de aprobación, emitida, enviada, vencida, pagada, envío fallido, disputa, pagada parcialmente, rectificada, anulada, incobrable |
-| FR-43 | Impedir modificación silenciosa de facturas emitidas y mantener trazabilidad de cambios |
-| FR-44 | Permitir eliminar borradores no emitidos bajo restricciones y dejando registro |
+| FR-17 | Crear facturas puntuales con una o varias líneas (concepto, cantidad, precio, descuento, impuesto) |
+| FR-18 | Generar automáticamente (día 1 del mes) las facturas de suscripciones activas |
+| FR-19 | Generar, en la fecha de inicio, factura proporcional por los días restantes del mes |
+| FR-20 | No generar facturas a clientes pausados, pendientes de activación o dados de baja |
+| FR-21 | Si falla la generación de una factura, continuar con el resto y avisar al responsable |
+| FR-22 | Mostrar vista previa de la factura antes de emitir |
+| FR-23 | Impedir emitir factura si falta dato fiscal obligatorio, indicando cuál |
+| FR-24 | Permitir modificar o eliminar solo borradores; al emitir, asignar numeración única y correlativa y generar un PDF completo e inmutable, independiente de cambios posteriores en plantilla o logo |
+| FR-25 | Permitir crear factura rectificativa a partir de una emitida, manteniendo vínculo |
+| FR-26 | Filtrar facturas por estado, tipo (puntual/recurrente), cliente y fecha |
+| FR-27 | Permitir seleccionar impuestos entre opciones preconfiguradas |
+| FR-28 | Gestionar estados del ciclo de vida: borrador, pendiente de aprobación, emitida, enviada, vencida, pagada, envío fallido, disputa, pagada parcialmente, rectificada, anulada, incobrable |
+| FR-29 | Impedir modificación silenciosa de facturas emitidas y mantener trazabilidad de cambios |
 
 --- Envío y recordatorios ---
 
 | ID | Requisito |
 |---|---|
-| FR-45 | Enviar automáticamente cada factura emitida, con PDF, por email a contactos de facturación y por WhatsApp a contactos con consentimiento |
-| FR-46 | Incluir email y teléfono de soporte de Turbine en todas las comunicaciones |
-| FR-47 | Registrar cada envío con canal, destinatario, fecha y resultado |
-| FR-48 | Si un envío falla o rebota, avisar al responsable y permitir corregir contacto y reenviar sin crear nueva factura |
-| FR-49 | Enviar recordatorios automáticos: antes del vencimiento (día 3), el día del vencimiento y periódicos (cada X días) hasta el pago, calculando fechas según condiciones del cliente |
-| FR-50 | Dejar de enviar recordatorios cuando la factura quede pagada |
-| FR-51 | Usar plantillas editables en español e inglés con datos del cliente, número, importe y vencimiento |
+| FR-30 | Enviar automáticamente las facturas con PDF por los canales autorizados, incluir los datos de soporte y registrar destinatario, canal, fecha y resultado; ante fallos, avisar y permitir corregir y reenviar sin duplicar la factura |
+| FR-31 | Enviar recordatorios automáticos: antes del vencimiento (día 3), el día del vencimiento y periódicos (cada X días) hasta el pago, calculando fechas según condiciones del cliente |
+| FR-32 | Dejar de enviar recordatorios cuando la factura quede pagada |
+| FR-33 | Usar plantillas editables en español e inglés con datos del cliente, número, importe y vencimiento |
 
 --- Cobros ---
 
 | ID | Requisito |
 |---|---|
-| FR-52 | Consultar periódicamente pagos en Stripe (simulado) y recibir avisos de pago |
-| FR-53 | Asociar cada pago a su factura y marcarla como pagada cuando coincida |
-| FR-54 | Ignorar avisos de pago repetidos (idempotencia) |
-| FR-55 | Si un pago no tiene referencia clara o puede corresponder a varias facturas, dejarlo pendiente para asociación manual |
-| FR-56 | Si importe pagado difiere del de la factura, registrar diferencia y dejar pendiente de revisión sin marcar como pagada |
-| FR-57 | Permitir asociar manualmente un pago a una factura y deshacer asociación incorrecta, registrando quién y por qué |
-| FR-58 | Calcular saldo de cada cliente: total facturado, cobrado y pendiente (teniendo en cuenta rectificativas) |
-| FR-59 | Permitir pausar recordatorios de factura en disputa, indicando motivo y fecha de revisión, avisando al responsable |
-| FR-60 | Permitir abrir incidencias internas sobre cliente o factura (responsable, estado, comentarios, resolución), pudiendo pausar recordatorios |
-| FR-61 | Permitir a un administrador declarar factura incobrable, con motivo y aprobación, sin marcarla como pagada |
+| FR-34 | Consultar pagos de Stripe, asociarlos automáticamente solo cuando la referencia e importe coincidan, ignorar avisos repetidos y dejar para revisión manual los pagos ambiguos o con diferencias de importe |
+| FR-35 | Permitir asociar manualmente un pago a una factura y deshacer asociación incorrecta, registrando quién y por qué |
+| FR-36 | Calcular saldo de cada cliente: total facturado, cobrado y pendiente (teniendo en cuenta rectificativas) |
+| FR-37 | Permitir pausar recordatorios de factura en disputa, indicando motivo y fecha de revisión, avisando al responsable |
+| FR-38 | Permitir abrir incidencias internas sobre cliente o factura (responsable, estado, comentarios, resolución), pudiendo pausar recordatorios |
+| FR-39 | Permitir a un administrador declarar factura incobrable, con motivo y aprobación, sin marcarla como pagada |
 
 --- Bajas, pausas y revisión anual ---
 
 | ID | Requisito |
 |---|---|
-| FR-62 | Permitir pausar suscripción con motivo, fecha de inicio y fecha prevista de reactivación, avisando al responsable |
-| FR-63 | Permitir registrar solicitud de baja de cliente, manualmente o vía API |
-| FR-64 | Al hacerse efectiva la baja, dejar de generar facturas recurrentes |
-| FR-65 | Si el cliente dado de baja tiene facturas pendientes, mantener recordatorios hasta pago |
-| FR-66 | Permitir reactivar cliente dado de baja usando ficha anterior, sin duplicado |
-| FR-67 | Mostrar anualmente lista de clientes cuyo rango de tarifa debe revisarse, permitir introducir facturación anual indicando fuente y fecha, y proponer rango |
-| FR-68 | El cambio de tarifa debe aprobarse antes de aplicarse, aplicarse desde fecha y no modificar facturas anteriores |
-| FR-69 | Registrar quién aprobó un cambio de tarifa, cuándo y precios anterior y nuevo |
-| FR-70 | Permitir configurar tramos de facturación anual y tarifas correspondientes |
-| FR-71 | Permitir al Superadmin modificar tabla de tarifas sin alterar importes de facturas históricas |
-| FR-72 | Permitir registrar excepciones comerciales (descuentos temporales, meses gratuitos, precios pactados) |
+| FR-40 | Permitir pausar suscripción con motivo, fecha de inicio y fecha prevista de reactivación, avisando al responsable |
+| FR-41 | Permitir registrar solicitud de baja de cliente, manualmente o vía API |
+| FR-42 | Al hacerse efectiva la baja, dejar de generar facturas recurrentes |
+| FR-43 | Si el cliente dado de baja tiene facturas pendientes, mantener recordatorios hasta pago |
+| FR-44 | Permitir reactivar cliente dado de baja usando ficha anterior, sin duplicado |
+| FR-45 | Mostrar anualmente lista de clientes cuyo rango de tarifa debe revisarse, permitir introducir facturación anual indicando fuente y fecha, y proponer rango |
+| FR-46 | El cambio de tarifa debe aprobarse antes de aplicarse, aplicarse desde fecha y no modificar facturas anteriores |
+| FR-47 | Registrar quién aprobó un cambio de tarifa, cuándo y precios anterior y nuevo |
+| FR-48 | Permitir al Superadmin configurar y modificar los tramos de facturación anual y sus tarifas sin alterar importes de facturas históricas |
+| FR-49 | Permitir registrar excepciones comerciales (descuentos temporales, meses gratuitos, precios pactados) |
 
 --- Aprobaciones, notificaciones y pantalla de trabajo ---
 
 | ID | Requisito |
 |---|---|
-| FR-73 | Exigir aprobación de administrador para operaciones económicas sensibles (descuentos, cambios manuales de importe, facturas puntuales sobre umbral…), sin exigirla para recurrentes de suscripción ya aprobada |
-| FR-74 | Ofrecer bandeja de aprobaciones con estado (pendiente/aprobada/rechazada) y comentario del aprobador |
-| FR-75 | Impedir que un usuario apruebe su propia solicitud cuando el importe supere el umbral |
-| FR-76 | Enviar notificaciones internas al responsable ante pagos, vencimientos, envíos fallidos, disputas, revisiones anuales y aprobaciones resueltas; permitir marcar leídas/resueltas |
-| FR-77 | Mostrar pantalla de trabajo diario con facturas próximas a vencer, vencidas, pagos pendientes de asociar, envíos fallidos y aprobaciones pendientes |
-| FR-78 | Configurar umbrales y condiciones que determinan si un cambio económico requiere aprobación de Admin o Superadmin |
+| FR-50 | Exigir aprobación de administrador para operaciones económicas sensibles (descuentos, cambios manuales de importe, facturas puntuales sobre umbral…), sin exigirla para recurrentes de suscripción ya aprobada |
+| FR-51 | Ofrecer bandeja de aprobaciones con estado (pendiente/aprobada/rechazada) y comentario del aprobador |
+| FR-52 | Impedir que un usuario apruebe su propia solicitud cuando el importe supere el umbral |
+| FR-53 | Enviar notificaciones internas al responsable ante pagos, vencimientos, envíos fallidos, disputas, revisiones anuales y aprobaciones resueltas; permitir marcar leídas/resueltas |
+| FR-54 | Mostrar pantalla de trabajo diario con facturas próximas a vencer, vencidas, pagos pendientes de asociar, envíos fallidos y aprobaciones pendientes |
+| FR-55 | Configurar umbrales y condiciones que determinan si un cambio económico requiere aprobación de Admin o Superadmin |
 
 --- Dashboard, informes, búsqueda e importación ---
 
 | ID | Requisito |
 |---|---|
-| FR-79 | Mostrar solo a administradores dashboard con facturado, cobrado, pendiente y vencido por semana, mes, trimestre y año; tiempo medio de cobro; clientes con mayor deuda; previsión de ingresos recurrentes del mes siguiente |
-| FR-80 | Permitir pulsar en cada cifra del dashboard para ver facturas que la componen |
-| FR-81 | Generar informes filtrados por periodo, cliente, responsable, país, sector, estado y tipo de factura |
-| FR-82 | Exportar informes a CSV y PDF, incluyendo solo datos que el usuario pueda ver |
-| FR-83 | Generar paquete mensual o trimestral para la gestoría con facturas emitidas, rectificativas, cobros y PDF |
-| FR-84 | Búsqueda global por nombre, razón social, ID fiscal, contacto, email o número de factura |
-| FR-85 | Filtrar clientes por ubicación, sector y estado |
-| FR-86 | Importar clientes desde CSV con vista previa, señalando filas con errores o ID fiscal duplicado, e importando solo filas válidas |
-| FR-87 | Guardar resumen de cada importación con filas creadas, rechazadas y motivo |
+| FR-56 | Mostrar solo a administradores dashboard con facturado, cobrado, pendiente y vencido por semana, mes, trimestre y año; tiempo medio de cobro; clientes con mayor deuda; previsión de ingresos recurrentes del mes siguiente |
+| FR-57 | Generar informes filtrados por periodo, cliente, responsable, país, sector, estado y tipo de factura |
+| FR-58 | Exportar informes a CSV y PDF, incluyendo solo datos que el usuario pueda ver |
+| FR-59 | Generar paquete mensual o trimestral para la gestoría con facturas emitidas, rectificativas, cobros y PDF |
+| FR-60 | Búsqueda global por nombre, razón social, ID fiscal, contacto, email o número de factura |
+| FR-61 | Filtrar clientes por ubicación, sector y estado |
+| FR-62 | Importar clientes desde CSV con vista previa, señalando filas con errores o ID fiscal duplicado, e importando solo filas válidas |
+| FR-63 | Guardar resumen de cada importación con filas creadas, rechazadas y motivo |
 
 --- Configuración, auditoría y API ---
 
 | ID | Requisito |
 |---|---|
-| FR-88 | Permitir al Superadmin configurar plazo de pago por defecto, cadencia de recordatorios, dominio de correo permitido, datos fiscales de Turbine, logo, series, impuestos, rangos de tarifa y umbrales de aprobación. Cambios aplican solo a futuro |
-| FR-89 | Registrar en auditoría acciones importantes (altas/cambios de clientes y datos fiscales, emisión, aprobaciones, asociación de pagos, cambios de permisos y configuración) y permitir consultarla y filtrarla |
-| FR-90 | Registrar cada ejecución de procesos automáticos (elementos procesados, fallos, motivo) y mostrar pantalla de estado con última generación, mensajes pendientes, errores recientes y última copia |
-| FR-91 | Ofrecer API para consultar si un cliente tiene facturas pendientes |
-| FR-92 | Permitir que sistema externo comunique por API solicitud de baja, que el sistema registrará para gestionarla con sus reglas |
-| FR-93 | La API debe exigir autenticación y aplicar los mismos permisos y reglas que la aplicación |
-| FR-94 | El sistema deberá guardar automáticamente el borrador de los formularios en edición (facturas puntuales, datos de clientes, suscripción) para evitar la pérdida de información por cierres accidentales, permitiendo recuperar el borrador al reabrir el formulario. |
-| FR-95 | El sistema deberá permitir deshacer acciones inmediatas de edición o cambio de estado accidental antes de su confirmación definitiva, al menos en: edición de borradores, cambios de estado de cliente y asociación/desasociación de pagos. El undo no aplicará a facturas emitidas y quedará registrado en auditoría. |
+| FR-64 | Permitir al Superadmin configurar plazo de pago por defecto, cadencia de recordatorios, dominio de correo permitido, datos fiscales de Turbine, logo, series, impuestos, rangos de tarifa y umbrales de aprobación. Cambios aplican solo a futuro |
+| FR-65 | Registrar y permitir consultar la auditoría de acciones importantes y de procesos automáticos, incluyendo elementos procesados, fallos, motivos y estado de las últimas ejecuciones y copias |
+| FR-66 | Ofrecer API para consultar si un cliente tiene facturas pendientes |
+| FR-67 | Permitir que sistema externo comunique por API solicitud de baja, que el sistema registrará para gestionarla con sus reglas |
+| FR-68 | La API debe exigir autenticación y aplicar los mismos permisos y reglas que la aplicación |
 
 4.2. REQUISITOS NO FUNCIONALES
 
 | ID | Categoría | Requisito | Criterio verificable |
 |---|---|---|---|
-| NFR-01 | Usabilidad | Operaciones habituales rápidas y con mínimo de clics | Crear cliente con suscripción o factura puntual en menos de 1 minuto |
-| NFR-02 | Usabilidad | Usuario con conocimiento administrativo puede usar la app sin formación previa | Da de alta cliente y suscripción sin ayuda |
-| NFR-03 | Usabilidad | Mensajes de error comprensibles, indicando campo y motivo | Sin códigos técnicos; indican campo afectado |
-| NFR-04 | Usabilidad | Interfaz coherente; confirmación solo en acciones irreversibles o masivas. La interfaz no deberá hacer uso de pop-ups o ventanas emergentes modales intrusivas para acciones rutinarias | Botones principales siempre en la misma posición; solo se confirma en acciones irreversibles o masivas; las acciones rutinarias no abren modales bloqueantes y los avisos se muestran como toasts/banners no bloqueantes |
-| NFR-05 | Portabilidad | App web responsive usable en ordenador, tablet y móvil | Mínimo 360 px sin scroll horizontal |
-| NFR-06 | Compatibilidad | Funciona en navegadores actuales (incl. Android/iOS); CSV conserva tildes; PDF se abre con cualquier lector | Verificado en versiones actuales |
-| NFR-07 | Accesibilidad | Campos con etiqueta, contraste suficiente, uso con teclado | Todos los campos etiquetados y navegables |
-| NFR-08 | Rendimiento | Búsquedas y apertura de fichas < 2 s con miles de clientes | Medido en conexión normal |
-| NFR-09 | Rendimiento | Tareas pesadas en segundo plano sin bloquear la app | Generación masiva e informes en background |
-| NFR-10 | Escalabilidad | Soporta miles de clientes, cientos de miles de facturas y decenas de usuarios | Listados paginados |
-| NFR-11 | Fiabilidad | Operaciones y procesos automáticos no duplican resultados | Idempotencia en generación, envío y pagos |
-| NFR-12 | Fiabilidad | Fallo de un elemento no detiene el proceso completo | Error registrado y resto continúa |
-| NFR-13 | Consistencia | Edición concurrente: el segundo usuario recibe aviso | No sobrescribe cambios |
-| NFR-14 | Exactitud | Importes con 2 decimales exactos; PDF, BD y dashboard coinciden | Cifras idénticas en todas las vistas |
-| NFR-15 | Seguridad | Solo usuarios autenticados y con permiso acceden a recursos | Rechazo también por URL directa o API |
-| NFR-16 | Seguridad | Contraseñas hasheadas, HTTPS, sin claves en repositorio, facturas con sesión/permiso o enlaces caducables | Verificado en auditoría de seguridad |
-| NFR-17 | Seguridad | Bloqueo temporal tras varios intentos fallidos seguidos | Cuenta bloqueada temporalmente |
-| NFR-18 | Seguridad | Diseño preparado para añadir doble factor en el futuro | Sin rehacer el acceso |
-| NFR-19 | Privacidad | Solo datos necesarios para facturar; sin marketing; anonimización sin invalidar facturas | Datos mínimos y anonimizables |
-| NFR-20 | Trazabilidad | De cada factura pagada se consulta el pago que lo justifica; de cada envío fallido, el motivo | Consultable en ficha |
-| NFR-21 | Auditoría | Registro de auditoría no editable ni borrable | Ningún usuario puede modificarlo |
-| NFR-22 | Recuperabilidad | Copia de seguridad automática diaria y restauración probada | Restauración verificada al menos una vez |
-| NFR-23 | Internacionalización | Comunicaciones en español e inglés; fechas con zona horaria; datos fiscales no asumen formato español | Plantillas y campos adaptados |
-| NFR-24 | Interoperabilidad | Sustituir Stripe simulado por real o añadir otra fuente sin modificar el resto | Cambio aislado |
-| NFR-25 | Interoperabilidad | API documentada con operaciones, entradas y respuestas | Documentación publicada |
-| NFR-26 | Mantenibilidad | Código con convenciones documentadas para otro equipo | Convenciones publicadas |
-| NFR-27 | Mantenibilidad | Pruebas automáticas de prorrateo, generación mensual, vencimientos, impuestos, permisos y conciliación | Suite de pruebas existente |
-| NFR-28 | Despliegue | Software libre, configuración separada del código y guía de puesta en marcha reproducible | Guía publicada |
-| NFR-29 | Privacidad | Datos ficticios para pruebas y demostraciones | Dataset de prueba |
-| NFR-30 | Independencia de IA | Facturación, vencimientos y cobros con reglas fijas; IA opcional y desactivable | Reglas deterministas |
-| NFR-31 | Disponibilidad | Disponible en horario de funcionamiento establecido, salvo mantenimientos programados | Horario definido por la empresa |
-| NFR-32 | Despliegue | Instalación y ejecución on-premises en servidor local | Instalable en servidor local |
-| NFR-33 | Privacidad / Uso | Las métricas de tiempo y uso registradas deberán enfocarse en la optimización del sistema y no en la fiscalización o evaluación punitiva del rendimiento de los empleados | La auditoría e informes no generan rankings ni alertas de productividad individual de los usuarios |
-| NFR-34 | Usabilidad | La interfaz no deberá hacer uso de pop-ups o ventanas emergentes modales intrusivas para acciones rutinarias | Las confirmaciones y avisos informativos se realizan mediante notificaciones no bloqueantes (toasts/banners) que no interrumpen la navegación |
+| NFR-01 | Usabilidad | Operaciones habituales rápidas, intuitivas y con mínimo de clics, sin formación previa | Un usuario administrativo da de alta un cliente con suscripción o una factura puntual en menos de 1 minuto y sin ayuda |
+| NFR-02 | Usabilidad | Mensajes de error comprensibles e interfaz coherente, sin ventanas modales intrusivas para acciones rutinarias | Los errores indican campo y motivo sin códigos técnicos; los botones mantienen posiciones coherentes y los avisos son no bloqueantes |
+| NFR-03 | Portabilidad | App web responsive usable en ordenador, tablet y móvil | Mínimo 360 px sin scroll horizontal |
+| NFR-04 | Compatibilidad | Funciona en navegadores actuales (incl. Android/iOS); CSV conserva tildes; PDF se abre con cualquier lector | Verificado en versiones actuales |
+| NFR-05 | Accesibilidad | Campos con etiqueta, contraste suficiente, uso con teclado | Todos los campos etiquetados y navegables |
+| NFR-06 | Rendimiento | Búsquedas y apertura de fichas < 2 s con miles de clientes | Medido en conexión normal |
+| NFR-07 | Rendimiento | Tareas pesadas en segundo plano sin bloquear la app | Generación masiva e informes en background |
+| NFR-08 | Escalabilidad | Soporta miles de clientes, cientos de miles de facturas y decenas de usuarios | Listados paginados |
+| NFR-09 | Fiabilidad | Operaciones y procesos automáticos no duplican resultados | Idempotencia en generación, envío y pagos |
+| NFR-10 | Fiabilidad | Fallo de un elemento no detiene el proceso completo | Error registrado y resto continúa |
+| NFR-11 | Consistencia | Edición concurrente: el segundo usuario recibe aviso | No sobrescribe cambios |
+| NFR-12 | Exactitud | Importes con 2 decimales exactos; PDF, BD y dashboard coinciden | Cifras idénticas en todas las vistas |
+| NFR-13 | Seguridad | Solo usuarios autenticados y con permiso acceden a recursos | Rechazo también por URL directa o API |
+| NFR-14 | Seguridad | Contraseñas hasheadas, HTTPS, sin claves en repositorio, facturas con sesión/permiso o enlaces caducables | Verificado en auditoría de seguridad |
+| NFR-15 | Seguridad | Bloqueo temporal tras varios intentos fallidos seguidos | Cuenta bloqueada temporalmente |
+| NFR-16 | Privacidad | Solo datos necesarios para facturar; sin marketing; anonimización sin invalidar facturas | Datos mínimos y anonimizables |
+| NFR-17 | Trazabilidad | De cada factura pagada se consulta el pago que lo justifica; de cada envío fallido, el motivo | Consultable en ficha |
+| NFR-18 | Auditoría | Registro de auditoría no editable ni borrable | Ningún usuario puede modificarlo |
+| NFR-19 | Recuperabilidad | Copia de seguridad automática diaria y restauración probada | Restauración verificada al menos una vez |
+| NFR-20 | Internacionalización | Comunicaciones en español e inglés; fechas con zona horaria; datos fiscales no asumen formato español | Plantillas y campos adaptados |
+| NFR-21 | Interoperabilidad | Sustituir Stripe simulado por real o añadir otra fuente sin modificar el resto | Cambio aislado |
+| NFR-22 | Interoperabilidad | API documentada con operaciones, entradas y respuestas | Documentación publicada |
+| NFR-23 | Mantenibilidad | Pruebas automáticas de prorrateo, generación mensual, vencimientos, impuestos, permisos y conciliación | Suite de pruebas existente |
+| NFR-24 | Despliegue | Software libre, configuración separada del código y guía de puesta en marcha reproducible | Guía publicada |
+| NFR-25 | Disponibilidad | Disponible en horario de funcionamiento establecido, salvo mantenimientos programados | Horario definido por la empresa |
+| NFR-26 | Despliegue | Instalación y ejecución on-premises en servidor local | Instalable en servidor local |
 
 
 ================================================================================
@@ -473,7 +422,6 @@ siguen reclamando (prevalece A sobre B).
 | UR-17 | FR-04, FR-89, FR-90 |
 | UR-18 | FR-63, FR-91, FR-92, FR-93 |
 | UR-19 | FR-08 |
-| UR-20 | FR-19 |
 | UR-21 | FR-18, FR-41 |
 | UR-22 | FR-16 |
 | UR-23 | FR-17 |
