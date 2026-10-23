@@ -122,7 +122,7 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 
 | ID | Requisito | Relacionado con |
 |---|---|---|
-| FR-01 | El sistema deberá permitir el accesoa la app mediante email y contraseña. | UR-01 |
+| FR-01 | El sistema deberá permitir el acceso a la app mediante email y contraseña. | UR-01 |
 | FR-02 | El sistema deberá rechazar cualquier email que no pertenezca al dominio corporativo de Turbine | UR-01 |
 | FR-03 | El sistema deberá permitir recuperar la contraseña mediante un enlace que caduque pasado un tiempo | UR-01 |
 | FR-04 | El sistema deberá cerrar la sesión automáticamente tras un periodo de inactividad | UR-01 |
