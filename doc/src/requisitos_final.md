@@ -151,7 +151,7 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | FR-16 | El sistema deberá permitir registrar la suscripción de un cliente con su fecha de inicio, su tarifa mensual y sus condiciones de pago | UR-05 |
 | FR-17 | El sistema deberá mostrar el importe prorrateado del primer mes antes de confirmar el alta | UR-05 |
 | FR-18 | El sistema deberá permitir indicar una fecha de inicio futura, sin generar facturas hasta esa fecha | UR-05 |
-| FR-19 | El sistema deberá permitir condiciones de pago particulares para un cliente (por ejemplo, a 30 días) que estarám por encima de las generales | UR-05 |
+| FR-19 | El sistema deberá permitir condiciones de pago particulares para un cliente (por ejemplo, a 30 días) que estarán por encima de las generales | UR-05 |
 | FR-20 | El sistema deberá impedir activar una suscripción si al cliente le faltan datos fiscales obligatorios, indicando cuáles son los datos que faltan | UR-05 |
 
 #### Facturas
@@ -160,7 +160,7 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 |---|---|---|
 | FR-21 | El sistema deberá permitir crear facturas puntuales con una o varias líneas, cada una con concepto, cantidad, precio, descuento e impuesto | UR-05 |
 | FR-22 | El sistema deberá ofrecer un catálogo de conceptos frecuentes con un precio orientativo que se pueda modificar al crear cada factura | UR-05 |
-| FR-23 | El sistema deberá generar automáticamente (dia 1 del mes) las facturas de todas las suscripciones activas | UR-05 |
+| FR-23 | El sistema deberá generar automáticamente (día 1 del mes) las facturas de todas las suscripciones activas | UR-05 |
 | FR-24 | El sistema deberá generar, en la fecha de inicio de la suscripción, una factura proporcional por los días que quedan de ese mes | UR-05 |
 | FR-25 | El sistema no deberá generar facturas a clientes pausados, pendientes de activación o dados de baja | UR-05, UR-10 |
 | FR-26 | Si falla la generación de la factura de un cliente, el sistema deberá continuar con el resto y avisar al responsable de ese cliente | UR-05, UR-11 |
@@ -170,18 +170,18 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | FR-30 | Al emitir una factura, el sistema deberá asignarle un número único y correlativo dentro de su serie | UR-05 |
 | FR-31 | El sistema deberá generar el PDF de cada factura con la imagen corporativa de Turbine, los datos fiscales, las líneas, los impuestos, el total y los datos de soporte | UR-05 |
 | FR-32 | El sistema deberá conservar el PDF de cada factura emitida sin cambios, aunque después se modifiquen la plantilla o el logo de la empresa | UR-06 |
-| FR-33 | El sistema deberá permitir crear una factura rectificativa a partir de una factura emitida, manteniendo el vínculo entre ambas factura | UR-06 |
+| FR-33 | El sistema deberá permitir crear una factura rectificativa a partir de una factura emitida, manteniendo el vínculo entre ambas facturas | UR-06 |
 | FR-34 | El sistema deberá permitir filtrar las facturas por estado, tipo (puntual o recurrente), cliente y fecha | UR-08, UR-12 |
 
 #### Envío y recordatorios
 
 | ID | Requisito | Relacionado con |
 |---|---|---|
-| FR-35 | El sistema deberá enviar automáticament cada factura emitida, con su PDF, por email a los contactos de facturación del cliente y, además, por WhatsApp a los contactos que hayan dado su consentimiento al darse de alta | UR-07 |
+| FR-35 | El sistema deberá enviar automáticamente cada factura emitida, con su PDF, por email a los contactos de facturación del cliente y, además, por WhatsApp a los contactos que hayan dado su consentimiento al darse de alta | UR-07 |
 | FR-36 | El sistema deberá incluir el email y el teléfono de soporte de Turbine en todas las comunicaciones a los clientes | UR-07 |
 | FR-37 | El sistema deberá registrar cada envío con su canal, destinatario, fecha y resultado | UR-07 |
 | FR-38 | Si un envío falla o el correo rebota, el sistema deberá avisar al responsable del cliente y permitir corregir el contacto y reenviar la factura sin crear una nueva | UR-07, UR-11 |
-| FR-39 | El sistema deberá enviar automáticamente un recordatorio antes del vencimiento (el día 3 de ser emitidad, por ejemplo), otro el día del vencimiento y, a partir de ahí, recordatorios periódicos (cada X días) hasta que la factura se pague, calculando las fechas a partir del vencimiento de cada factura según las condiciones de pago del cliente | UR-07 |
+| FR-39 | El sistema deberá enviar automáticamente un recordatorio antes del vencimiento (el día 3 después de ser emitida, por ejemplo), otro el día del vencimiento y, a partir de ahí, recordatorios periódicos (cada X días) hasta que la factura se pague, calculando las fechas a partir del vencimiento de cada factura según las condiciones de pago del cliente | UR-07 |
 | FR-40 | El sistema deberá dejar de enviar recordatorios en cuanto una factura quede pagada | UR-07, UR-08 |
 | FR-41 | El sistema deberá usar plantillas de mensaje editables, en español e inglés, con datos como el nombre del cliente, el número de factura, el importe y el vencimiento | UR-07, UR-16 |
 
@@ -193,11 +193,11 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | FR-43 | El sistema deberá asociar cada pago recibido a su factura y marcarla como pagada cuando la coincidencia sea clara (misma referencia e importe) | UR-08 |
 | FR-44 | El sistema deberá ignorar los avisos de pago repetidos, de forma que un mismo pago no se cuente dos veces | UR-08 |
 | FR-45 | Si un pago no tiene una referencia clara o puede corresponder a varias facturas, el sistema deberá dejarlo pendiente para que un usuario lo asocie manualmente | UR-09 |
-| FR-46 | Si el importe pagado es menor o mayor que el de la factura, el sistema deberá registrar la diferencia y dejarla pendiente de revisióny nomarcar la factura como pagada | UR-09 |
+| FR-46 | Si el importe pagado es menor o mayor que el de la factura, el sistema deberá registrar la diferencia y dejarla pendiente de revisión y no marcar la factura como pagada | UR-09 |
 | FR-47 | El sistema deberá permitir asociar manualmente un pago a una factura y deshacer una asociación incorrecta, registrando quién lo hizo y por qué | UR-09 |
 | FR-48 | El sistema deberá calcular el saldo de cada cliente: total facturado, cobrado y pendiente. Debe tener en cuenta las facturas rectificativas obviamente | UR-08 |
 | FR-49 | El sistema deberá permitir pausar los recordatorios de una factura en disputa, indicando el motivo y una fecha de revisión, y avisar al responsable cuando llegue esa fecha | UR-09, UR-11 |
-| FR-50 | El sistema deberá permitir abrir incidencias internas sobre un cliente o una factura, con responsable, estado, comentarios y resolución. Pudiendo estas pausar los recordatorios | UR-09 |
+| FR-50 | El sistema deberá permitir abrir incidencias internas sobre un cliente o una factura, con responsable, estado, comentarios y resolución, pudiendo estas pausar los recordatorios | UR-09 |
 | FR-51 | El sistema deberá permitir a un administrador declarar una factura como incobrable, indicando el motivo y con aprobación, sin marcarla como pagada | UR-09, UR-14 |
 
 #### Bajas, pausas y revisión anual
@@ -216,8 +216,8 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 
 | ID | Requisito | Relacionado con |
 |---|---|---|
-| FR-59 | El sistema deberá exigir la aprobación de un administrador para las operaciones económicas mas sensibles (descuentos, cambios manuales de importe, facturas puntuales por encima de un importe configurado...), sin exigirla para las facturas recurrentes generadas a partir de una suscripción ya aprobada | UR-14 |
-| FR-60 | El sistema deberá ofrecer una bandeja de aprobaciones donde el solicitante vea si su solicitud está pendiente, aprobada o rechazada, junto con el comentario de quien lo aprobo | UR-14 |
+| FR-59 | El sistema deberá exigir la aprobación de un administrador para las operaciones económicas más sensibles (descuentos, cambios manuales de importe, facturas puntuales por encima de un importe configurado...), sin exigirla para las facturas recurrentes generadas a partir de una suscripción ya aprobada | UR-14 |
+| FR-60 | El sistema deberá ofrecer una bandeja de aprobaciones donde el solicitante vea si su solicitud está pendiente, aprobada o rechazada, junto con el comentario de quien lo aprobó | UR-14 |
 | FR-61 | El sistema deberá impedir que un usuario apruebe su propia solicitud cuando el importe supere el umbral configurado | UR-14 |
 | FR-62 | El sistema deberá enviar notificaciones internas al responsable de cada cliente ante pagos recibidos, facturas vencidas, envíos fallidos, disputas, revisiones anuales y aprobaciones resueltas, y permitir marcarlas como leídas y como resueltas | UR-11 |
 | FR-63 | El sistema deberá mostrar al entrar una pantalla de trabajo diario con las facturas que vencen pronto, las vencidas, los pagos pendientes de asociar, los envíos fallidos y las aprobaciones pendientes | UR-11 |
