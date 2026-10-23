@@ -1,23 +1,17 @@
-' =====================================================================
 ' Diagramas de casos de uso - Sistema de facturación y cobros de Turbine
 ' Entrega 1 - Análisis y Diseño de Aplicaciones
 '
 ' El sistema se representa en 5 diagramas, uno por área funcional.
-' Generalización de actores (RB-18): Superadministrador -> Administrador
-' -> Usuario operativo. Cada caso de uso se asocia al rol mínimo que puede
-' realizarlo; los roles superiores lo heredan.
+' Generalización de actores (RB-18): Superadministrador -> Administrador -> Usuario operativo.
 '
-' Relaciones utilizadas (como en la Sesión 1.5):
-'  - <<include>>: el caso de uso base siempre ejecuta el incluido.
-'  - <<extend>>: desde el caso de uso base se ejecuta opcionalmente otro,
-'    solo si se cumple una condición.
-'  - <<dependency>>: el caso de uso debe haberse ejecutado antes que otro.
-' =====================================================================
+' Relaciones utilizadas:
+' - <<include>>
+' - <<extend>>
+' - <<dependency>>
 
 
-' ---------------------------------------------------------------------
 ' Diagrama 1: Acceso y administración
-' ---------------------------------------------------------------------
+
 @startuml CU_1_acceso_y_administracion
 title Diagrama 1. Acceso y administración
 left to right direction
@@ -56,9 +50,8 @@ note "Todos los casos de uso de los usuarios internos\nrequieren haber iniciado 
 @enduml
 
 
-' ---------------------------------------------------------------------
 ' Diagrama 2: Clientes y suscripciones
-' ---------------------------------------------------------------------
+
 @startuml CU_2_clientes_y_suscripciones
 title Diagrama 2. Clientes y suscripciones
 left to right direction
@@ -100,9 +93,8 @@ end note
 @enduml
 
 
-' ---------------------------------------------------------------------
 ' Diagrama 3: Facturación y envíos
-' ---------------------------------------------------------------------
+
 @startuml CU_3_facturacion_y_envios
 title Diagrama 3. Facturación y envíos
 left to right direction
@@ -145,9 +137,8 @@ end note
 @enduml
 
 
-' ---------------------------------------------------------------------
 ' Diagrama 4: Cobros y aprobaciones
-' ---------------------------------------------------------------------
+
 @startuml CU_4_cobros_y_aprobaciones
 title Diagrama 4. Cobros y aprobaciones
 left to right direction
@@ -188,9 +179,8 @@ end note
 @enduml
 
 
-' ---------------------------------------------------------------------
 ' Diagrama 5: Consulta e integración externa
-' ---------------------------------------------------------------------
+
 @startuml CU_5_consulta_e_integracion
 title Diagrama 5. Consulta e integración externa
 left to right direction
