@@ -1,0 +1,216 @@
+' =====================================================================
+' Diagramas de casos de uso - Sistema de facturación y cobros de Turbine
+' Entrega 1 - Análisis y Diseño de Aplicaciones
+'
+' El sistema se representa en 5 diagramas, uno por área funcional.
+' Generalización de actores (RB-18): Superadministrador -> Administrador
+' -> Usuario operativo. Cada caso de uso se asocia al rol mínimo que puede
+' realizarlo; los roles superiores lo heredan.
+'
+' Relaciones utilizadas (como en la Sesión 1.5):
+'  - <<include>>: el caso de uso base siempre ejecuta el incluido.
+'  - <<extend>>: desde el caso de uso base se ejecuta opcionalmente otro,
+'    solo si se cumple una condición.
+'  - <<dependency>>: el caso de uso debe haberse ejecutado antes que otro.
+' =====================================================================
+
+
+' ---------------------------------------------------------------------
+' Diagrama 1: Acceso y administración
+' ---------------------------------------------------------------------
+@startuml CU_1_acceso_y_administracion
+title Diagrama 1. Acceso y administración
+left to right direction
+skinparam shadowing false
+
+actor "Usuario operativo" as UO
+actor "Administrador" as AD
+actor "Superadministrador" as SA
+actor "Servicio de mensajería\n(simulado)" as MSG
+
+UO <|-- AD
+AD <|-- SA
+
+rectangle "Sistema de facturación y cobros de Turbine" {
+  usecase "CU-01\nIniciar sesión" as CU01
+  usecase "CU-02\nRecuperar contraseña" as CU02
+  usecase "CU-03\nGestionar usuarios\ny asignaciones" as CU03
+  usecase "CU-26\nConfigurar el sistema" as CU26
+  usecase "CU-27\nConsultar auditoría y\nestado del sistema" as CU27
+}
+
+UO -- CU01
+AD -- CU03
+SA -- CU26
+SA -- CU27
+CU02 -- MSG
+
+CU01 ..> CU02 : <<extend>>
+
+note bottom of CU02
+  <<extend>> Recuperar contraseña desde Iniciar sesión
+  (opcional: solo si el usuario ha olvidado la contraseña)
+end note
+
+note "Todos los casos de uso de los usuarios internos\nrequieren haber iniciado sesión (CU-01)." as N1
+@enduml
+
+
+' ---------------------------------------------------------------------
+' Diagrama 2: Clientes y suscripciones
+' ---------------------------------------------------------------------
+@startuml CU_2_clientes_y_suscripciones
+title Diagrama 2. Clientes y suscripciones
+left to right direction
+skinparam shadowing false
+
+actor "Usuario operativo" as UO
+actor "Administrador" as AD
+actor "Sistema externo\nvía API" as EXT
+
+UO <|-- AD
+
+rectangle "Sistema de facturación y cobros de Turbine" {
+  usecase "CU-04\nGestionar clientes\ny contactos" as CU04
+  usecase "CU-05\nImportar clientes\ndesde CSV" as CU05
+  usecase "CU-06\nGestionar suscripción\n(alta y pausa)" as CU06
+  usecase "CU-17\nGestionar baja\nde cliente" as CU17
+  usecase "CU-18\nComunicar solicitud\nde baja (API)" as CU18
+  usecase "CU-20\nRevisar tarifa anual" as CU20
+  usecase "CU-21\nSolicitar aprobación" as CU21
+}
+
+UO -- CU04
+UO -- CU05
+UO -- CU06
+UO -- CU17
+AD -- CU20
+EXT -- CU18
+
+CU18 ..> CU17 : <<include>>
+CU20 ..> CU21 : <<include>>
+CU06 ..> CU21 : <<extend>>
+CU06 ..> CU04 : <<dependency>>
+CU17 ..> CU06 : <<dependency>>
+
+note bottom of CU21
+  <<extend>> Solicitar aprobación desde Gestionar suscripción
+  (opcional: solo si se registra una excepción comercial)
+end note
+@enduml
+
+
+' ---------------------------------------------------------------------
+' Diagrama 3: Facturación y envíos
+' ---------------------------------------------------------------------
+@startuml CU_3_facturacion_y_envios
+title Diagrama 3. Facturación y envíos
+left to right direction
+skinparam shadowing false
+
+actor "Usuario operativo" as UO
+actor "Planificador\ndel sistema" as PL
+actor "Servicio de mensajería\n(simulado)" as MSG
+
+rectangle "Sistema de facturación y cobros de Turbine" {
+  usecase "CU-07\nCrear factura puntual" as CU07
+  usecase "CU-09\nGenerar facturas\nrecurrentes" as CU09
+  usecase "CU-08\nEmitir factura" as CU08
+  usecase "CU-21\nSolicitar aprobación" as CU21
+  usecase "CU-10\nEnviar factura" as CU10
+  usecase "CU-11\nEnviar recordatorios" as CU11
+  usecase "CU-12\nCrear factura\nrectificativa" as CU12
+}
+
+UO -- CU07
+UO -- CU08
+UO -- CU12
+PL -- CU09
+PL -- CU11
+CU10 -- MSG
+CU11 -- MSG
+
+CU07 ..> CU08 : <<include>>
+CU09 ..> CU08 : <<include>>
+CU08 ..> CU10 : <<include>>
+CU12 ..> CU21 : <<include>>
+CU08 ..> CU21 : <<extend>>
+CU12 ..> CU08 : <<dependency>>
+
+note bottom of CU21
+  <<extend>> Solicitar aprobación desde Emitir factura
+  (opcional: solo si hay descuento, importe modificado
+  o importe superior al umbral)
+end note
+@enduml
+
+
+' ---------------------------------------------------------------------
+' Diagrama 4: Cobros y aprobaciones
+' ---------------------------------------------------------------------
+@startuml CU_4_cobros_y_aprobaciones
+title Diagrama 4. Cobros y aprobaciones
+left to right direction
+skinparam shadowing false
+
+actor "Usuario operativo" as UO
+actor "Administrador" as AD
+actor "Planificador\ndel sistema" as PL
+actor "Stripe\n(simulado)" as ST
+
+UO <|-- AD
+
+rectangle "Sistema de facturación y cobros de Turbine" {
+  usecase "CU-13\nConciliar pagos" as CU13
+  usecase "CU-14\nAsociar pago\nmanualmente" as CU14
+  usecase "CU-15\nGestionar disputas\ne incidencias" as CU15
+  usecase "CU-16\nDeclarar factura\nincobrable" as CU16
+  usecase "CU-21\nSolicitar aprobación" as CU21
+  usecase "CU-22\nAprobar o rechazar\nsolicitudes" as CU22
+}
+
+UO -- CU14
+UO -- CU15
+AD -- CU16
+AD -- CU22
+PL -- CU13
+CU13 -- ST
+
+CU13 ..> CU14 : <<extend>>
+CU16 ..> CU21 : <<include>>
+CU22 ..> CU21 : <<dependency>>
+
+note bottom of CU14
+  <<extend>> Asociar pago manualmente desde Conciliar pagos
+  (opcional: solo si el pago no tiene referencia clara
+  o el importe no coincide con el de la factura)
+end note
+@enduml
+
+
+' ---------------------------------------------------------------------
+' Diagrama 5: Consulta e integración externa
+' ---------------------------------------------------------------------
+@startuml CU_5_consulta_e_integracion
+title Diagrama 5. Consulta e integración externa
+left to right direction
+skinparam shadowing false
+
+actor "Usuario operativo" as UO
+actor "Administrador" as AD
+actor "Sistema externo\nvía API" as EXT
+
+UO <|-- AD
+
+rectangle "Sistema de facturación y cobros de Turbine" {
+  usecase "CU-23\nConsultar pantalla de\ntrabajo y notificaciones" as CU23
+  usecase "CU-24\nBuscar clientes\ny facturas" as CU24
+  usecase "CU-25\nConsultar dashboard\ne informes" as CU25
+  usecase "CU-19\nConsultar facturas\npendientes (API)" as CU19
+}
+
+UO -- CU23
+UO -- CU24
+AD -- CU25
+EXT -- CU19
+@enduml
