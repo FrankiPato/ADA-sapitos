@@ -105,13 +105,14 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | UR-09 | Administrador, Usuario operativo | Poder gestionar situaciones excepcionales de cobro, como disputas, incidencias o pagos con un importe distinto al de la factura | Cliente / entrevista [A29,A32,A33,A66] |
 | UR-10 | Administrador, Usuario operativo | Poder gestionar las pausas, bajas y reactivaciones de clientes sin perder datos, ni las deudas pendientes... | Cliente / entrevista [P098,A19,A20,A21] |
 | UR-11 | Usuario interno | Recibir avisos de lo que afecta a sus clientes y ver en una pantalla qué tareas tiene pendientes | Cliente / entrevista [P123, P199,P200,P201, A35,A36,A37] |
-| UR-12 | Usuario interno | Poder encontrar rápidamente cualquier cliente o factura | Cliente / entrevista [P141,A40] |
+| UR-12 | Usuario interno | Poder encontrar rápidamente cualquier cliente o factura mediante un sistema de búsqueda y filtrado| Cliente / entrevista [P141,A40] |
 | UR-13 | Administrador | Poder consultar la situación financiera de la empresa mediante un dashboard e informes, y exportarlos | Cliente / entrevista [P104,P130–P131,A38,A39] |
 | UR-14 | Administrador, Superadministrador | Poder aprobar o rechazar las operaciones económicas que requieran control, como descuentos o importes elevados | Cliente / entrevista [A11–A12, A97] |
 | UR-15 | Administrador | Poder revisar una vez al año el rango de tarifa de cada cliente a partir de su facturación anual | Cliente / entrevista [P114,P146,A10,A72] |
 | UR-16 | Superadministrador | Poder configurar los parámetros del sistema (plazos de pago, recordatorios, tarifas, series, plantillas) sin necesidad de modificar el código | Cliente / entrevista [P134,P144,A09,A57] |
 | UR-17 | Superadministrador | Poder consultar quién ha realizado cada acción y cuándo, y comprobar que los procesos automáticos funcionan correctamente | Cliente / entrevista [P207–P208,A48,A55,A77] |
 | UR-18 | Sistema externo vía API | Poder consultar si un cliente tiene facturas pendientes y comunicar solicitudes de baja | Cliente / entrevista [P203,P212, A74,A75] |
+| UR-19 | Administrador | Poder gestionar sustituciones temporales de los usuarios operativos | [A47] |
 
 
 ## 4. Requisitos del sistema
@@ -128,7 +129,7 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | FR-04 | El sistema deberá cerrar la sesión automáticamente tras un periodo de inactividad | UR-01 |
 | FR-05 | El sistema deberá permitir al administrador crear, modificar y desactivar usuarios, sin opción de registrarse por cuenta propia. Al desactivar un usuario, se cerrarán sus sesiones y se conservará el registro de sus acciones | UR-02, UR-17 |
 | FR-06 | El sistema deberá asignar a cada usuario uno de los tres roles: Superadministrador, Administrador o Usuario operativo | UR-02 |
-| FR-07 | El sistema deberá permitir al administrador asignar y desasignar clientes a cada usuario operativo | UR-02 |
+| FR-07 | El sistema deberá permitir al administrador asignar y desasignar clientes a cada usuario operativo, asi también como reasignar clientes a otro usuario operativo durante un intervalo de tiempo. | UR-02, UR-19 |
 | FR-08 | El sistema deberá impedir que un usuario operativo acceda a clientes o facturas que no tenga asignados, incluso escribiendo directamente la dirección web | UR-02 |
 
 
