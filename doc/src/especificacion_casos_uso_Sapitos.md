@@ -227,7 +227,7 @@ En los flujos, "Usuario" se refiere al usuario interno que realiza el caso de us
 
 1. El administrador selecciona el usuario.
 2. El administrador cambia su rol o asigna y desasigna clientes.
-3. Si cambia el responsable de un cliente, el nuevo responsable pasa a recibir sus avisos y el historial sigue indicando quién hizo cada acción anterior.
+3. Si cambia el responsable de un cliente, temporal o permanentemente, el nuevo responsable pasa a recibir sus avisos y el historial sigue indicando quién hizo cada acción anterior.
 
 **Continuación:** el caso de uso continúa en el paso 7 del flujo principal.
 
