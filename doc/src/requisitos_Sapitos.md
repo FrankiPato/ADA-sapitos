@@ -1,4 +1,4 @@
-# Requisitos
+  # Requisitos
 
 ## 1. Contexto y alcance
 
@@ -407,13 +407,83 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | UR-17 Auditoría y procesos automáticos | FR-05, FR-74, FR-75 |
 | UR-18 API para sistemas externos | FR-53, FR-76 a FR-78 |
 
-### 8.3. Ejemplo de trazabilidad completa: baja de un cliente con deuda
+### 8.3. Reglas de negocio, requisitos funcionales y casos de uso
+
+| Regla de negocio | Requisitos funcionales | Casos de uso |
+|---|---|---|
+| RB-01 Cliente empresa con contacto de facturación activo | FR-13, FR-14 | CU-04 |
+| RB-02 Tarifa según el rango de facturación anual | FR-16, FR-57, FR-73 | CU-06, CU-20 |
+| RB-03 Revisión anual de la tarifa | FR-57, FR-58 | CU-20 |
+| RB-04 Facturas recurrentes el día 1 | FR-23 | CU-09 |
+| RB-05 Factura proporcional (prorrateo) | FR-17, FR-24 | CU-06, CU-09 |
+| RB-06 Plazo de pago de 5 días o condiciones pactadas | FR-19, FR-39, FR-73 | CU-06, CU-11 |
+| RB-07 Calendario de recordatorios | FR-39, FR-40 | CU-11 |
+| RB-08 Un impago no cancela el servicio | FR-39, FR-40 | CU-11 |
+| RB-09 Estados de la factura | FR-27 a FR-33, FR-43, FR-46, FR-49, FR-51 | CU-08, CU-10, CU-12, CU-13, CU-15, CU-16 |
+| RB-10 Solo se modifican los borradores | FR-29, FR-33 | CU-07, CU-08, CU-12 |
+| RB-11 Numeración única y correlativa | FR-30, FR-38 | CU-08, CU-10 |
+| RB-12 Factura pagada solo con el cobro total | FR-43, FR-46, FR-51 | CU-13, CU-14, CU-16 |
+| RB-13 Operaciones que necesitan aprobación | FR-51, FR-58, FR-59, FR-81 | CU-06, CU-08, CU-12, CU-16, CU-20, CU-21, CU-22 |
+| RB-14 Baja con facturas pendientes | FR-54, FR-55 | CU-11, CU-17 |
+| RB-15 Cliente en pausa | FR-25, FR-52 | CU-06, CU-09 |
+| RB-16 Redondeo de importes | FR-21, FR-80 | CU-07, CU-09 |
+| RB-17 La configuración no afecta a facturas emitidas | FR-32, FR-73 | CU-26 |
+| RB-18 Permisos de cada rol | FR-06, FR-08 | CU-03 (y todos los CU de usuarios internos) |
+| RB-19 Conservación y anonimización de datos | FR-12 | CU-04, CU-17 |
+| RB-20 Estados del cliente | FR-25, FR-79 | CU-06, CU-09, CU-17, CU-24 |
+| RB-21 Conservación de informes y exportaciones | FR-67, FR-68 | CU-25 |
+
+### 8.4. Requisitos funcionales y casos de uso
+
+| Requisitos funcionales | Casos de uso |
+|---|---|
+| FR-01, FR-02, FR-04 | CU-01 |
+| FR-03 | CU-02 |
+| FR-05 a FR-07 | CU-03 |
+| FR-08 | CU-03, CU-04, CU-24 |
+| FR-09 a FR-11, FR-13 a FR-15, FR-56, FR-82 | CU-04 |
+| FR-12 | CU-04, CU-17 |
+| FR-16 a FR-20, FR-52 | CU-06 |
+| FR-21, FR-22, FR-80 | CU-07 |
+| FR-23 a FR-26 | CU-09 |
+| FR-27, FR-28, FR-30 a FR-32 | CU-08 |
+| FR-29 | CU-07, CU-08, CU-12 |
+| FR-33 | CU-12 |
+| FR-34, FR-69, FR-70, FR-79 | CU-24 |
+| FR-35 a FR-38 | CU-10 |
+| FR-39 | CU-11 |
+| FR-40 | CU-11, CU-13 |
+| FR-41 | CU-10, CU-11, CU-26 |
+| FR-42 a FR-44 | CU-13 |
+| FR-45, FR-46 | CU-13, CU-14 |
+| FR-47 | CU-14 |
+| FR-48 | CU-12, CU-13 |
+| FR-49, FR-50 | CU-15 |
+| FR-51 | CU-16 |
+| FR-53 | CU-17, CU-18 |
+| FR-54 | CU-17 |
+| FR-55 | CU-11, CU-17 |
+| FR-57, FR-58 | CU-20 |
+| FR-59 | CU-08, CU-12, CU-21 |
+| FR-60 | CU-21, CU-22 |
+| FR-61 | CU-22 |
+| FR-62 | CU-11, CU-13, CU-15, CU-22, CU-23 |
+| FR-63 | CU-23 |
+| FR-64 a FR-68 | CU-25 |
+| FR-71, FR-72 | CU-05 |
+| FR-73 | CU-26 |
+| FR-74 | CU-03, CU-16, CU-22, CU-26, CU-27 |
+| FR-75 | CU-09, CU-27 |
+| FR-76 | CU-19 |
+| FR-77 | CU-18 |
+| FR-78 | CU-18, CU-19 |
+| FR-81 | CU-06, CU-21 |
+
+### 8.5. Ejemplo de trazabilidad completa: baja de un cliente con deuda
 
 | Fuente | Requisito de usuario | Requisitos funcionales | Regla de negocio | Decisión / duda |
 |---|---|---|---|---|
 | [P098, P176–P179, A20, A75] | UR-10, UR-18 | FR-53, FR-54, FR-55, FR-77 | RB-14 | Q-01, Q-02 |
-
-En las siguientes entregas esta trazabilidad se ampliará con los casos de uso, el diseño y las pruebas correspondientes.
 
 ## 9. Glosario
 
