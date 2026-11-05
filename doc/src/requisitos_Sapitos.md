@@ -24,9 +24,6 @@ factura se ha enviado, cobrado o quedado pendiente.
 
 ### 1.2. Alcance
 
-Descripción de qué responsabilidades corresponden al sistema y, cuando sea relevante,
-qué elementos quedan explícitamente fuera de su alcance.
-
 Dentro del alcance: 
 - Gestión de los clientes de Turbine (empresas), sus personas de contacto y sususcripción.
 - Creación de facturas puntuales y generación automática de las recurrentes, con su correspondiente PDF y numeración.
@@ -59,7 +56,7 @@ afectados por su funcionamiento (partes interesadas).
 | Superadministrador | Actor principal | Usuario interno de Turbine con permisos de configuración del sistema. Será una persona o un grupo muy reducido | Configurar plazos de pago, recordatorios, tarifas, series de facturación y plantillas, y consultar el registro de actividad |
 | Administrador | Actor principal | Usuario interno que gestiona todas la operaciones: clientes, facturas, usuarios, asignaciones y aprobacione | Tener una visión global de la facturación y los cobros y controlar las operaciones económicas importantes |
 | Usuario operativo | Actor principal | Empleado del departamento administrativo que trabaja únicamente con los clientes que tiene asignados. (lo que llamamos lector) | Gestionar de forma rápida a sus clientes, sus facturas y sus cobros, y recibir los avisos que le corresponden |
-| Planificador del sistema | Actor secundario (sistema) | Componente que lanza automáticamente los procesos, como la generación de facturas recurrentes del día 1, los recordatorios o las copias de seguridad (decisión tomada por el equipo ya que Alejandro pide tareas automáticas) | Que los procesos se ejecuten a tiempo, sin duplicados y dejando registro |
+| Planificador del sistema | Actor secundario (temporizador) | Representa el paso del tiempo: es el que inicia los procesos que ocurren en una fecha u hora, como la generación de facturas del día 1, los recordatorios o la consulta de pagos. No es una persona ni un sistema externo. La pieza interna que ejecuta estas tareas forma parte del diseño del sistema | Que los procesos se ejecuten a tiempo, sin duplicados y dejando registro |
 | Stripe (simulado) | Actor secundario (sistema externo) | Plataforma de pagos de Turbine, que informa de si una factura ha sido pagada o no. En el futuro podrían añadirse otras fuentes, como Revolut | Proporciona información sobre los cobros |
 | Servicio de mensajería (simulado) | Actor secundario (sistema externo) | Servicio de email y WhatsApp encargado de entregar las facturas y los recordatorios a los clientes, e informar de si el envío ha fallado [P101, A26–A27] | Entregar las comunicaciones y avisar de rebotes o errores |
 | Sistema externo vía API | Actor secundario (sistema externo) | Otro sistema de Turbine que consulta si un cliente tiene facturas pendientes o comunica una solicitud de baja | Consultar información de facturación sin saltarse las reglas del sistema (lo necesitamos por ejemplo para la gestión al dar de baja una empresa) |
@@ -70,6 +67,20 @@ afectados por su funcionamiento (partes interesadas).
 El superadministrador dispone de todas las capacidades del Administrador, además de la configuración avanzada del sistema y la consulta de la auditoría.
 Los clientes de Turbine no se consideran actores del sistema, ya que nunca interactúan con la aplicación. Por ello, no aparecerán en el diagrama de casos de uso.
 
+### 1.4. Procesos automáticos y límites de la automatización
+
+| Proceso | Quién lo inicia | Qué hace el sistema solo | Cuándo interviene una persona | Caso de uso |
+|---|---|---|---|---|
+| Facturas recurrentes | Planificador (día 1 de cada mes) | Genera y emite las facturas de las suscripciones activas | Si falla la factura de un cliente, se avisa a su responsable | CU-09 |
+| Factura proporcional | Planificador (fecha de inicio de la suscripción) | Genera la factura por los días que quedan de mes | Nunca, salvo error | CU-09 |
+| Envío de facturas | El propio sistema, al emitir una factura | Envía el PDF por email y WhatsApp | Si el envío falla, el responsable corrige el contacto y reenvía | CU-10 |
+| Recordatorios | Planificador (cada día) | Envía los recordatorios según el calendario de RB-07 | Una persona puede pausarlos si hay una disputa o incidencia | CU-11 |
+| Conciliación de pagos | Planificador (consulta periódica) y avisos de Stripe | Marca como pagadas las facturas con misma referencia e importe | Si el pago no está claro o el importe no coincide, lo asocia una persona | CU-13, CU-14 |
+| Revisión anual de tarifa | Planificador (una vez al año) | Muestra la lista de clientes que hay que revisar | El administrador introduce la facturación y el cambio se aprueba | CU-20 |
+| Fin de una pausa o de una disputa | Planificador (fecha prevista) | Avisa al responsable | La reactivación la confirma una persona (Q-15) | CU-06, CU-15 |
+| Copias de seguridad | Proceso interno del sistema | Hace una copia diaria | El superadministrador consulta su estado | CU-27 |
+
+Fuera de estos casos, ninguna operación económica (descuentos, rectificativas, incobrables, cambios de tarifa) se hace de forma automática: siempre la inicia y la aprueba una persona (RB-13).
 
 ## 2. Requisitos de negocio
 
@@ -340,10 +351,10 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | A-15 | Las copias de seguridad no se modifican para borrar a un cliente concreto. Si se restaura una copia, se vuelven a aplicar las anonimizaciones que se hubieran hecho | El cliente reconoció que no lo tenía pensado [P187] y pidió una política para ello [A51] | RB-19 |
 | A-16 | Cada línea de factura se redondea al céntimo, con redondeo hacia arriba en caso de empate | El cliente pidió que la regla de redondeo estuviera documentada [A94] | RB-16, NFR-14 |
 | A-17 | El paquete para la gestoría se exporta como un archivo comprimido con un CSV y los PDF de las facturas | El cliente dejó el formato abierto [A102] | FR-68 |
-| A-18 | Se incluye un actor "Planificador del sistema" que representa el paso del tiempo y lanza las tareas automáticas (facturas recurrentes, recordatorios, consulta de pagos y copias de seguridad) | El cliente pide que estas tareas se realicen automáticamente, sin intervención de ninguna persona. En UML, todo caso de uso debe ser iniciado por un actor y así vamos a representar los procesos que se inician por fecha u hora | 1.3, FR-23, FR-39, FR-42, NFR-22 |
+| A-18 | Se incluye un actor "Planificador del sistema" que representa el paso del tiempo y lanza las tareas automáticas (facturas recurrentes, recordatorios y consulta de pagos). Es un temporizador, no un componente: el componente interno que las ejecuta se recoge en el diseño | El cliente pide que estas tareas se realicen automáticamente, sin intervención de ninguna persona. En UML, todo caso de uso debe ser iniciado por un actor y así vamos a representar los procesos que se inician por fecha u hora | 1.3, FR-23, FR-39, FR-42 |
 | A-19 | En la importación de clientes desde CSV, se importan solo las filas válidas; las filas con errores o con identificador fiscal duplicado se rechazan y aparecen en el resumen, para que el usuario pueda corregirlas | El cliente deja la política a elección del equipo [A41]. Así no se bloquea toda la importación por unas pocas filas erróneas, y no entran datos incorrectos | FR-71, FR-72 |
 | A-20 | Quedan fuera de esta versión las ampliaciones que el cliente presentó como opcionales: presupuestos, varias sociedades emisoras, centros de coste, conversión entre monedas, objetivos de facturación, cierre de periodos, fusión de clientes duplicados, importación de facturas antiguas, un futuro rol externo para la gestoría y funciones de inteligencia artificial | El cliente las presentó como ampliaciones o mejoras opcionales y pidió que lo que se deja fuera se documente, por eso está aquí [A119] | — |
-| A-21 | Se aplazan a versiones posteriores algunas funciones secundarias que el cliente mencionó, para priorizar el núcleo del sistema (clientes, facturación, envíos y cobros): delegación temporal de clientes, adjuntos de documentos, etiquetas de clientes, favoritos y filtros guardados, acciones masivas, menciones en comentarios, informes programados, alertas configurables, preferencias de canal de las notificaciones, calendario laboral y festivos, reasignación de aprobaciones a un suplente, notas restringidas solo para administradores, envío de pruebas de plantillas y la excepción comercial de no aplicar prorrateo | Son funciones de comodidad o de organización que no impiden el funcionamiento principal del sistema. Se priorizan las funciones imprescindibles para la primera versión, tal como permite el cliente [A119,A120] | - |
+| A-21 | Se aplazan a versiones posteriores algunas funciones secundarias que el cliente mencionó, para priorizar el núcleo del sistema (clientes, facturación, envíos y cobros): adjuntos de documentos, etiquetas de clientes, favoritos y filtros guardados, acciones masivas, menciones en comentarios, informes programados, alertas configurables, preferencias de canal de las notificaciones, calendario laboral y festivos, reasignación de aprobaciones a un suplente, notas restringidas solo para administradores, envío de pruebas de plantillas y la excepción comercial de no aplicar prorrateo | Son funciones de comodidad o de organización que no impiden el funcionamiento principal del sistema. Se priorizan las funciones imprescindibles para la primera versión, tal como permite el cliente [A119,A120] | - |
 
 ## 7. Dudas, ambigüedades y cuestiones pendientes
 
@@ -376,7 +387,7 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | BR-01 Reducir el trabajo manual de facturación y recordatorios | UR-05, UR-06, UR-07 | FR-16 a FR-33, FR-35 a FR-41, FR-80, FR-81 |
 | BR-02 Automatizar el seguimiento de los cobros | UR-08, UR-09, UR-10 | FR-34, FR-42 a FR-56, NFR-20, NFR-30 |
 | BR-03 Permitir que la administración crezca | UR-02, UR-04, UR-17 | FR-05 a FR-08, FR-71, FR-72, FR-75, NFR-09 a NFR-13, NFR-26, NFR-27 |
-| BR-04 Que la información llegue a la persona correcta | UR-11, UR-14 | FR-26, FR-38, FR-49, FR-52, FR-59 a FR-63 |
+| BR-04 Que la información llegue a la persona correcta | UR-11, UR-14, UR-19 | FR-07, FR-26, FR-38, FR-49, FR-52, FR-59 a FR-63 |
 | BR-05 Agilizar las tareas habituales | UR-03, UR-12 | FR-09 a FR-15, FR-34, FR-69, FR-70, FR-79, FR-82, NFR-01 a NFR-04, NFR-08 |
 | BR-06 Gestionar desde cualquier lugar y dispositivo | UR-01 | FR-01 a FR-04, NFR-05 a NFR-07 |
 | BR-07 Conocer la situación financiera | UR-13, UR-15 | FR-57, FR-58, FR-64 a FR-68, NFR-06, NFR-14 |
@@ -406,6 +417,7 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | UR-16 Configuración | FR-41, FR-73 |
 | UR-17 Auditoría y procesos automáticos | FR-05, FR-74, FR-75 |
 | UR-18 API para sistemas externos | FR-53, FR-76 a FR-78 |
+| UR-19 Sustituciones temporales | FR-07 |
 
 ### 8.3. Reglas de negocio, requisitos funcionales y casos de uso
 
@@ -485,6 +497,8 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 |---|---|---|---|---|
 | [P098, P176–P179, A20, A75] | UR-10, UR-18 | FR-53, FR-54, FR-55, FR-77 | RB-14 | Q-01, Q-02 |
 
+En las siguientes entregas esta trazabilidad se ampliará con el modelo de datos, las clases, los diagramas de secuencia y las pruebas correspondientes.
+
 ## 9. Glosario
 
 | Término | Definición |
@@ -518,7 +532,7 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | Aprobación | Validación por parte de un administrador o superadministrador de una operación económica sensible antes de que se aplique |
 | Separación de funciones | Regla por la que una persona no puede aprobar su propia solicitud cuando supera un importe determinado |
 | Auditoría | Registro no modificable de quién ha hecho cada acción importante en el sistema y cuándo |
-| Planificador | Parte del sistema que lanza automáticamente los procesos programados, como la generación de facturas del día 1 |
+| Planificador | Actor que representa el paso del tiempo e inicia los procesos que ocurren en una fecha u hora, como la generación de facturas del día 1. No es una persona ni un sistema externo |
 | Simulado | Componente que imita el comportamiento de un servicio real (Stripe, email o WhatsApp) para poder probar el sistema sin usar el servicio real |
 | Stripe | Plataforma de pagos online que utiliza Turbine |
 | API | Interfaz que permite que otros sistemas se comuniquen con la aplicación de forma automática |
