@@ -1,0 +1,55 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam roundcorner 5
+hide members
+title Visión general (solo clases y relaciones principales)
+
+package "Usuarios" #F3F3F3 {
+  abstract class Usuario
+  class UsuarioOperativo
+  class Administrador
+  class Superadministrador
+  class Notificacion
+}
+package "Clientes y suscripciones" #E8F1FB {
+  class Cliente
+  class Contacto
+  class Suscripcion
+  class SolicitudBaja
+}
+package "Facturación y cobros" #E9F6E9 {
+  class Factura
+  class Pago
+  class Incidencia
+}
+package "Comunicaciones y aprobaciones" #FFF6E0 {
+  class EnvioMensaje
+  class SolicitudAprobacion
+}
+package "Configuración y operación" #F6E8F6 {
+  class ConfiguracionSistema
+  class RegistroAuditoria
+  class EjecucionProceso
+}
+
+Usuario <|-- UsuarioOperativo
+UsuarioOperativo <|-- Administrador
+Administrador <|-- Superadministrador
+
+Usuario "1" -- "0..*" Cliente : responsable de >
+Usuario "1" -- "0..*" Notificacion : "recibe >"
+Cliente "1..*" -- "1..*" Contacto : "tiene >"
+Cliente "1" -- "0..1" Suscripcion : "contrata >"
+Cliente "1" -- "0..*" SolicitudBaja : "solicita >"
+Cliente "1" -- "0..*" Factura : "se emite a >"
+Cliente "1" -- "0..*" Incidencia : "reporta >"
+Suscripcion "0..1" -- "0..*" Factura : "genera (recurrentes) >"
+Factura "1" -- "0..*" Pago : se concilia con >
+Factura "0..1" -- "0..*" Incidencia : "puede tener >"
+Factura "1" -- "0..*" EnvioMensaje : "se notifica con >"
+Usuario "1" -- "0..*" SolicitudAprobacion : "solicita >"
+SolicitudAprobacion "0..*" -- "0..1" Factura : "vinculada a >"
+Superadministrador ..> ConfiguracionSistema : "configura"
+Superadministrador ..> RegistroAuditoria : "consulta"
+EjecucionProceso "0..1" -- "0..*" Factura : genera >
+@enduml

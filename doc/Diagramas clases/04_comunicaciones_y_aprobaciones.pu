@@ -1,0 +1,72 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam roundcorner 5
+hide empty members
+title 04 - Comunicaciones y aprobaciones (CU-10, 11, 21, 22)
+
+class EnvioMensaje {
+  - tipo: FACTURA | RECORDATORIO | RECUPERACION
+  - canal: EMAIL | WHATSAPP
+  - fecha: DateTime
+  - numeroIntento: Integer
+  - resultado: ENVIADO | FALLIDO | REBOTADO
+}
+
+class PlantillaMensaje {
+  - tipo: String
+  - idioma: ES | EN
+  - asunto: String
+  - cuerpo: String
+  - version: Integer
+}
+
+class SolicitudAprobacion {
+  - tipoOperacion: TipoOperacion
+  - fechaSolicitud: Date
+  - motivo: String
+  - importe: Decimal
+  - requiereSeparacionFunciones: Boolean
+  - estado: EstadoAprobacion
+  - comentarioResolucion: String
+  + aprobar()
+  + rechazar()
+}
+
+enum TipoOperacion {
+  EMISION_FACTURA
+  RECTIFICATIVA
+  INCOBRABLE
+  CAMBIO_TARIFA
+  EXCEPCION_COMERCIAL
+}
+
+enum EstadoAprobacion {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+}
+
+class Factura #E0E0E0
+class Contacto #E0E0E0
+class Usuario #E0E0E0
+class Administrador #E0E0E0
+class ExcepcionComercial #E0E0E0
+class RevisionTarifa #E0E0E0
+
+Factura "1" -- "0..*" EnvioMensaje : se notifica con >
+Contacto "1" -- "0..*" EnvioMensaje : recibe >
+PlantillaMensaje "0..1" -- "0..*" EnvioMensaje : se usa en >
+
+Usuario "1" -- "0..*" SolicitudAprobacion : solicita >
+Administrador "0..1" -- "0..*" SolicitudAprobacion : resuelve >
+SolicitudAprobacion "0..*" -- "0..1" Factura
+SolicitudAprobacion "0..1" -- "0..1" ExcepcionComercial
+SolicitudAprobacion "0..1" -- "0..1" RevisionTarifa
+
+note bottom of SolicitudAprobacion
+  Vinculada a exactamente uno de:
+  Factura, ExcepcionComercial o RevisionTarifa.
+  Un solicitante no puede aprobar su propia solicitud
+  si importe > umbral de separación de funciones (FR-61).
+end note
+@enduml

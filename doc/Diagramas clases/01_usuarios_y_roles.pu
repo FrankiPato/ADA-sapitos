@@ -1,0 +1,94 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam roundcorner 5
+hide empty members
+title 01 - Usuarios y roles (CU-01, CU-02, CU-03, CU-23)
+
+abstract class Usuario {
+  - id: String
+  - nombre: String
+  - emailCorporativo: String
+  - contrasenaHash: String
+  - estado: EstadoUsuario
+  - intentosFallidos: Integer
+  - bloqueadoHasta: DateTime
+  + iniciarSesion()
+  + recuperarContrasena()
+}
+
+class UsuarioOperativo {
+  + gestionarClientesAsignados()
+}
+
+class Administrador {
+  + gestionarUsuarios()
+  + aprobarOperaciones()
+  + revisarTarifasAnuales()
+}
+
+class Superadministrador {
+  + configurarSistema()
+  + consultarAuditoria()
+}
+
+class TokenRecuperacion {
+  - hashToken: String
+  - fechaCaducidad: DateTime
+  - usado: Boolean
+}
+
+class AsignacionCliente {
+  - fechaInicio: Date
+  - fechaFin: Date
+  - temporal: Boolean
+}
+
+class Notificacion {
+  - tipo: TipoNotificacion
+  - mensaje: String
+  - fecha: DateTime
+  - leida: Boolean
+  - resuelta: Boolean
+}
+
+package "\nClientes y suscripciones\n" {
+  class Cliente
+}
+
+package "\nComunicaciones y aprobaciones\n" {
+  class SolicitudAprobacion
+}
+
+enum EstadoUsuario {
+  ACTIVO
+  BLOQUEADO_TEMPORALMENTE
+  DESACTIVADO
+}
+
+enum TipoNotificacion {
+  PAGO_RECIBIDO
+  FACTURA_VENCIDA
+  DISPUTA
+  REVISION_ANUAL
+  APROBACION_RESUELTA
+  ENVIO_FALLIDO
+  ...
+}
+
+Usuario <|-- UsuarioOperativo
+UsuarioOperativo <|-- Administrador
+Administrador <|-- Superadministrador
+
+Usuario "1" *-- "0..*" TokenRecuperacion : solicita >
+Usuario "1" -- "0..*" Notificacion : recibe >
+Usuario "1" -- "0..*" Cliente : es responsable interno de >
+Usuario "1" -- "0..*" SolicitudAprobacion : solicita >
+UsuarioOperativo "1" -- "0..*" AsignacionCliente : tiene >
+Cliente "1" -- "0..*" AsignacionCliente
+
+note right of AsignacionCliente
+  Qué clientes puede operar cada usuario
+  (temporal o permanente). El responsable
+  interno (único) recibe los avisos.
+end note
+@enduml

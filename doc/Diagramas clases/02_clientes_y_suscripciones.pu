@@ -1,0 +1,119 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam roundcorner 5
+hide empty members
+title 02 - Clientes y suscripciones (CU-04, 05, 06, 17, 18, 20)
+
+class Cliente {
+  - idFiscal: String
+  - nombreComercial: String
+  - razonSocial: String
+  - direccionFiscal: String
+  - pais: String
+  - moneda: String
+  - sector: String
+  - idioma: Idioma
+  - estado: EstadoCliente
+  + darDeAlta()
+  + solicitarBaja()
+  + reactivar()
+}
+
+class Contacto {
+  - nombre: String
+  - email: String
+  - telefono: String
+  - consentimientoWhatsApp: Boolean
+}
+
+class ContactoCliente <<asociación>> {
+  - funcion: FuncionContacto
+  - activo: Boolean
+}
+
+class Suscripcion {
+  - fechaInicio: Date
+  - tarifaMensual: Decimal
+  - plazoPagoDias: Integer
+  - estado: EstadoSuscripcion
+  - fechaPrevistaReactivacion: Date
+  + activar()
+  + pausar()
+  + cancelar()
+}
+
+class ExcepcionComercial {
+  - tipo: TipoExcepcion
+  - valor: Decimal
+  - fechaInicio: Date
+  - fechaFin: Date
+}
+
+class RevisionTarifa {
+  - facturacionAnual: Decimal
+  - precioAnterior: Decimal
+  - precioNuevo: Decimal
+  - fechaEfecto: Date
+}
+
+class RangoTarifa {
+  - facturacionMinima: Decimal
+  - facturacionMaxima: Decimal
+  - precioMensual: Decimal
+}
+
+class SolicitudBaja {
+  - origen: MANUAL | API
+  - fechaSolicitud: Date
+  - fechaEfectiva: Date
+}
+
+class ImportacionClientes {
+  - nombreFichero: String
+  - filasCreadas: Integer
+  - filasRechazadas: Integer
+}
+
+package "Usuarios" {
+  abstract class Usuario
+}
+
+package "\nFacturación y cobros\n" {
+  class Factura
+  class Incidencia
+}
+
+enum EstadoCliente {
+  PENDIENTE_ACTIVACION
+  ACTIVO
+  PAUSADO
+  BAJA_SOLICITADA
+  BAJA
+}
+
+enum EstadoSuscripcion {
+  PENDIENTE_ACTIVACION
+  ACTIVA
+  PAUSADA
+  CANCELADA
+}
+
+enum Idioma {
+  ES
+  EN
+}
+
+Cliente "1..*" -- "1..*" Contacto : tiene >
+(Cliente, Contacto) .. ContactoCliente
+Cliente "1" *-- "0..1" Suscripcion : contrata >
+Cliente "1" -- "0..*" SolicitudBaja
+Suscripcion "0..*" -- "1" RangoTarifa : aplica >
+Suscripcion "1" *-- "0..*" ExcepcionComercial
+Suscripcion "1" *-- "0..*" RevisionTarifa
+RevisionTarifa "0..*" -- "0..1" RangoTarifa : propone >
+ImportacionClientes ..> Cliente : crea >
+Usuario "1" -- "0..*" Cliente : responsable de >
+Cliente "1" -- "0..*" Factura : "se emite a >"
+Cliente "1" -- "0..*" Incidencia : "reporta >"
+Suscripcion "0..1" -- "0..*" Factura : "genera (recurrentes) >"
+@enduml

@@ -1,0 +1,121 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam roundcorner 5
+hide empty members
+title 03 - Facturación y cobros (CU-07 a CU-16)
+
+class Factura {
+  - numero: String
+  - tipo: TipoFactura
+  - estado: EstadoFactura
+  - fechaEmision: Date
+  - fechaVencimiento: Date
+  - importeTotal: Decimal
+  - saldoPendiente: Decimal
+  - urlPdf: String
+  + emitir()
+  + enviar()
+  + marcarPagada()
+  + declararIncobrable()
+}
+
+class LineaFactura {
+  - concepto: String
+  - cantidad: Decimal
+  - precioUnitario: Decimal
+  - descuento: Decimal
+  - porcentajeImpuesto: Decimal
+  - importeLinea: Decimal
+}
+
+class ConceptoCatalogo {
+  - nombre: String
+  - precioOrientativo: Decimal
+}
+
+class Pago {
+  - referenciaStripe: String {unique}
+  - fecha: Date
+  - importe: Decimal
+  - estado: EstadoPago
+  + conciliar()
+  + asociarManualmente()
+}
+
+class AsociacionPago {
+  - fecha: DateTime
+  - tipo: AUTOMATICA | MANUAL
+  - motivo: String
+  - activa: Boolean
+  - motivoDeshecha: String
+  + deshacer()
+}
+
+class Incidencia {
+  - tipo: String
+  - descripcion: String
+  - esDisputa: Boolean
+  - fechaRevision: Date
+  - pausaRecordatorios: Boolean
+  - estado: EstadoIncidencia
+  - resolucion: String
+  + cerrar()
+}
+
+class ComentarioIncidencia {
+  - texto: String
+  - fecha: DateTime
+}
+
+class Cliente #E0E0E0
+class Suscripcion #E0E0E0
+class Usuario #E0E0E0
+class SerieFacturacion #E0E0E0
+class Impuesto #E0E0E0
+
+enum TipoFactura {
+  PUNTUAL
+  RECURRENTE
+  RECTIFICATIVA
+}
+
+enum EstadoFactura {
+  BORRADOR
+  PENDIENTE_APROBACION
+  EMITIDA
+  VENCIDA
+  PARCIALMENTE_PAGADA
+  PAGADA
+  EN_DISPUTA
+  INCOBRABLE
+}
+
+enum EstadoPago {
+  PENDIENTE_ASOCIAR
+  ASOCIADO
+  DIFERENCIA_PENDIENTE_REVISION
+}
+
+Cliente "1" -- "0..*" Factura : se emite a >
+Suscripcion "0..1" -- "0..*" Factura : genera (recurrentes) >
+Factura "1" *-- "1..*" LineaFactura : contiene >
+LineaFactura "0..*" -- "0..1" ConceptoCatalogo
+LineaFactura "0..*" -- "1" Impuesto
+Factura "0..*" -- "0..1" SerieFacturacion : numerada en >
+Factura "0..*" -- "0..1" Factura : rectifica a >
+
+Factura "1" -- "0..*" AsociacionPago : se concilia mediante >
+Pago "1" -- "0..*" AsociacionPago
+Usuario "0..1" -- "0..*" AsociacionPago : asocia / deshace >
+
+Cliente "1" -- "0..*" Incidencia : reporta >
+Factura "0..1" -- "0..*" Incidencia : puede tener >
+Usuario "1" -- "0..*" Incidencia : es responsable de >
+Incidencia "1" *-- "0..*" ComentarioIncidencia
+
+note bottom of Factura
+  Una factura emitida es inmutable (RB-10):
+  solo se corrige con una rectificativa.
+  Una incobrable nunca se marca como pagada (RB-12).
+end note
+@enduml

@@ -1,0 +1,98 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam roundcorner 5
+hide empty members
+title 05 - Configuración, auditoría y procesos (CU-09, 13, 18, 19, 25, 26, 27)
+
+class ConfiguracionSistema {
+  - plazoPagoPorDefectoDias: Integer
+  - cadenciaRecordatoriosDias: Integer
+  - dominioCorreo: String
+  - datosFiscalesTurbine: String
+  - umbralAprobacionImporte: Decimal
+  - umbralSeparacionFunciones: Decimal
+  - vigenteDesde: DateTime
+}
+
+class SerieFacturacion {
+  - prefijo: String {unique}
+  - ultimoNumero: Integer
+  + siguienteNumero(): String
+}
+
+class Impuesto {
+  - nombre: String
+  - porcentaje: Decimal
+}
+
+class RangoTarifa {
+  - facturacionMinima: Decimal
+  - facturacionMaxima: Decimal
+  - precioMensual: Decimal
+}
+
+class PlantillaMensaje {
+  - idioma: ES | EN
+  - cuerpo: String
+}
+
+class RegistroAuditoria <<inmutable>> {
+  - fecha: DateTime
+  - accion: String
+  - entidad: String
+  - detalle: String
+}
+
+class EjecucionProceso {
+  - tipo: GENERACION_MENSUAL | RECORDATORIOS | CONCILIACION | COPIA_SEGURIDAD
+  - fechaInicio: DateTime
+  - elementosProcesados: Integer
+  - fallos: Integer
+}
+
+class DetalleEjecucion {
+  - elemento: String
+  - resultado: String
+  - motivoFallo: String
+}
+
+class Informe {
+  - tipo: FACTURACION | PAQUETE_GESTORIA
+  - formato: CSV | PDF | ZIP
+  - estado: EN_GENERACION | LISTO
+}
+
+class LlamadaAPI {
+  - fecha: DateTime
+  - sistemaOrigen: String
+  - operacion: String
+  - resultado: String
+}
+
+class Superadministrador #E0E0E0
+class Administrador #E0E0E0
+class Usuario #E0E0E0
+class Cliente #E0E0E0
+class Factura #E0E0E0
+
+Superadministrador ..> ConfiguracionSistema : configura
+ConfiguracionSistema "1" o-- "1..*" SerieFacturacion
+ConfiguracionSistema "1" o-- "0..*" Impuesto
+ConfiguracionSistema "1" o-- "1..*" RangoTarifa
+ConfiguracionSistema "1" o-- "0..*" PlantillaMensaje
+
+Superadministrador ..> RegistroAuditoria : consulta
+Superadministrador ..> EjecucionProceso : consulta
+Usuario "0..1" -- "0..*" RegistroAuditoria : realiza >
+Cliente "0..1" -- "0..*" RegistroAuditoria : afecta a <
+
+EjecucionProceso "1" *-- "0..*" DetalleEjecucion
+EjecucionProceso "0..1" -- "0..*" Factura : genera >
+
+Administrador "1" -- "0..*" Informe : genera >
+Cliente "0..1" -- "0..*" LlamadaAPI
+
+note bottom of RegistroAuditoria
+  Solo se crea y consulta; nunca se edita ni borra.
+end note
+@enduml
