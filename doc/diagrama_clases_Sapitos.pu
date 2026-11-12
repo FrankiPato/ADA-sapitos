@@ -1,0 +1,669 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam monochrome false
+skinparam roundcorner 5
+hide empty members
+
+title Diagrama de clases - Sistema de facturación y cobros de Turbine
+
+' =====================================================================
+' 1. USUARIOS Y ROLES   (CU-01, CU-02, CU-03, CU-23)
+' =====================================================================
+package "Usuarios y roles" {
+
+  abstract class Usuario {
+    - id: String
+    - nombre: String
+    - emailCorporativo: String
+    - contrasenaHash: String
+    - estado: EstadoUsuario
+    - intentosFallidos: Integer
+    - bloqueadoHasta: DateTime
+    - ultimoAcceso: DateTime
+    + iniciarSesion()
+    + cerrarSesion()
+    + recuperarContrasena()
+    + cambiarContrasena()
+    + consultarPantallaTrabajo()
+    + buscarClientesYFacturas()
+  }
+
+  class UsuarioOperativo {
+    + gestionarClientesAsignados()
+    + importarClientes()
+    + gestionarSuscripcion()
+    + crearFacturaPuntual()
+    + crearRectificativa()
+    + asociarPagoManualmente()
+    + gestionarIncidencias()
+    + gestionarBajaCliente()
+  }
+
+  class Administrador {
+    + gestionarTodosClientes()
+    + gestionarUsuarios()
+    + aprobarOperaciones()
+    + declararIncobrable()
+    + revisarTarifasAnuales()
+    + consultarDashboard()
+    + generarInforme()
+  }
+
+  class Superadministrador {
+    + configurarSistema()
+    + consultarAuditoria()
+    + consultarEstadoSistema()
+  }
+
+  class TokenRecuperacion {
+    - hashToken: String
+    - fechaCaducidad: DateTime
+    - usado: Boolean
+    + estaVigente(): Boolean
+  }
+
+  class AsignacionCliente {
+    - fechaInicio: Date
+    - fechaFin: Date
+    - temporal: Boolean
+  }
+
+  class Notificacion {
+    - tipo: TipoNotificacion
+    - mensaje: String
+    - fecha: DateTime
+    - leida: Boolean
+    - resuelta: Boolean
+    + marcarLeida()
+    + marcarResuelta()
+  }
+}
+
+' =====================================================================
+' 2. CLIENTES, CONTACTOS Y SUSCRIPCIONES   (CU-04, CU-05, CU-06, CU-17, CU-18, CU-20)
+' =====================================================================
+package "Clientes y suscripciones" {
+
+  class Cliente {
+    - idFiscal: String
+    - nombreComercial: String
+    - razonSocial: String
+    - direccionFiscal: String
+    - pais: String
+    - moneda: String
+    - sector: String
+    - idioma: Idioma
+    - estado: EstadoCliente
+    - fechaBaja: Date
+    + darDeAlta()
+    + modificar()
+    + solicitarBaja()
+    + reactivar()
+    + tieneDatosFiscalesCompletos(): Boolean
+    + tieneContactoFacturacionActivo(): Boolean
+    + calcularSaldoPendiente(): Decimal
+    + consultarHistorial()
+  }
+
+  class Contacto {
+    - nombre: String
+    - email: String
+    - telefono: String
+    - consentimientoWhatsApp: Boolean
+  }
+
+  class ContactoCliente <<asociación>> {
+    - funcion: FuncionContacto
+    - activo: Boolean
+    + desactivar()
+  }
+
+  class Suscripcion {
+    - fechaInicio: Date
+    - fechaFin: Date
+    - tarifaMensual: Decimal
+    - condicionesPago: String
+    - plazoPagoDias: Integer
+    - estado: EstadoSuscripcion
+    - motivoPausa: String
+    - fechaInicioPausa: Date
+    - fechaPrevistaReactivacion: Date
+    + activar()
+    + pausar()
+    + reactivar()
+    + cancelar()
+    + calcularImporteProrrateado(): Decimal
+  }
+
+  class ExcepcionComercial {
+    - tipo: TipoExcepcion
+    - valor: Decimal
+    - fechaInicio: Date
+    - fechaFin: Date
+    - estado: EstadoExcepcion
+  }
+
+  class RevisionTarifa {
+    - anio: Integer
+    - facturacionAnual: Decimal
+    - fuenteDato: String
+    - fechaDato: Date
+    - precioAnterior: Decimal
+    - precioNuevo: Decimal
+    - fechaEfecto: Date
+    - estado: EstadoRevision
+    + proponerRango()
+    + aplicar()
+  }
+
+  class SolicitudBaja {
+    - origen: OrigenSolicitud
+    - fechaSolicitud: Date
+    - fechaEfectiva: Date
+    - estado: EstadoSolicitudBaja
+    + confirmar()
+    + cancelar()
+  }
+
+  class ImportacionClientes {
+    - fecha: DateTime
+    - nombreFichero: String
+    - filasCreadas: Integer
+    - filasRechazadas: Integer
+    + validarFilas()
+    + confirmar()
+    + cancelar()
+  }
+
+  class FilaRechazadaImportacion {
+    - numeroFila: Integer
+    - motivo: String
+  }
+}
+
+' =====================================================================
+' 3. FACTURACIÓN Y COBROS   (CU-07 a CU-16)
+' =====================================================================
+package "Facturación y cobros" {
+
+  class Factura {
+    - numero: String
+    - tipo: TipoFactura
+    - estado: EstadoFactura
+    - fechaEmision: Date
+    - fechaVencimiento: Date
+    - periodoFacturado: String
+    - esProporcional: Boolean
+    - importeTotal: Decimal
+    - saldoPendiente: Decimal
+    - motivoRectificacion: String
+    - rectificacionTotal: Boolean
+    - urlPdf: String
+    - motivoIncobrable: String
+    + calcularImportes()
+    + necesitaAprobacion(): Boolean
+    + emitir()
+    + generarPdf()
+    + enviar()
+    + reenviar()
+    + marcarPagada()
+    + marcarVencida()
+    + declararIncobrable()
+    + volverABorrador()
+  }
+
+  class LineaFactura {
+    - concepto: String
+    - cantidad: Decimal
+    - precioUnitario: Decimal
+    - descuento: Decimal
+    - porcentajeImpuesto: Decimal
+    - importeLinea: Decimal
+  }
+
+  class ConceptoCatalogo {
+    - nombre: String
+    - precioOrientativo: Decimal
+    - activo: Boolean
+  }
+
+  class Pago {
+    - referenciaStripe: String {unique}
+    - fecha: Date
+    - importe: Decimal
+    - diferenciaImporte: Decimal
+    - estado: EstadoPago
+    + conciliar()
+    + asociarManualmente()
+  }
+
+  class AsociacionPago {
+    - fecha: DateTime
+    - importeAplicado: Decimal
+    - tipo: TipoAsociacion
+    - motivo: String
+    - activa: Boolean
+    - fechaDeshecha: DateTime
+    - motivoDeshecha: String
+    + deshacer()
+  }
+
+  class Incidencia {
+    - tipo: String
+    - descripcion: String
+    - fechaApertura: Date
+    - esDisputa: Boolean
+    - fechaRevision: Date
+    - pausaRecordatorios: Boolean
+    - estado: EstadoIncidencia
+    - resolucion: String
+    + pausarRecordatorios()
+    + cerrar()
+  }
+
+  class ComentarioIncidencia {
+    - texto: String
+    - fecha: DateTime
+  }
+}
+
+' =====================================================================
+' 4. COMUNICACIONES   (CU-02, CU-10, CU-11)
+' =====================================================================
+package "Comunicaciones" {
+
+  class EnvioMensaje {
+    - tipo: TipoEnvio
+    - canal: CanalEnvio
+    - destinatario: String
+    - fecha: DateTime
+    - numeroIntento: Integer
+    - resultado: ResultadoEnvio
+    - motivoFallo: String
+  }
+
+  class PlantillaMensaje {
+    - tipo: TipoEnvio
+    - idioma: Idioma
+    - asunto: String
+    - cuerpo: String
+    - version: Integer
+    - vigenteDesde: DateTime
+  }
+}
+
+' =====================================================================
+' 5. APROBACIONES   (CU-21, CU-22)
+' =====================================================================
+package "Aprobaciones" {
+
+  class SolicitudAprobacion {
+    - tipoOperacion: TipoOperacion
+    - fechaSolicitud: Date
+    - motivo: String
+    - importe: Decimal
+    - requiereSeparacionFunciones: Boolean
+    - estado: EstadoAprobacion
+    - fechaResolucion: Date
+    - comentarioResolucion: String
+    + aprobar()
+    + rechazar()
+    + puedeAprobarla(aprobador: Administrador): Boolean
+  }
+}
+
+' =====================================================================
+' 6. CONFIGURACIÓN   (CU-26)
+' =====================================================================
+package "Configuración" {
+
+  class ConfiguracionSistema {
+    - plazoPagoPorDefectoDias: Integer
+    - cadenciaRecordatoriosDias: Integer
+    - dominioCorreo: String
+    - datosFiscalesTurbine: String
+    - logo: String
+    - umbralAprobacionImporte: Decimal
+    - umbralSeparacionFunciones: Decimal
+    - vigenteDesde: DateTime
+    + validar(): Boolean
+    + aplicar()
+  }
+
+  class SerieFacturacion {
+    - prefijo: String {unique}
+    - ultimoNumero: Integer
+    - activa: Boolean
+    + siguienteNumero(): String
+  }
+
+  class Impuesto {
+    - nombre: String
+    - porcentaje: Decimal
+    - activo: Boolean
+  }
+
+  class RangoTarifa {
+    - nombre: String
+    - facturacionMinima: Decimal
+    - facturacionMaxima: Decimal
+    - precioMensual: Decimal
+  }
+}
+
+' =====================================================================
+' 7. AUDITORÍA, PROCESOS, INFORMES Y API   (CU-09, 11, 13, 18, 19, 25, 27)
+' =====================================================================
+package "Auditoría, procesos e informes" {
+
+  class RegistroAuditoria <<inmutable>> {
+    - fecha: DateTime
+    - accion: String
+    - entidad: String
+    - idEntidad: String
+    - detalle: String
+  }
+
+  class EjecucionProceso {
+    - tipo: TipoProceso
+    - fechaInicio: DateTime
+    - fechaFin: DateTime
+    - elementosProcesados: Integer
+    - fallos: Integer
+    - estado: EstadoEjecucion
+  }
+
+  class DetalleEjecucion {
+    - elemento: String
+    - resultado: String
+    - motivoFallo: String
+  }
+
+  class Informe {
+    - tipo: TipoInforme
+    - filtros: String
+    - formato: FormatoInforme
+    - fechaGeneracion: DateTime
+    - estado: EstadoInforme
+    - urlArchivo: String
+    + generar()
+    + exportar()
+  }
+
+  class LlamadaAPI {
+    - fecha: DateTime
+    - sistemaOrigen: String
+    - operacion: String
+    - resultado: String
+  }
+}
+
+' =====================================================================
+' ENUMERACIONES
+' =====================================================================
+package "Enumeraciones" {
+  enum EstadoUsuario {
+    ACTIVO
+    BLOQUEADO_TEMPORALMENTE
+    DESACTIVADO
+  }
+  enum EstadoCliente {
+    PENDIENTE_ACTIVACION
+    ACTIVO
+    PAUSADO
+    BAJA_SOLICITADA
+    BAJA
+  }
+  enum EstadoSuscripcion {
+    PENDIENTE_ACTIVACION
+    ACTIVA
+    PAUSADA
+    CANCELADA
+  }
+  enum EstadoExcepcion {
+    PENDIENTE_APROBACION
+    APLICADA
+    RECHAZADA
+    FINALIZADA
+  }
+  enum EstadoRevision {
+    PENDIENTE
+    SIN_CAMBIO
+    PENDIENTE_APROBACION
+    APLICADA
+    RECHAZADA
+  }
+  enum EstadoSolicitudBaja {
+    REGISTRADA
+    CONFIRMADA
+    CANCELADA
+    EJECUTADA
+  }
+  enum TipoExcepcion {
+    DESCUENTO_TEMPORAL
+    MESES_GRATUITOS
+    PRECIO_ESPECIAL
+  }
+  enum OrigenSolicitud {
+    MANUAL
+    API
+  }
+  enum FuncionContacto {
+    FACTURACION
+    IMPAGOS
+    COMERCIAL
+    OTRO
+  }
+  enum Idioma {
+    ES
+    EN
+  }
+  enum TipoFactura {
+    PUNTUAL
+    RECURRENTE
+    RECTIFICATIVA
+  }
+  enum EstadoFactura {
+    BORRADOR
+    PENDIENTE_APROBACION
+    EMITIDA
+    VENCIDA
+    PARCIALMENTE_PAGADA
+    PAGADA
+    EN_DISPUTA
+    INCOBRABLE
+  }
+  enum EstadoPago {
+    PENDIENTE_ASOCIAR
+    ASOCIADO
+    DIFERENCIA_PENDIENTE_REVISION
+  }
+  enum TipoAsociacion {
+    AUTOMATICA
+    MANUAL
+  }
+  enum EstadoIncidencia {
+    ABIERTA
+    CERRADA
+  }
+  enum TipoEnvio {
+    FACTURA
+    RECORDATORIO
+    RECUPERACION_CONTRASENA
+  }
+  enum CanalEnvio {
+    EMAIL
+    WHATSAPP
+  }
+  enum ResultadoEnvio {
+    ENVIADO
+    FALLIDO
+    REBOTADO
+  }
+  enum TipoOperacion {
+    EMISION_FACTURA
+    RECTIFICATIVA
+    INCOBRABLE
+    CAMBIO_TARIFA
+    EXCEPCION_COMERCIAL
+  }
+  enum EstadoAprobacion {
+    PENDIENTE
+    APROBADA
+    RECHAZADA
+  }
+  enum TipoNotificacion {
+    PAGO_RECIBIDO
+    FACTURA_VENCIDA
+    DISPUTA
+    REVISION_ANUAL
+    APROBACION_RESUELTA
+    ENVIO_FALLIDO
+    ERROR_GENERACION
+    REACTIVACION_PREVISTA
+    SOLICITUD_BAJA
+    INFORME_LISTO
+  }
+  enum TipoProceso {
+    GENERACION_MENSUAL
+    RECORDATORIOS
+    CONCILIACION_PAGOS
+    COPIA_SEGURIDAD
+  }
+  enum EstadoEjecucion {
+    EN_CURSO
+    COMPLETADA
+    COMPLETADA_CON_FALLOS
+    FALLIDA
+  }
+  enum TipoInforme {
+    FACTURACION_Y_COBROS
+    PAQUETE_GESTORIA
+  }
+  enum FormatoInforme {
+    CSV
+    PDF
+    ZIP
+  }
+  enum EstadoInforme {
+    EN_GENERACION
+    LISTO
+    ERROR
+  }
+}
+
+' =====================================================================
+' RELACIONES
+' =====================================================================
+
+' --- Jerarquía de roles (RB-18) ---
+Usuario <|-- UsuarioOperativo
+UsuarioOperativo <|-- Administrador
+Administrador <|-- Superadministrador
+
+' --- Usuarios ---
+Usuario "1" *-- "0..*" TokenRecuperacion : "solicita >"
+Usuario "1" -- "0..*" Notificacion : "recibe >"
+Notificacion "0..*" -- "0..1" Cliente : "se refiere a >"
+Notificacion "0..*" -- "0..1" Factura : "se refiere a >"
+Usuario "1" -- "0..*" Cliente : "es responsable interno de >"
+UsuarioOperativo "1" -- "0..*" AsignacionCliente : "tiene >"
+Cliente "1" -- "0..*" AsignacionCliente : "es gestionado mediante >"
+
+' --- Clientes y contactos ---
+Cliente "1..*" -- "1..*" Contacto : "tiene >"
+(Cliente, Contacto) .. ContactoCliente
+
+' --- Suscripción y tarifa ---
+Cliente "1" *-- "0..1" Suscripcion : "contrata >"
+Suscripcion "0..*" -- "1" RangoTarifa : "aplica >"
+Suscripcion "1" *-- "0..*" ExcepcionComercial : "tiene >"
+Suscripcion "1" *-- "0..*" RevisionTarifa : "se revisa en >"
+RevisionTarifa "0..*" -- "0..1" RangoTarifa : "propone >"
+
+' --- Baja de cliente ---
+Cliente "1" -- "0..*" SolicitudBaja : "solicita >"
+Usuario "0..1" -- "0..*" SolicitudBaja : "registra >"
+
+' --- Importación CSV ---
+Usuario "1" -- "0..*" ImportacionClientes : "realiza >"
+ImportacionClientes "1" *-- "0..*" FilaRechazadaImportacion : "rechaza >"
+
+' --- Facturas ---
+Cliente "1" -- "0..*" Factura : "se emite a >"
+Suscripcion "0..1" -- "0..*" Factura : "genera (recurrentes) >"
+Usuario "0..1" -- "0..*" Factura : "emite >"
+Factura "1" *-- "1..*" LineaFactura : "contiene >"
+LineaFactura "0..*" -- "0..1" ConceptoCatalogo : "parte de >"
+LineaFactura "0..*" -- "1" Impuesto : "aplica >"
+Factura "0..*" -- "0..1" SerieFacturacion : "numerada en >"
+Factura "0..*" -- "0..1" Factura : "rectifica a >"
+EjecucionProceso "0..1" -- "0..*" Factura : "genera >"
+
+' --- Pagos ---
+Factura "1" -- "0..*" AsociacionPago : "se concilia mediante >"
+Pago "1" -- "0..*" AsociacionPago : "se asocia mediante >"
+Usuario "0..1" -- "0..*" AsociacionPago : "asocia (manual) >"
+Usuario "0..1" -- "0..*" AsociacionPago : "deshace >"
+
+' --- Incidencias y disputas ---
+Cliente "1" -- "0..*" Incidencia : "reporta >"
+Factura "0..1" -- "0..*" Incidencia : "puede tener >"
+Usuario "1" -- "0..*" Incidencia : "es responsable de >"
+Incidencia "1" *-- "0..*" ComentarioIncidencia : "contiene >"
+Usuario "1" -- "0..*" ComentarioIncidencia : "escribe >"
+
+' --- Comunicaciones ---
+Factura "1" -- "0..*" EnvioMensaje : "se notifica con >"
+Contacto "1" -- "0..*" EnvioMensaje : "recibe >"
+PlantillaMensaje "0..1" -- "0..*" EnvioMensaje : "se usa en >"
+
+' --- Aprobaciones ---
+Usuario "1" -- "0..*" SolicitudAprobacion : "solicita >"
+Administrador "0..1" -- "0..*" SolicitudAprobacion : "resuelve >"
+SolicitudAprobacion "0..*" -- "0..1" Factura : "vinculada a >"
+SolicitudAprobacion "0..1" -- "0..1" ExcepcionComercial : "vinculada a >"
+SolicitudAprobacion "0..1" -- "0..1" RevisionTarifa : "vinculada a >"
+
+' --- Configuración ---
+Superadministrador ..> ConfiguracionSistema : "configura"
+ConfiguracionSistema "1" o-- "1..*" SerieFacturacion
+ConfiguracionSistema "1" o-- "0..*" Impuesto
+ConfiguracionSistema "1" o-- "1..*" RangoTarifa
+ConfiguracionSistema "1" o-- "0..*" PlantillaMensaje
+
+' --- Auditoría, procesos, informes y API ---
+Usuario "0..1" -- "0..*" RegistroAuditoria : "realiza >"
+Cliente "0..1" -- "0..*" RegistroAuditoria : "afecta a <"
+Superadministrador ..> RegistroAuditoria : "consulta"
+Superadministrador ..> EjecucionProceso : "consulta"
+EjecucionProceso "1" *-- "0..*" DetalleEjecucion : "registra >"
+Administrador "1" -- "0..*" Informe : "genera >"
+Cliente "0..1" -- "0..*" LlamadaAPI : "es consultado en >"
+
+' --- Notas de restricciones ---
+note bottom of SolicitudAprobacion
+  Debe estar vinculada a exactamente uno de:
+  Factura, ExcepcionComercial o RevisionTarifa.
+  Un solicitante no puede aprobar su propia solicitud
+  si importe > umbralSeparacionFunciones (FR-61).
+end note
+
+note bottom of Factura
+  Una factura emitida es inmutable (RB-10):
+  solo se corrige con una rectificativa.
+  Una incobrable nunca se marca como pagada (RB-12).
+end note
+
+note bottom of RegistroAuditoria
+  Solo se puede crear y consultar;
+  nunca editar ni borrar (CU-27 FE-1).
+end note
+
+note bottom of AsignacionCliente
+  Define qué clientes puede ver/operar un usuario operativo
+  (temporal o permanente). El responsable interno
+  (único por cliente) recibe los avisos.
+end note
+
+@enduml
