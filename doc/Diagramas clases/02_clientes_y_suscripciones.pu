@@ -63,7 +63,7 @@ class RangoTarifa {
 }
 
 class SolicitudBaja {
-  - origen: MANUAL | API
+  - origen: OrigenSolicitud
   - fechaSolicitud: Date
   - fechaEfectiva: Date
 }
@@ -101,6 +101,25 @@ enum EstadoSuscripcion {
 enum Idioma {
   ES
   EN
+}
+
+enum TipoExcepcion {
+  DESCUENTO_TEMPORAL
+  MESES_GRATUITOS
+  PRECIO_ESPECIAL
+}
+
+enum FuncionContacto
+{
+  FACTURACION
+  IMPAGOS
+  COMERCIAL
+  OTRO
+}
+
+enum OrigenSolicitud {
+  MANUAL
+  API
 }
 
 Cliente "1..*" -- "1..*" Contacto : tiene >
