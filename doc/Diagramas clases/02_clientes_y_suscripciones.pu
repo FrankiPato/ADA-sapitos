@@ -106,7 +106,7 @@ enum Idioma {
 Cliente "1..*" -- "1..*" Contacto : tiene >
 (Cliente, Contacto) .. ContactoCliente
 Cliente "1" *-- "0..1" Suscripcion : contrata >
-Cliente "1" -- "0..*" SolicitudBaja
+Cliente "1" -- "0..*" SolicitudBaja : solicita >
 Suscripcion "0..*" -- "1" RangoTarifa : aplica >
 Suscripcion "1" *-- "0..*" ExcepcionComercial
 Suscripcion "1" *-- "0..*" RevisionTarifa
