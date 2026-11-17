@@ -34,7 +34,7 @@ class ConceptoCatalogo {
 }
 
 class Pago {
-  - referenciaStripe: String {unique}
+  - referenciaStripe: String
   - fecha: Date
   - importe: Decimal
   - estado: EstadoPago
@@ -44,7 +44,7 @@ class Pago {
 
 class AsociacionPago {
   - fecha: DateTime
-  - tipo: AUTOMATICA | MANUAL
+  - tipo: TipoAsociacion
   - motivo: String
   - activa: Boolean
   - motivoDeshecha: String
@@ -67,11 +67,19 @@ class ComentarioIncidencia {
   - fecha: DateTime
 }
 
-class Cliente #E0E0E0
-class Suscripcion #E0E0E0
-class Usuario #E0E0E0
-class SerieFacturacion #E0E0E0
-class Impuesto #E0E0E0
+package "Clientes y suscripciones"{
+  class Contacto
+  class Suscripcion
+}
+
+package "Usuarios"{
+  class Usuario
+}
+
+package "Configuración y operación" {
+  class SerieFacturacion #E0E0E0
+  class Impuesto #E0E0E0
+}
 
 enum TipoFactura {
   PUNTUAL
@@ -94,6 +102,16 @@ enum EstadoPago {
   PENDIENTE_ASOCIAR
   ASOCIADO
   DIFERENCIA_PENDIENTE_REVISION
+}
+
+enum TipoAsociacion {
+  AUTOMATICA
+  MANUAL
+}
+
+enum EstadoIncidencia {
+  ABIERTA
+  CERRADA
 }
 
 Cliente "1" -- "0..*" Factura : se emite a >
