@@ -15,7 +15,7 @@ class ConfiguracionSistema {
 }
 
 class SerieFacturacion {
-  - prefijo: String {unique}
+  - prefijo: String
   - ultimoNumero: Integer
   + siguienteNumero(): String
 }
@@ -32,7 +32,7 @@ class RangoTarifa {
 }
 
 class PlantillaMensaje {
-  - idioma: ES | EN
+  - idioma: Idioma
   - cuerpo: String
 }
 
@@ -44,7 +44,7 @@ class RegistroAuditoria <<inmutable>> {
 }
 
 class EjecucionProceso {
-  - tipo: GENERACION_MENSUAL | RECORDATORIOS | CONCILIACION | COPIA_SEGURIDAD
+  - tipo: TipoProceso
   - fechaInicio: DateTime
   - elementosProcesados: Integer
   - fallos: Integer
@@ -57,9 +57,9 @@ class DetalleEjecucion {
 }
 
 class Informe {
-  - tipo: FACTURACION | PAQUETE_GESTORIA
-  - formato: CSV | PDF | ZIP
-  - estado: EN_GENERACION | LISTO
+  - tipo: TipoInforme
+  - formato: FormatoInforme
+  - estado: EstadoInforme
 }
 
 class LlamadaAPI {
@@ -69,11 +69,48 @@ class LlamadaAPI {
   - resultado: String
 }
 
-class Superadministrador #E0E0E0
-class Administrador #E0E0E0
-class Usuario #E0E0E0
-class Cliente #E0E0E0
-class Factura #E0E0E0
+package "Usuarios" {
+class Superadministrador
+class Administrador
+class Usuario
+}
+
+package "Clientes y suscripciones" {
+class Cliente
+}
+
+package "Facturación y cobros" {
+class Factura
+}
+
+enum TipoProceso {
+  GENERACION_MENSUAL
+  RECORDATORIOS
+  CONCILIACION_PAGOS
+  COPIA_SEGURIDAD
+}
+
+enum Idioma {
+  ES
+  EN
+}
+
+enum TipoInforme {
+  FACTURACION_Y_COBROS
+  PAQUETE_GESTORIA
+}
+
+enum FormatoInforme {
+  CSV
+  PDF
+  ZIP
+}
+
+enum EstadoInforme {
+  EN_GENERACION
+  LISTO
+  ERROR
+}
 
 Superadministrador ..> ConfiguracionSistema : configura
 ConfiguracionSistema "1" o-- "1..*" SerieFacturacion
