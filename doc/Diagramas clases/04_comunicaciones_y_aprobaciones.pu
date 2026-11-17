@@ -5,16 +5,16 @@ hide empty members
 title 04 - Comunicaciones y aprobaciones (CU-10, 11, 21, 22)
 
 class EnvioMensaje {
-  - tipo: FACTURA | RECORDATORIO | RECUPERACION
-  - canal: EMAIL | WHATSAPP
+  - tipo: TipoEnvio
+  - canal: CanalEnvio
   - fecha: DateTime
   - numeroIntento: Integer
-  - resultado: ENVIADO | FALLIDO | REBOTADO
+  - resultado: ResultadoEnvio
 }
 
 class PlantillaMensaje {
   - tipo: String
-  - idioma: ES | EN
+  - idioma: Idioma
   - asunto: String
   - cuerpo: String
   - version: Integer
@@ -46,12 +46,42 @@ enum EstadoAprobacion {
   RECHAZADA
 }
 
-class Factura #E0E0E0
-class Contacto #E0E0E0
-class Usuario #E0E0E0
-class Administrador #E0E0E0
-class ExcepcionComercial #E0E0E0
-class RevisionTarifa #E0E0E0
+package "Usuarios"{
+  class Usuario
+  class Administrador
+}
+
+package "Clientes y suscripciones"{
+  class Contacto
+  class ExcepcionComercial
+  class RevisionTarifa
+}
+
+package "Facturación y cobros"{
+  class Factura
+}
+
+enum Idioma {
+  ES
+  EN
+}
+
+enum TipoEnvio {
+  FACTURA
+  RECORDATORIO
+  RECUPERACION_CONTRASENA
+}
+
+enum CanalEnvio {
+  EMAIL
+  WHATSAPP
+}
+
+enum ResultadoEnvio {
+  ENVIADO
+  FALLIDO
+  REBOTADO
+}
 
 Factura "1" -- "0..*" EnvioMensaje : se notifica con >
 Contacto "1" -- "0..*" EnvioMensaje : recibe >
