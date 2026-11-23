@@ -1,4 +1,4 @@
-  # Requisitos
+# Requisitos
 
 ## 1. Contexto y alcance
 
@@ -267,6 +267,7 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | FR-80 | El sistema deberá permitir elegir el impuesto de cada línea de factura entre los impuestos configurados en el sistema [A08] | UR-05 |
 | FR-81 | El sistema deberá permitir registrar excepciones comerciales de un cliente (descuentos temporales, meses gratuitos o precios pactados), que requerirán aprobación según RB-13 [A11] | UR-05, UR-14 |
 | FR-82 | El sistema deberá permitir asociar una misma persona de contacto a varias empresas cliente [A06] | UR-03 |
+| FR-83 | El sistema deberá permitir pausar temporalmente los recordatorios automáticos de una o varias facturas de un cliente cuando este llame para negociar un aplazamiento, indicando el motivo, la fecha en que se reanudan y quién lo pausa. Al llegar esa fecha los recordatorios se reanudan solos y se avisa al responsable [Feedback cliente 09/11] | UR-07, UR-09 |
 
 ### 4.2. Requisitos no funcionales
 
@@ -320,7 +321,7 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | RB-11 | Cada factura emitida tiene un número único y correlativo dentro de su serie. El número se asigna al emitirla y reenviar una factura no cambia su número [P218,A15] |
 | RB-12 | Una factura solo se considera pagada cuando se ha recibido el cobro de su importe total. Si se recibe un importe menor o mayor, la diferencia queda pendiente de revisión. Una factura incobrable, anulada o rectificada nunca se marca como pagada [P175, A30, A33] |
 | RB-13 | Necesitan aprobación: los descuentos, los cambios manuales de importe, las facturas puntuales que superen un importe configurado, las rectificativas, declarar una factura incobrable y los cambios de tarifa. Las facturas recurrentes normales no necesitan aprobación [A11–A12, A30, A70] |
-| RB-14 | Cuando un cliente se da de baja, se dejan de generar sus facturas recurrentes desde la fecha de baja, pero las facturas que tenga pendientes se siguen reclamando hasta que se paguen [A20] |
+| RB-14 | Cuando un cliente se da de baja, se dejan de generar sus facturas recurrentes desde la fecha de baja. La baja no cancela ni condona las deudas: las facturas pendientes siguen en proceso de cobro (recordatorios y conciliación) hasta que se paguen o se declaren incobrables [A20, Feedback cliente 09/11] |
 | RB-15 | Un cliente en pausa no genera facturas nuevas, pero sus facturas anteriores siguen su proceso de cobro normal [A19] |
 | RB-16 | Los importes se calculan con 2 decimales. Cada línea se redondea al céntimo más cercano (redondeo hacia arriba en caso de empate) y el total es la suma de las líneas ya redondeadas [A94] |
 | RB-17 | Los cambios de configuración (plazos, tarifas, plantillas o logo) solo afectan a las facturas nuevas, nunca a las ya emitidas [A09,A25,A57] |
@@ -328,6 +329,8 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | RB-19 | Los datos de los clientes no se borran: se conservan el tiempo que permita la ley. Los datos personales de un contacto pueden anonimizarse cuando proceda, pero las facturas emitidas se conservan siempre [P100,P112,A51,A110] |
 | RB-20 | Un cliente puede estar en uno de estos estados: pendiente de activación, activo, pausado, baja solicitada o inactivo. Solo los clientes activos generan facturas recurrentes [A18,A19,A20,A95] |
 | RB-21 | Los informes y exportaciones generados se conservan durante un tiempo configurable, mientras que las facturas emitidas se conservan según la obligación legal [A109,A110] |
+| RB-22 | Mientras los recordatorios de una factura están pausados (disputa, incidencia o aplazamiento negociado), no se envía ningún recordatorio de esa factura, pero sigue pendiente de cobro y su vencimiento no cambia. Al terminar la pausa, los recordatorios continúan según RB-07 [Feedback cliente 09/11] |
+| RB-23 | Cada envío se identifica por la factura, el tipo de mensaje y la fecha prevista. El sistema no envía dos veces el mismo mensaje aunque el proceso se repita o el Servicio de mensajería tarde en responder; si un envío falla, se reintenta el mismo envío sin crear otro [Feedback cliente 09/11] |
 
 
 ## 6. Suposiciones y decisiones de análisis
@@ -385,7 +388,7 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | Requisito de negocio | Requisito de usuario | Requisito funcional / no funcional |
 |---|---|---|
 | BR-01 Reducir el trabajo manual de facturación y recordatorios | UR-05, UR-06, UR-07 | FR-16 a FR-33, FR-35 a FR-41, FR-80, FR-81 |
-| BR-02 Automatizar el seguimiento de los cobros | UR-08, UR-09, UR-10 | FR-34, FR-42 a FR-56, NFR-20, NFR-30 |
+| BR-02 Automatizar el seguimiento de los cobros | UR-08, UR-09, UR-10 | FR-34, FR-42 a FR-56, FR-83, NFR-20, NFR-30 |
 | BR-03 Permitir que la administración crezca | UR-02, UR-04, UR-17 | FR-05 a FR-08, FR-71, FR-72, FR-75, NFR-09 a NFR-13, NFR-26, NFR-27 |
 | BR-04 Que la información llegue a la persona correcta | UR-11, UR-14, UR-19 | FR-07, FR-26, FR-38, FR-49, FR-52, FR-59 a FR-63 |
 | BR-05 Agilizar las tareas habituales | UR-03, UR-12 | FR-09 a FR-15, FR-34, FR-69, FR-70, FR-79, FR-82, NFR-01 a NFR-04, NFR-08 |
@@ -405,9 +408,9 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | UR-04 Importación de clientes | FR-71, FR-72 |
 | UR-05 Creación de facturas puntuales y recurrentes | FR-16 a FR-26, FR-30, FR-31, FR-80, FR-81 |
 | UR-06 Revisión y corrección de facturas | FR-27 a FR-29, FR-32, FR-33 |
-| UR-07 Envío de facturas y recordatorios | FR-35 a FR-41 |
+| UR-07 Envío de facturas y recordatorios | FR-35 a FR-41, FR-83 |
 | UR-08 Estado de los cobros | FR-34, FR-40, FR-42 a FR-44, FR-48 |
-| UR-09 Situaciones excepcionales de cobro | FR-45 a FR-47, FR-49 a FR-51 |
+| UR-09 Situaciones excepcionales de cobro | FR-45 a FR-47, FR-49 a FR-51, FR-83 |
 | UR-10 Pausas, bajas y reactivaciones | FR-12, FR-25, FR-52 a FR-56 |
 | UR-11 Avisos y pantalla de trabajo | FR-26, FR-38, FR-49, FR-52, FR-62, FR-63 |
 | UR-12 Búsqueda | FR-34, FR-69, FR-70, FR-79 |
@@ -444,6 +447,8 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | RB-19 Conservación y anonimización de datos | FR-12 | CU-04, CU-17 |
 | RB-20 Estados del cliente | FR-25, FR-79 | CU-06, CU-09, CU-17, CU-24 |
 | RB-21 Conservación de informes y exportaciones | FR-67, FR-68 | CU-25 |
+| RB-22 Pausa de recordatorios | FR-49, FR-50, FR-83 | CU-11, CU-15 |
+| RB-23 Envíos sin duplicados | FR-37, FR-38, FR-39 | CU-10, CU-11 |
 
 ### 8.4. Requisitos funcionales y casos de uso
 
@@ -490,6 +495,7 @@ Turbine (Superadministrador, Administrador y Usuario operativo).
 | FR-77 | CU-18 |
 | FR-78 | CU-18, CU-19 |
 | FR-81 | CU-06, CU-21 |
+| FR-83 | CU-11, CU-15 |
 
 ### 8.5. Ejemplo de trazabilidad completa: baja de un cliente con deuda
 
