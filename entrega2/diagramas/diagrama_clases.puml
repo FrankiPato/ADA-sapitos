@@ -1,25 +1,610 @@
-@startuml
-title Diagrama UML de clases · ejemplo
+' Diagrama UML de clases - Sistema de facturación y cobros de Turbine
+' Grupo Sapitos - Entrega 2
+' Se divide en una vista general y tres vistas de detalle para que se pueda leer bien.
+' La explicación de cada vista está en documentacion/diagrama_clases.md
+
+' =====================================================================
+' Vista general: clases del dominio, solo nombres y relaciones
+' =====================================================================
+@startuml CL_0_vista_general
+title Diagrama de clases. Vista general del modelo de dominio
+skinparam shadowing false
 skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #FFFFCC
+  BorderColor #A80036
+  ArrowColor #A80036
+}
+skinparam packageStyle rectangle
+hide members
+hide circle
+
+package "Usuarios" {
+  class UsuarioOperativo
+  class Administrador
+  class Superadministrador
+}
+package "Clientes y suscripciones" {
+  class Cliente
+  class AsignacionCliente
+  class Contacto
+  class ClienteContacto
+  class Suscripcion
+  class Pausa
+  class Baja
+  class RangoTarifa
+  class RevisionTarifa
+  class ExcepcionComercial
+}
+package "Facturación" {
+  abstract class Factura
+  class FacturaPuntual
+  class FacturaRecurrente
+  class FacturaProporcional
+  class FacturaRectificativa
+  class LineaFactura
+  class Serie
+  class Concepto
+  class Impuesto
+}
+package "Cobros y comunicaciones" {
+  class Pago
+  class Conciliacion
+  class Envio
+  class PlantillaMensaje
+  class Incidencia
+  class Comentario
+}
+package "Control" {
+  class SolicitudAprobacion
+  class Notificacion
+  class RegistroAuditoria
+}
+
+UsuarioOperativo <|-- Administrador
+Administrador <|-- Superadministrador
+
+Cliente "1" -- "0..*" AsignacionCliente
+UsuarioOperativo "1" -- "0..*" AsignacionCliente
+Cliente "1" -- "1..*" ClienteContacto
+Contacto "1" -- "1..*" ClienteContacto
+Cliente "1" *-- "0..*" Suscripcion
+Suscripcion "1" *-- "0..*" Pausa
+Cliente "1" -- "0..*" Baja
+Suscripcion "0..*" --> "1" RangoTarifa
+Suscripcion "1" -- "0..*" RevisionTarifa
+Suscripcion "1" -- "0..*" ExcepcionComercial
+
+Factura <|-- FacturaPuntual
+Factura <|-- FacturaRecurrente
+Factura <|-- FacturaProporcional
+Factura <|-- FacturaRectificativa
+Cliente "1" -- "0..*" Factura
+Suscripcion "1" -- "0..*" FacturaRecurrente
+Suscripcion "1" -- "0..1" FacturaProporcional
+FacturaRectificativa "0..*" --> "1" Factura : rectifica
+Factura "1" *-- "1..*" LineaFactura
+Factura "0..*" --> "0..1" Serie
+LineaFactura "0..*" --> "0..1" Concepto
+LineaFactura "0..*" --> "1" Impuesto
+
+Pago "1" -- "0..*" Conciliacion
+Factura "1" -- "0..*" Conciliacion
+Factura "1" *-- "0..*" Envio
+Envio "0..*" --> "1" Contacto
+Envio "0..*" --> "0..1" PlantillaMensaje
+Cliente "1" -- "0..*" Incidencia
+Factura "0..*" -- "0..*" Incidencia
+Incidencia "1" *-- "0..*" Comentario
+
+UsuarioOperativo "1" -- "0..*" SolicitudAprobacion : solicita
+Administrador "0..1" -- "0..*" SolicitudAprobacion : resuelve
+UsuarioOperativo "1" -- "0..*" Notificacion
+UsuarioOperativo "0..1" -- "0..*" RegistroAuditoria
+@enduml
+
+
+' =====================================================================
+' Vista 1: usuarios, clientes y suscripciones
+' =====================================================================
+@startuml CL_1_usuarios_clientes_suscripciones
+title Diagrama de clases. Vista 1: usuarios, clientes y suscripciones
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #FFFFCC
+  BorderColor #A80036
+  ArrowColor #A80036
+}
+hide circle
+left to right direction
+
+class UsuarioOperativo {
+  - idUsuario : int
+  - nombre : String
+  - email : String
+  - contrasena : String
+  - activo : boolean
+  - intentosFallidos : int
+  + iniciarSesion(email : String, contrasena : String) : boolean
+  + recuperarContrasena(email : String) : void
+  + cerrarSesion() : void
+  + puedeGestionar(cliente : Cliente) : boolean
+}
+
+class Administrador {
+  + crearUsuario(nombre : String, email : String, rol : Rol) : UsuarioOperativo
+  + desactivarUsuario(usuario : UsuarioOperativo) : void
+  + asignarCliente(cliente : Cliente, usuario : UsuarioOperativo, tipo : TipoAsignacion) : AsignacionCliente
+  + resolverSolicitud(solicitud : SolicitudAprobacion, aprobada : boolean, comentario : String) : void
+  + consultarDashboard(periodo : String) : void
+  + generarInforme(desde : Date, hasta : Date) : List<Factura>
+  + exportarPaqueteGestoria(desde : Date, hasta : Date) : String
+}
+
+class Superadministrador {
+  + modificarParametro(clave : String, valor : String) : void
+  + consultarAuditoria(desde : Date, hasta : Date) : List<RegistroAuditoria>
+}
+
 class Cliente {
-  - id: int
-  - nombre: String
-  + crearPedido(): Pedido
+  - idCliente : int
+  - nombreComercial : String
+  - razonSocial : String
+  - idFiscal : String
+  - direccionFiscal : String
+  - pais : String
+  - moneda : String
+  - sector : String
+  - estado : EstadoCliente
+  - diasPagoPactados : int [0..1]
+  - fechaAlta : Date
+  + tieneDatosFiscalesCompletos() : boolean
+  + tieneContactoFacturacionActivo() : boolean
+  + tieneFacturasPendientes() : boolean
+  + calcularSaldo() : double
+  + plazoPago() : int
+  + solicitarBaja(fechaEfectiva : Date, origen : OrigenBaja) : Baja
+  + reactivar() : void
 }
-class Pedido {
-  - id: int
-  - fecha: Date
-  + agregarLinea(producto: String, cantidad: int): void
-  + confirmar(): boolean
+
+class AsignacionCliente {
+  - tipo : TipoAsignacion
+  - fechaInicio : Date
+  - fechaFin : Date [0..1]
+  + estaVigente(fecha : Date) : boolean
 }
-class LineaPedido {
-  - producto: String
-  - cantidad: int
+
+class Contacto {
+  - idContacto : int
+  - nombre : String
+  - email : String
+  - telefono : String
+  - idioma : Idioma
+  - consentimientoWhatsApp : boolean
+  - activo : boolean
+  - anonimizado : boolean
+  + anonimizar() : void
 }
-Cliente "1" -- "0..*" Pedido : realiza
-Pedido "1" *-- "1..*" LineaPedido : contiene
-note right of Pedido
-  La composición expresa que las
-  líneas forman parte de un pedido.
+
+class ClienteContacto {
+  - funcion : FuncionContacto
+  - activo : boolean
+}
+
+class Suscripcion {
+  - idSuscripcion : int
+  - tarifaMensual : double
+  - fechaInicio : Date
+  - fechaFin : Date [0..1]
+  - estado : EstadoSuscripcion
+  + calcularProrrateo() : double
+  + activar() : void
+  + tarifaVigente(fecha : Date) : double
+  + debeFacturarse(fecha : Date) : boolean
+  + pausar(motivo : String, inicio : Date, finPrevisto : Date) : Pausa
+  + finalizar(fecha : Date) : void
+}
+
+class Pausa {
+  - motivo : String
+  - fechaInicio : Date
+  - fechaPrevistaFin : Date
+  - fechaRealFin : Date [0..1]
+  + finalizar(fecha : Date) : void
+}
+
+class Baja {
+  - fechaSolicitud : Date
+  - fechaEfectiva : Date
+  - origen : OrigenBaja
+  - motivo : String
+  + hacerEfectiva() : void
+}
+
+class RangoTarifa {
+  - facturacionMin : double
+  - facturacionMax : double [0..1]
+  - precioMensual : double
+  - fechaDesde : Date
+  - fechaHasta : Date [0..1]
+  + contiene(facturacionAnual : double) : boolean
+}
+
+class RevisionTarifa {
+  - facturacionAnual : double
+  - fuenteDato : String
+  - fechaDato : Date
+  - fechaEfecto : Date
+  + proponerRango(rangos : List<RangoTarifa>) : RangoTarifa
+  + aplicar() : void
+}
+
+class ExcepcionComercial {
+  - tipo : TipoExcepcion
+  - valor : double
+  - fechaDesde : Date
+  - fechaHasta : Date [0..1]
+  + aplicaEn(fecha : Date) : boolean
+}
+
+class SolicitudAprobacion
+
+UsuarioOperativo <|-- Administrador
+Administrador <|-- Superadministrador
+
+Cliente "0..*" -- "1..*" UsuarioOperativo : -responsables
+(Cliente, UsuarioOperativo) .. AsignacionCliente
+Cliente "1..*" -- "1..*" Contacto : -contactos
+(Cliente, Contacto) .. ClienteContacto
+
+Cliente "1" *-- "0..*" Suscripcion : -suscripciones
+Suscripcion "1" *-- "0..*" Pausa : -pausas
+Cliente "1" -- "0..*" Baja : -bajas
+Suscripcion "0..*" --> "1" RangoTarifa : -rango
+Suscripcion "1" -- "0..*" RevisionTarifa : -revisiones
+RevisionTarifa "0..*" --> "1" RangoTarifa : -rangoPropuesto
+Suscripcion "1" *-- "0..*" ExcepcionComercial : -excepciones
+RevisionTarifa "0..*" --> "1" SolicitudAprobacion : -aprobacion
+ExcepcionComercial "0..*" --> "1" SolicitudAprobacion : -aprobacion
+
+note bottom of Suscripcion
+  Prorrateo: tarifa mensual x días
+  que quedan de mes / días del mes
+end note
+
+note bottom of UsuarioOperativo
+  Cada rol puede hacer todo
+  lo del rol del que hereda
+end note
+@enduml
+
+
+' =====================================================================
+' Vista 2: facturación, cobros y comunicaciones
+' =====================================================================
+@startuml CL_2_facturacion_cobros
+title Diagrama de clases. Vista 2: facturación, cobros y comunicaciones
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #FFFFCC
+  BorderColor #A80036
+  ArrowColor #A80036
+}
+hide circle
+
+abstract class Factura {
+  - idFactura : int
+  - numero : int [0..1]
+  - estado : EstadoFactura
+  - fechaEmision : Date [0..1]
+  - fechaVencimiento : Date [0..1]
+  - datosFiscalesEmitidos : String
+  - baseImponible : double
+  - totalImpuestos : double
+  - total : double
+  - moneda : String
+  - rutaPdf : String
+  - recordatoriosPausados : boolean
+  + anadirLinea(linea : LineaFactura) : void
+  + calcularTotales() : void
+  + necesitaAprobacion() : boolean
+  + emitir(serie : Serie) : void
+  + marcarPagada() : void
+  + registrarDiferencia(importePagado : double) : void
+  + marcarRectificada(rectificativa : FacturaRectificativa) : void
+  + importePendiente() : double
+  + estaVencida(fecha : Date) : boolean
+  + pausarRecordatorios(motivo : String) : void
+}
+
+class FacturaPuntual
+class FacturaRecurrente {
+  - periodoDesde : Date
+  - periodoHasta : Date
+}
+class FacturaProporcional {
+  - periodoDesde : Date
+  - periodoHasta : Date
+  - diasFacturados : int
+}
+class FacturaRectificativa {
+  - motivo : String
+}
+
+class LineaFactura {
+  - descripcion : String
+  - cantidad : double
+  - precioUnitario : double
+  - descuento : double
+  - importe : double
+  + calcularImporte() : double
+}
+
+class Serie {
+  - codigo : String
+  - tipo : TipoSerie
+  - ultimoNumero : int
+  + siguienteNumero() : int
+}
+
+class Concepto {
+  - nombre : String
+  - precioOrientativo : double
+}
+
+class Impuesto {
+  - nombre : String
+  - porcentaje : double
+  - pais : String
+}
+
+class Pago {
+  - idPago : int
+  - origen : String
+  - referenciaExterna : String
+  - referenciaCliente : String
+  - importe : double
+  - moneda : String
+  - fechaPago : DateTime
+  - estado : EstadoPago
+  + importeSinAplicar() : double
+}
+
+class Conciliacion {
+  - importeAplicado : double
+  - tipo : TipoConciliacion
+  - motivo : String
+  - fecha : DateTime
+  - deshecha : boolean
+  + deshacer(usuario : UsuarioOperativo, motivo : String) : void
+}
+
+class Envio {
+  - tipo : TipoEnvio
+  - canal : Canal
+  - fechaPrevista : Date
+  - fecha : DateTime
+  - resultado : ResultadoEnvio
+  - motivoError : String
+  + registrarResultado(resultado : ResultadoEnvio, motivo : String) : void
+}
+
+class PlantillaMensaje {
+  - tipo : TipoPlantilla
+  - idioma : Idioma
+  - asunto : String
+  - cuerpo : String
+  + rellenar(factura : Factura, contacto : Contacto) : String
+}
+
+class Incidencia {
+  - tipo : TipoIncidencia
+  - motivo : String
+  - estado : EstadoIncidencia
+  - pausaRecordatorios : boolean
+  - fechaApertura : Date
+  - fechaRevision : Date [0..1]
+  - fechaReanudacion : Date [0..1]
+  - resolucion : String
+  + anadirComentario(autor : UsuarioOperativo, texto : String) : Comentario
+  + reanudarRecordatorios() : void
+  + resolver(resolucion : String) : void
+}
+
+class Comentario {
+  - texto : String
+  - fecha : DateTime
+}
+
+class Cliente
+class Suscripcion
+class Contacto
+
+Factura <|-- FacturaPuntual
+Factura <|-- FacturaRecurrente
+Factura <|-- FacturaProporcional
+Factura <|-- FacturaRectificativa
+
+Cliente "1" -- "0..*" Factura : -facturas
+Suscripcion "1" -- "0..*" FacturaRecurrente : -suscripcion
+Suscripcion "1" -- "0..1" FacturaProporcional : -suscripcion
+FacturaRectificativa "0..*" --> "1" Factura : -facturaRectificada
+Factura "1" *-- "1..*" LineaFactura : -lineas
+Factura "0..*" --> "0..1" Serie : -serie
+LineaFactura "0..*" --> "0..1" Concepto : -concepto
+LineaFactura "0..*" --> "1" Impuesto : -impuesto
+
+Pago "0..*" -- "0..*" Factura : -facturas
+(Pago, Factura) .. Conciliacion
+
+Factura "1" *-- "0..*" Envio : -envios
+Envio "0..*" --> "1" Contacto : -destinatario
+Envio "0..*" --> "0..1" PlantillaMensaje : -plantilla
+
+Cliente "1" -- "0..*" Incidencia : -incidencias
+Factura "0..*" -- "0..*" Incidencia : -facturasAfectadas
+Incidencia "1" *-- "0..*" Comentario : -comentarios
+
+note right of Factura
+  Una vez emitida no se modifica:
+  los errores se corrigen con
+  una factura rectificativa
+end note
+
+note bottom of Conciliacion
+  Un pago puede cubrir varias facturas
+  y una factura pagarse en varios pagos
+end note
+
+note bottom of Incidencia
+  Tipos: disputa, incidencia o aplazamiento.
+  Mientras dura, no se envían recordatorios
+end note
+@enduml
+
+
+' =====================================================================
+' Vista 3: clases de control y registro del sistema
+' =====================================================================
+@startuml CL_3_control_y_registro
+title Diagrama de clases. Vista 3: clases de control y registro del sistema
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #FFFFCC
+  BorderColor #A80036
+  ArrowColor #A80036
+}
+hide circle
+
+class Planificador {
+  - horaEjecucion : String
+  + ejecutarTareasDelDia(fecha : Date) : void
+}
+
+class ServicioClientes {
+  + crearCliente(razonSocial : String, idFiscal : String, pais : String) : Cliente
+  + importarCSV(fichero : String) : ImportacionCSV
+  + buscar(texto : String) : List<Cliente>
+  + prepararAlta(cliente : Cliente, fechaInicio : Date, tarifa : double) : Suscripcion
+  + confirmarAlta(suscripcion : Suscripcion) : void
+  + pausarSuscripcion(suscripcion : Suscripcion, motivo : String, fechaFin : Date) : Pausa
+  + comprobarBaja(cliente : Cliente) : List<Factura>
+  + registrarBaja(cliente : Cliente, fechaEfectiva : Date) : Baja
+  + procesarBajasYPausas(fecha : Date) : void
+}
+
+class ServicioFacturacion {
+  + generarFacturasMensuales(fecha : Date) : EjecucionProceso
+  + generarFacturaProporcional(suscripcion : Suscripcion) : FacturaProporcional
+  + crearFacturaPuntual(cliente : Cliente) : FacturaPuntual
+  + emitirFactura(factura : Factura) : void
+  + crearRectificativa(original : Factura, motivo : String) : FacturaRectificativa
+  + declararIncobrable(factura : Factura, motivo : String) : void
+  + generarPDF(factura : Factura) : String
+}
+
+class ServicioCobros {
+  + consultarPagos(fecha : Date) : EjecucionProceso
+  + asociarPago(pago : Pago, factura : Factura) : Conciliacion
+  + enviarRecordatoriosDelDia(fecha : Date) : void
+  + abrirIncidencia(cliente : Cliente, factura : Factura, motivo : String) : Incidencia
+  + registrarAplazamiento(cliente : Cliente, facturas : List<Factura>, fechaReanudacion : Date) : Incidencia
+}
+
+class ServicioAprobaciones {
+  + solicitar(tipo : TipoSolicitud, solicitante : UsuarioOperativo, importe : double) : SolicitudAprobacion
+  + resolver(solicitud : SolicitudAprobacion, aprobador : Administrador, aprobada : boolean) : void
+}
+
+class ServicioEnvios {
+  + enviarFactura(factura : Factura) : void
+  + enviarRecordatorio(factura : Factura) : void
+  + notificarResponsable(cliente : Cliente, mensaje : String) : Notificacion
+}
+
+class SolicitudAprobacion {
+  - tipo : TipoSolicitud
+  - importe : double
+  - estado : EstadoSolicitud
+  - comentario : String
+  - fechaSolicitud : DateTime
+  - fechaResolucion : DateTime [0..1]
+  + aprobar(aprobador : Administrador, comentario : String) : void
+  + rechazar(aprobador : Administrador, comentario : String) : void
+}
+
+class Notificacion {
+  - mensaje : String
+  - leida : boolean
+  - resuelta : boolean
+  - fecha : DateTime
+  + marcarLeida() : void
+}
+
+class RegistroAuditoria {
+  - accion : String
+  - entidad : String
+  - valorAnterior : String
+  - valorNuevo : String
+  - fecha : DateTime
+}
+
+class EjecucionProceso {
+  - proceso : TipoProceso
+  - periodo : String
+  - procesados : int
+  - fallos : int
+  - fechaInicio : DateTime
+  + registrarFallo(motivo : String) : void
+}
+
+class Parametro {
+  - clave : String
+  - valor : String
+  - fechaDesde : Date
+}
+
+class ImportacionCSV {
+  - nombreFichero : String
+  - fecha : DateTime
+  - filasCreadas : int
+  - filasRechazadas : int
+}
+
+Planificador "1" o-- "1" ServicioFacturacion : lanza
+Planificador "1" o-- "1" ServicioCobros : lanza
+Planificador "1" o-- "1" ServicioClientes : lanza
+Planificador "1" -- "0..*" EjecucionProceso : registra
+
+ServicioFacturacion --> ServicioAprobaciones
+ServicioClientes --> ServicioAprobaciones
+ServicioFacturacion --> ServicioEnvios
+ServicioCobros --> ServicioEnvios
+ServicioAprobaciones "1" -- "0..*" SolicitudAprobacion : gestiona
+ServicioEnvios "1" -- "0..*" Notificacion : crea
+ServicioClientes "1" -- "0..*" ImportacionCSV : registra
+ServicioFacturacion ..> Parametro : usa
+ServicioFacturacion ..> RegistroAuditoria : crea
+ServicioCobros ..> RegistroAuditoria : crea
+ServicioAprobaciones ..> RegistroAuditoria : crea
+
+note top of Planificador
+  Es la parte interna del sistema que hace
+  de "Planificador del sistema" en los casos
+  de uso: lanza las tareas en su fecha
+end note
+
+note bottom of SolicitudAprobacion
+  Quien solicita no puede aprobar su
+  propia solicitud si supera el umbral
+end note
+
+note bottom of ServicioEnvios
+  Usa el Servicio de mensajería (email y WhatsApp
+  simulados); ServicioCobros consulta Stripe
+  simulado. Ver diagrama de arquitectura
 end note
 @enduml
