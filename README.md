@@ -1,11 +1,10 @@
-Este proyecto está orientado a la planificación y diseño de una aplicación web, en base a un problema dispuesto por una empresa real llamada TurbineH; distribuido por el profesorado de la asignatura de Análisis y Diseño de Aplicaciones de la Escuela Superior Técnica de Ingeniería Informática de la Universidad de Málaga; y elaborado por el subgrupo Sapitos del curso de 3o, grupo A.
+# Fuentes de la Entrega 2
 
+- `informe.md`: índice y portada orientativos para preparar manualmente el informe PDF.
+- `documentacion/*.md`: explicación y justificación de cada diagrama.
+- `diagramas/*.puml`: fuentes PlantUML; exportad manualmente sus diagramas e insertadlos en el informe.
+- `informe_scrum.md`: trabajo del equipo y evidencias de Scrum.
+- `cambios_entrega1.md`: cambios de análisis y su impacto en el diseño.
+- `evidencias/`: capturas reales del tablero de gestión.
 
-  Miembros del grupo Sapitos
-- Aragón Ortegosa, Emilio José
-- Gallego Zafra, Marco
-- García Zamudio, Ismael
-- González Doña, Iván
-- Jiménez Tirado, Francisco
-- Sánchez Gámez, Francisco
-- Vargas Peña, Miguel
+Completad las plantillas, componed el informe en el editor de documentos que prefiráis y **exportadlo manualmente** como `informe-final/entrega2.pdf`. No hay scripts de compilación en este paquete.
