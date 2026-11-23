@@ -842,7 +842,7 @@ En los flujos, "Usuario" se refiere al usuario interno que realiza el caso de us
 | **Objetivo** | Hacer llegar la factura emitida a los contactos de facturación del cliente y registrar el resultado. |
 | **Actores participantes** | Servicio de mensajería (secundario). Se ejecuta incluido en CU-08 |
 | **Relaciones** | Incluido por CU-08 (Emitir factura) |
-| **Requisitos relacionados** | UR-07; FR-35 a FR-38, FR-41; NFR-20, NFR-24 |
+| **Requisitos relacionados** | UR-07; FR-35 a FR-38, FR-41; RB-23; NFR-20, NFR-24 |
 
 ---
 
@@ -908,7 +908,7 @@ En los flujos, "Usuario" se refiere al usuario interno que realiza el caso de us
 | **Objetivo** | Recordar automáticamente a los clientes sus facturas pendientes hasta que las paguen. |
 | **Actores participantes** | Planificador del sistema (principal), Servicio de mensajería (secundario) |
 | **Relaciones** | Ninguna |
-| **Requisitos relacionados** | UR-07, UR-11; FR-39 a FR-41, FR-55, FR-62; RB-06, RB-07, RB-08, RB-14 |
+| **Requisitos relacionados** | UR-07, UR-11; FR-39 a FR-41, FR-55, FR-62, FR-83; RB-06, RB-07, RB-08, RB-14, RB-22, RB-23 |
 
 ---
 
@@ -942,12 +942,12 @@ En los flujos, "Usuario" se refiere al usuario interno que realiza el caso de us
 
 **Continuación:** el caso de uso continúa en el paso 3 del flujo principal.
 
-#### FA-2 — Factura en disputa o con incidencia
+#### FA-2 — Factura en disputa, con incidencia o con aplazamiento
 
 **Se produce en:** paso 2 del flujo principal.  
-**Condición:** los recordatorios de la factura están pausados (CU-15).
+**Condición:** los recordatorios de la factura están pausados por una disputa, una incidencia o un aplazamiento negociado (CU-15, RB-22).
 
-1. El sistema no envía recordatorios de esa factura hasta la fecha de revisión.
+1. El sistema no envía recordatorios de esa factura hasta que termine la pausa.
 
 **Continuación:** el caso de uso continúa con la siguiente factura en el paso 2.
 
@@ -1247,10 +1247,10 @@ En los flujos, "Usuario" se refiere al usuario interno que realiza el caso de us
 |---|---|
 | **Identificador** | CU-15 |
 | **Nombre** | Gestionar disputas e incidencias |
-| **Objetivo** | Registrar y seguir los problemas de cobro, pausando los recordatorios cuando sea necesario. |
+| **Objetivo** | Registrar y seguir los problemas de cobro, incluidos los aplazamientos negociados con el cliente, pausando los recordatorios cuando sea necesario. |
 | **Actores participantes** | Usuario operativo (principal; también Administrador y Superadministrador por herencia) |
 | **Relaciones** | Ninguna |
-| **Requisitos relacionados** | UR-09, UR-11; FR-49, FR-50, FR-62 |
+| **Requisitos relacionados** | UR-09, UR-11; FR-49, FR-50, FR-62, FR-83; RB-22 |
 
 ---
 
@@ -1291,6 +1291,17 @@ En los flujos, "Usuario" se refiere al usuario interno que realiza el caso de us
 
 1. El usuario indica que se pausen los recordatorios de la factura.
 2. El sistema deja de enviarlos mientras la incidencia esté abierta.
+
+**Continuación:** el caso de uso continúa en el paso 4 del flujo principal.
+
+#### FA-3 — Aplazamiento negociado por teléfono
+
+**Se produce en:** paso 1 del flujo principal.  
+**Condición:** el cliente llama para negociar un aplazamiento del pago.
+
+1. El usuario registra el aplazamiento sobre las facturas afectadas, con el motivo y la fecha de reanudación.
+2. El sistema pausa los recordatorios de esas facturas, que siguen como no cobradas (RB-22).
+3. Al llegar la fecha de reanudación, el sistema vuelve a enviar los recordatorios y avisa al responsable.
 
 **Continuación:** el caso de uso continúa en el paso 4 del flujo principal.
 
