@@ -1,29 +1,399 @@
-@startuml
-' Ejemplo ficticio de diagrama físico (IE / Crow's Foot)
-title Modelo físico de datos · ejemplo
+@startuml ER_1_usuarios_clientes_suscripciones
+' Modelo físico de datos - parte 1
+title Modelo físico de datos · 1. Usuarios, clientes y suscripciones
 hide circle
 skinparam linetype ortho
+
+entity "USUARIO" as Usuario {
+  * id_usuario : INTEGER <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * email : VARCHAR(150) <<UNIQUE>>
+  * contrasena : VARCHAR(255)
+  * rol : VARCHAR(20)
+  * activo : BOOLEAN
+  * intentos_fallidos : INTEGER
+}
+
 entity "CLIENTE" as Cliente {
   * id_cliente : INTEGER <<PK>>
   --
-  * nombre : VARCHAR(100)
+  * nombre_comercial : VARCHAR(150)
+  * razon_social : VARCHAR(200)
+  * id_fiscal : VARCHAR(30) <<UNIQUE>>
+  * direccion_fiscal : VARCHAR(300)
+  * pais : CHAR(2)
+  * moneda : CHAR(3)
+  sector : VARCHAR(80)
+  * estado : VARCHAR(25)
+  dias_pago_pactados : INTEGER
+  * fecha_alta : DATE
 }
-entity "PEDIDO" as Pedido {
-  * id_pedido : INTEGER <<PK>>
+
+entity "ASIGNACION_CLIENTE" as Asignacion {
+  * id_asignacion : INTEGER <<PK>>
   --
   * id_cliente : INTEGER <<FK>>
-  * fecha : DATE
+  * id_usuario : INTEGER <<FK>>
+  * tipo : VARCHAR(15)
+  * fecha_inicio : DATE
+  fecha_fin : DATE
 }
-entity "LINEA_PEDIDO" as Linea {
+
+entity "CONTACTO" as Contacto {
+  * id_contacto : INTEGER <<PK>>
+  --
+  * nombre : VARCHAR(150)
+  email : VARCHAR(150)
+  telefono : VARCHAR(20)
+  * idioma : CHAR(2)
+  * consentimiento_whatsapp : BOOLEAN
+  * activo : BOOLEAN
+  * anonimizado : BOOLEAN
+}
+
+entity "CLIENTE_CONTACTO" as ClienteContacto {
+  * id_cliente : INTEGER <<PK, FK>>
+  * id_contacto : INTEGER <<PK, FK>>
+  * funcion : VARCHAR(15) <<PK>>
+  --
+  * activo : BOOLEAN
+}
+
+entity "RANGO_TARIFA" as Rango {
+  * id_rango : INTEGER <<PK>>
+  --
+  * facturacion_min : DECIMAL(14,2)
+  facturacion_max : DECIMAL(14,2)
+  * precio_mensual : DECIMAL(10,2)
+  * fecha_desde : DATE
+  fecha_hasta : DATE
+}
+
+entity "SUSCRIPCION" as Suscripcion {
+  * id_suscripcion : INTEGER <<PK>>
+  --
+  * id_cliente : INTEGER <<FK>>
+  * id_rango : INTEGER <<FK>>
+  * tarifa_mensual : DECIMAL(10,2)
+  * fecha_inicio : DATE
+  fecha_fin : DATE
+  * estado : VARCHAR(15)
+}
+
+entity "PAUSA" as Pausa {
+  * id_pausa : INTEGER <<PK>>
+  --
+  * id_suscripcion : INTEGER <<FK>>
+  * motivo : VARCHAR(300)
+  * fecha_inicio : DATE
+  * fecha_prevista_fin : DATE
+  fecha_real_fin : DATE
+}
+
+entity "BAJA" as Baja {
+  * id_baja : INTEGER <<PK>>
+  --
+  * id_cliente : INTEGER <<FK>>
+  * fecha_solicitud : DATE
+  * fecha_efectiva : DATE
+  * origen : VARCHAR(10)
+  motivo : VARCHAR(300)
+}
+
+entity "SOLICITUD_APROBACION" as Solicitud {
+  * id_solicitud : INTEGER <<PK>>
+  --
+  * id_solicitante : INTEGER <<FK>>
+  id_aprobador : INTEGER <<FK>>
+  * tipo : VARCHAR(20)
+  importe : DECIMAL(10,2)
+  * estado : VARCHAR(10)
+  comentario : VARCHAR(500)
+  * fecha_solicitud : TIMESTAMP
+  fecha_resolucion : TIMESTAMP
+}
+
+entity "REVISION_TARIFA" as Revision {
+  * id_revision : INTEGER <<PK>>
+  --
+  * id_suscripcion : INTEGER <<FK>>
+  * id_rango_propuesto : INTEGER <<FK>>
+  * id_solicitud : INTEGER <<FK>>
+  * facturacion_anual : DECIMAL(14,2)
+  * fuente_dato : VARCHAR(150)
+  * fecha_dato : DATE
+  fecha_efecto : DATE
+}
+
+entity "EXCEPCION_COMERCIAL" as Excepcion {
+  * id_excepcion : INTEGER <<PK>>
+  --
+  * id_suscripcion : INTEGER <<FK>>
+  * id_solicitud : INTEGER <<FK>>
+  * tipo : VARCHAR(15)
+  * valor : DECIMAL(10,2)
+  * fecha_desde : DATE
+  fecha_hasta : DATE
+}
+
+Cliente ||--o{ Asignacion : tiene
+Usuario ||--o{ Asignacion : gestiona
+Cliente ||--|{ ClienteContacto : tiene
+Contacto ||--|{ ClienteContacto : pertenece
+Cliente ||--o{ Suscripcion : contrata
+Rango ||--o{ Suscripcion : fija precio
+Suscripcion ||--o{ Pausa : tiene
+Cliente ||--o{ Baja : solicita
+Suscripcion ||--o{ Revision : se revisa
+Rango ||--o{ Revision : propuesto
+Suscripcion ||--o{ Excepcion : tiene
+Solicitud ||--o{ Revision : aprueba
+Solicitud ||--o{ Excepcion : aprueba
+Usuario ||--o{ Solicitud : solicita
+Usuario |o--o{ Solicitud : resuelve
+@enduml
+
+
+@startuml ER_2_facturacion_cobros
+' Modelo físico de datos - parte 2
+title Modelo físico de datos · 2. Facturación, cobros y comunicaciones
+hide circle
+skinparam linetype ortho
+
+entity "CLIENTE" as Cliente {
+  * id_cliente : INTEGER <<PK>>
+}
+
+entity "SUSCRIPCION" as Suscripcion {
+  * id_suscripcion : INTEGER <<PK>>
+}
+
+entity "CONTACTO" as Contacto {
+  * id_contacto : INTEGER <<PK>>
+}
+
+entity "FACTURA" as Factura {
+  * id_factura : INTEGER <<PK>>
+  --
+  * id_cliente : INTEGER <<FK>>
+  id_suscripcion : INTEGER <<FK>>
+  id_serie : INTEGER <<FK>>
+  id_factura_rectificada : INTEGER <<FK>>
+  * tipo : VARCHAR(15)
+  numero : INTEGER
+  * estado : VARCHAR(25)
+  fecha_emision : DATE
+  fecha_vencimiento : DATE
+  periodo_desde : DATE
+  periodo_hasta : DATE
+  dias_facturados : INTEGER
+  motivo_rectificacion : VARCHAR(300)
+  datos_fiscales_emitidos : TEXT
+  * base_imponible : DECIMAL(12,2)
+  * total_impuestos : DECIMAL(12,2)
+  * total : DECIMAL(12,2)
+  * moneda : CHAR(3)
+  ruta_pdf : VARCHAR(300)
+  * recordatorios_pausados : BOOLEAN
+}
+
+entity "LINEA_FACTURA" as Linea {
   * id_linea : INTEGER <<PK>>
   --
-  * id_pedido : INTEGER <<FK>>
-  * cantidad : INTEGER
+  * id_factura : INTEGER <<FK>>
+  id_concepto : INTEGER <<FK>>
+  * id_impuesto : INTEGER <<FK>>
+  * descripcion : VARCHAR(300)
+  * cantidad : DECIMAL(10,2)
+  * precio_unitario : DECIMAL(12,2)
+  * descuento : DECIMAL(5,2)
+  * importe : DECIMAL(12,2)
 }
-Cliente ||--o{ Pedido : realiza
-Pedido ||--|{ Linea : contiene
-note bottom of Linea
-  Ejemplo: cantidad > 0.
-  Explicar restricciones en el .md.
+
+entity "SERIE" as Serie {
+  * id_serie : INTEGER <<PK>>
+  --
+  * codigo : VARCHAR(10) <<UNIQUE>>
+  * tipo : VARCHAR(15)
+  * ultimo_numero : INTEGER
+}
+
+entity "CONCEPTO" as Concepto {
+  * id_concepto : INTEGER <<PK>>
+  --
+  * nombre : VARCHAR(150)
+  precio_orientativo : DECIMAL(10,2)
+}
+
+entity "IMPUESTO" as Impuesto {
+  * id_impuesto : INTEGER <<PK>>
+  --
+  * nombre : VARCHAR(50)
+  * porcentaje : DECIMAL(5,2)
+  * pais : CHAR(2)
+}
+
+entity "PAGO" as Pago {
+  * id_pago : INTEGER <<PK>>
+  --
+  * origen : VARCHAR(20)
+  * referencia_externa : VARCHAR(100) <<UNIQUE>>
+  referencia_cliente : VARCHAR(100)
+  * importe : DECIMAL(12,2)
+  * moneda : CHAR(3)
+  * fecha_pago : TIMESTAMP
+  * estado : VARCHAR(20)
+}
+
+entity "CONCILIACION" as Conciliacion {
+  * id_conciliacion : INTEGER <<PK>>
+  --
+  * id_pago : INTEGER <<FK>>
+  * id_factura : INTEGER <<FK>>
+  * importe_aplicado : DECIMAL(12,2)
+  * tipo : VARCHAR(10)
+  motivo : VARCHAR(300)
+  * fecha : TIMESTAMP
+  * deshecha : BOOLEAN
+}
+
+entity "PLANTILLA_MENSAJE" as Plantilla {
+  * id_plantilla : INTEGER <<PK>>
+  --
+  * tipo : VARCHAR(30)
+  * idioma : CHAR(2)
+  * asunto : VARCHAR(200)
+  * cuerpo : TEXT
+}
+
+entity "ENVIO" as Envio {
+  * id_envio : INTEGER <<PK>>
+  --
+  * id_factura : INTEGER <<FK>>
+  * id_contacto : INTEGER <<FK>>
+  id_plantilla : INTEGER <<FK>>
+  * tipo : VARCHAR(15)
+  * canal : VARCHAR(10)
+  * fecha_prevista : DATE
+  fecha : TIMESTAMP
+  * resultado : VARCHAR(10)
+  motivo_error : VARCHAR(300)
+}
+
+entity "INCIDENCIA" as Incidencia {
+  * id_incidencia : INTEGER <<PK>>
+  --
+  * id_cliente : INTEGER <<FK>>
+  * tipo : VARCHAR(15)
+  * motivo : VARCHAR(500)
+  * estado : VARCHAR(12)
+  * pausa_recordatorios : BOOLEAN
+  * fecha_apertura : DATE
+  fecha_revision : DATE
+  fecha_reanudacion : DATE
+  resolucion : VARCHAR(500)
+}
+
+entity "INCIDENCIA_FACTURA" as IncidenciaFactura {
+  * id_incidencia : INTEGER <<PK, FK>>
+  * id_factura : INTEGER <<PK, FK>>
+}
+
+entity "COMENTARIO" as Comentario {
+  * id_comentario : INTEGER <<PK>>
+  --
+  * id_incidencia : INTEGER <<FK>>
+  * texto : VARCHAR(1000)
+  * fecha : TIMESTAMP
+}
+
+Cliente ||--o{ Factura : recibe
+Suscripcion |o--o{ Factura : genera
+Serie |o--o{ Factura : numera
+Factura |o--o{ Factura : rectifica
+Factura ||--|{ Linea : contiene
+Concepto |o--o{ Linea
+Impuesto ||--o{ Linea
+Pago ||--o{ Conciliacion
+Factura ||--o{ Conciliacion
+Factura ||--o{ Envio : se envía
+Contacto ||--o{ Envio : recibe
+Plantilla |o--o{ Envio
+Cliente ||--o{ Incidencia : tiene
+Incidencia ||--|{ IncidenciaFactura
+Factura ||--o{ IncidenciaFactura
+Incidencia ||--o{ Comentario : tiene
+
+note bottom of Envio
+  UNIQUE (id_factura, id_contacto,
+  canal, tipo, fecha_prevista)
+end note
+@enduml
+
+
+@startuml ER_3_control_y_sistema
+' Modelo físico de datos - parte 3
+title Modelo físico de datos · 3. Control y registro del sistema
+hide circle
+skinparam linetype ortho
+
+entity "USUARIO" as Usuario {
+  * id_usuario : INTEGER <<PK>>
+}
+
+entity "NOTIFICACION" as Notificacion {
+  * id_notificacion : INTEGER <<PK>>
+  --
+  * id_usuario : INTEGER <<FK>>
+  * mensaje : VARCHAR(500)
+  * leida : BOOLEAN
+  * resuelta : BOOLEAN
+  * fecha : TIMESTAMP
+}
+
+entity "REGISTRO_AUDITORIA" as Auditoria {
+  * id_registro : INTEGER <<PK>>
+  --
+  id_usuario : INTEGER <<FK>>
+  * accion : VARCHAR(50)
+  * entidad : VARCHAR(50)
+  valor_anterior : TEXT
+  valor_nuevo : TEXT
+  * fecha : TIMESTAMP
+}
+
+entity "EJECUCION_PROCESO" as Ejecucion {
+  * id_ejecucion : INTEGER <<PK>>
+  --
+  * proceso : VARCHAR(25)
+  * periodo : VARCHAR(10)
+  * procesados : INTEGER
+  * fallos : INTEGER
+  * fecha_inicio : TIMESTAMP
+  detalle : TEXT
+}
+
+entity "PARAMETRO" as Parametro {
+  * clave : VARCHAR(50) <<PK>>
+  * fecha_desde : DATE <<PK>>
+  --
+  * valor : VARCHAR(200)
+}
+
+entity "IMPORTACION_CSV" as Importacion {
+  * id_importacion : INTEGER <<PK>>
+  --
+  * nombre_fichero : VARCHAR(200)
+  * fecha : TIMESTAMP
+  * filas_creadas : INTEGER
+  * filas_rechazadas : INTEGER
+}
+
+Usuario ||--o{ Notificacion : recibe
+Usuario |o--o{ Auditoria : realiza
+
+note bottom of Ejecucion
+  UNIQUE (proceso, periodo)
 end note
 @enduml
