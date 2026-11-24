@@ -1,17 +1,80 @@
 @startuml
-title Arquitectura por componentes · ejemplo
+title Arquitectura lógica por capas · Sistema de facturación y cobros de Turbine
 skinparam componentStyle rectangle
-actor Cliente
-component "Interfaz web" as UI
-component "Servicio de pedidos" as S
-component "Repositorio de pedidos" as R
+skinparam linetype ortho
+
+actor "Usuario interno" as Usuario
+actor "Sistema externo vía API" as Externo
+
+rectangle "Capa de presentación" as Presentacion {
+  component "Interfaz web\n(responsive)" as UI
+  component "API REST" as API
+}
+
+actor "Planificador del sistema\n(temporizador)" as Reloj
+
+rectangle "Capa de negocio" as Negocio {
+  component "Planificador" as PL
+  component "ServicioClientes" as SCL
+  component "ServicioFacturacion" as SFA
+  component "ServicioCobros" as SCO
+  component "ServicioAprobaciones" as SAP
+  component "ServicioEnvios" as SEN
+}
+
+rectangle "Capa de integración" as Integracion {
+  component "Adaptador de pagos" as APAG
+  component "Adaptador de mensajería" as AMSG
+}
+
+rectangle "Capa de persistencia" as Persistencia {
+  component "Repositorios" as REPO
+}
+
 database "Base de datos" as DB
-Cliente --> UI : utiliza
-UI --> S : solicita operaciones
-S --> R : persistencia
-R --> DB : consultas / transacciones
-note right of S
-  Responsabilidad: reglas
-  de negocio de pedidos.
+folder "Almacén de PDF" as PDF
+
+actor "Stripe (simulado)" as Stripe
+actor "Servicio de mensajería\n(simulado)" as Mensajeria
+
+' orden de las capas
+Presentacion -[hidden]down- Negocio
+Negocio -[hidden]down- Integracion
+Negocio -[hidden]down- Persistencia
+Integracion -[hidden]right- Persistencia
+PL -[hidden]right- SCL
+SCL -[hidden]right- SFA
+SFA -[hidden]right- SCO
+SAP -[hidden]right- SEN
+PL -[hidden]down- SAP
+
+Usuario --> UI : utiliza (HTTPS)
+Externo --> API : consulta y bajas\n(HTTPS + token)
+UI --> Negocio
+API --> Negocio
+Reloj --> PL : dispara por fecha
+
+PL --> SCL : lanza tareas
+PL --> SFA : lanza tareas
+PL --> SCO : lanza tareas
+SFA --> SAP
+SCL --> SAP
+SFA --> SEN
+SCO --> SEN
+
+SCO --> APAG : consulta pagos
+SEN --> AMSG : envía mensajes
+APAG --> Stripe
+AMSG --> Mensajeria
+
+Negocio --> REPO : persistencia
+REPO --> DB : consultas
+REPO --> PDF : guarda PDF
+
+note right of PL
+  Parte interna del sistema que recibe
+  la señal del temporizador y lanza las
+  tareas del día
 end note
+
 @enduml
