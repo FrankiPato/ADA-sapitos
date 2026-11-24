@@ -1,0 +1,62 @@
+@startuml
+title CU-12 Crear factura rectificativa · escenario principal
+autonumber
+actor "Usuario operativo" as UO
+actor "Administrador" as AD
+boundary "PantallaFacturas" as UI
+control "ServicioFacturacion" as SF
+control "ServicioAprobaciones" as SA
+entity "Factura (original)" as F
+entity "Serie" as SE
+control "ServicioEnvios" as EN
+database "BaseDatos" as BD
+
+UO -> UI : rectificar(factura, motivo)
+activate UI
+UI -> SF : crearRectificativa(factura, motivo)
+activate SF
+create entity "FacturaRectificativa" as R
+SF -> R : new(factura, motivo)
+SF -> R : calcularTotales()
+SF -> SA : solicitar(RECTIFICATIVA, usuario, importe)
+activate SA
+SA --> SF : solicitud
+deactivate SA
+SF -> BD : guardar(rectificativa)
+SF --> UI : pendiente de aprobación
+deactivate SF
+UI --> UO : mostrarEstado()
+deactivate UI
+
+== El administrador revisa la solicitud (CU-22) ==
+
+AD -> UI : resolver(solicitud, decision)
+activate UI
+UI -> SA : resolver(solicitud, administrador, decision)
+activate SA
+SA --> UI : resultado
+deactivate SA
+alt aprobada
+  UI -> SF : emitirFactura(rectificativa)
+  activate SF
+  SF -> R : emitir(serie)
+  R -> SE : siguienteNumero()
+  SE --> R : numero
+  SF -> F : marcarRectificada(rectificativa)
+  SF -> SF : generarPDF(rectificativa)
+  SF -> BD : guardar(rectificativa, original)
+  SF ->> EN : enviarFactura(rectificativa)
+  SF --> UI : ok
+  deactivate SF
+  UI --> AD : mostrarConfirmacion()
+else rechazada
+  UI --> AD : mostrarRechazo()
+  note over UI, F : La rectificativa no se emite y la\nfactura original no cambia
+end
+deactivate UI
+
+note right of F
+  La factura original nunca se modifica:
+  solo pasa a estado RECTIFICADA
+end note
+@enduml
