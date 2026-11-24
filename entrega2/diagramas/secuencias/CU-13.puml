@@ -1,0 +1,56 @@
+@startuml
+title CU-13 Conciliar pagos · pago correcto, importe distinto y pago sin referencia
+autonumber
+actor "Planificador del sistema" as PL
+control "Planificador" as P
+control "ServicioCobros" as SC
+participant "Stripe (simulado)" as ST
+database "BaseDatos" as BD
+entity "Factura" as F
+control "ServicioEnvios" as EN
+
+PL -> P : ejecutarTareasDelDia(fecha)
+activate P
+P -> SC : consultarPagos(fecha)
+activate SC
+SC -> ST : obtenerPagos(desde)
+alt Stripe no responde
+  ST --> SC : error
+  note over SC : Se registra el error y no se cambia\nninguna factura. Se reintenta mañana
+else Stripe responde
+  ST --> SC : pagos
+  loop para cada pago
+    SC -> BD : existePago(referenciaExterna)
+    BD --> SC : resultado
+    alt el pago ya estaba registrado
+      note over SC : Se ignora para no contarlo dos veces
+    else pago nuevo
+      SC -> BD : buscarFactura(referenciaCliente)
+      BD --> SC : factura
+      alt misma referencia y mismo importe
+        SC -> SC : asociarPago(pago, factura)
+        SC -> F : marcarPagada()
+        SC ->> EN : notificarResponsable(cliente, "pago recibido")
+      else importe distinto
+        SC -> SC : asociarPago(pago, factura)
+        SC -> F : registrarDiferencia(importe)
+        SC ->> EN : notificarResponsable(cliente, "revisar diferencia")
+      else sin referencia clara
+        SC -> SC : dejar pago pendiente de asociar
+        SC ->> EN : notificarResponsable(cliente, "asociar pago a mano")
+      end
+      SC -> BD : guardar(pago)
+    end
+  end
+end
+SC --> P : ejecucion
+deactivate SC
+deactivate P
+
+note right of F
+  Con importe distinto la factura
+  no se marca como pagada.
+  Los pagos pendientes se
+  asocian a mano en CU-14
+end note
+@enduml
