@@ -1,0 +1,55 @@
+@startuml
+title CU-06 Gestionar suscripción · alta a mitad de mes con prorrateo
+autonumber
+actor "Usuario operativo" as UO
+boundary "PantallaSuscripcion" as UI
+control "ServicioClientes" as SC
+entity "Cliente" as C
+entity "Suscripcion" as S
+control "ServicioAprobaciones" as SA
+control "ServicioFacturacion" as SF
+database "BaseDatos" as BD
+
+UO -> UI : crearSuscripcion(fechaInicio, tarifa)
+activate UI
+UI -> SC : prepararAlta(cliente, fechaInicio, tarifa)
+activate SC
+SC -> C : tieneDatosFiscalesCompletos()
+C --> SC : resultado
+alt faltan datos fiscales
+  SC --> UI : error(datos que faltan)
+  UI --> UO : mostrarDatosQueFaltan()
+else datos completos
+  create S
+  SC -> S : new(cliente, fechaInicio, tarifa)
+  SC -> S : calcularProrrateo()
+  S --> SC : importe
+  SC --> UI : suscripcion, importe
+  UI --> UO : mostrarImportePrimerMes()
+  UO -> UI : confirmar()
+  UI -> SC : confirmarAlta(suscripcion)
+  opt hay excepción comercial
+    SC -> SA : solicitar(EXCEPCION, usuario, importe)
+    SA --> SC : solicitud
+  end
+  alt fecha de inicio futura
+    SC -> SC : dejar cliente pendiente de activación
+  else empieza hoy
+    SC -> S : activar()
+    SC -> SF : generarFacturaProporcional(suscripcion)
+    activate SF
+    SF --> SC : factura
+    deactivate SF
+  end
+  SC -> BD : guardar(suscripcion)
+  SC --> UI : ok
+  UI --> UO : mostrarConfirmacion()
+end
+deactivate SC
+deactivate UI
+
+note right of S
+  Ejemplo: alta el 14/11 con 890 €/mes
+  890 x 17 / 30 = 504,33 €
+end note
+@enduml
