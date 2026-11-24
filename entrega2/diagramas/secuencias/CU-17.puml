@@ -1,0 +1,66 @@
+@startuml
+title CU-17 Gestionar baja de cliente · cliente con facturas pendientes
+autonumber
+actor "Usuario operativo" as UO
+boundary "PantallaCliente" as UI
+control "ServicioClientes" as SC
+entity "UsuarioOperativo" as U
+entity "Cliente" as C
+database "BaseDatos" as BD
+entity "Suscripcion" as S
+control "Planificador" as P
+actor "Planificador del sistema" as PL
+
+UO -> UI : solicitarBaja(cliente, fechaEfectiva)
+activate UI
+UI -> SC : comprobarBaja(cliente)
+activate SC
+SC -> U : puedeGestionar(cliente)
+U --> SC : resultado
+alt el cliente no está asignado al usuario
+  SC --> UI : denegado
+  UI --> UO : mostrarError()
+else cliente asignado
+  SC -> BD : obtenerFacturasPendientes(cliente)
+  BD --> SC : facturasPendientes
+  SC --> UI : facturasPendientes
+  deactivate SC
+  UI --> UO : avisar que se seguirán reclamando
+  alt el usuario cancela
+    UO -> UI : cancelar()
+    note over UI : No se realiza ningún cambio
+  else el usuario confirma
+    UO -> UI : confirmar()
+    UI -> SC : registrarBaja(cliente, fechaEfectiva)
+    activate SC
+    SC -> C : solicitarBaja(fechaEfectiva, MANUAL)
+    create entity "Baja" as B
+    C -> B : new(fechaEfectiva, MANUAL)
+    C --> SC : baja
+    SC -> BD : guardar(cliente, baja)
+    SC --> UI : ok
+    deactivate SC
+    UI --> UO : mostrarConfirmacion()
+  end
+end
+deactivate UI
+
+== En la fecha efectiva de la baja ==
+
+PL -> P : ejecutarTareasDelDia(fecha)
+activate P
+P -> SC : procesarBajasYPausas(fecha)
+activate SC
+SC -> BD : obtenerBajas(fecha)
+BD --> SC : bajas
+SC -> B : hacerEfectiva()
+B -> S : finalizar(fecha)
+SC -> BD : guardar(cliente)
+deactivate SC
+deactivate P
+
+note over PL, S
+  Desde esta fecha no se generan más facturas del cliente,
+  pero sus facturas pendientes se siguen reclamando (RB-14)
+end note
+@enduml
