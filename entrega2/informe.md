@@ -1,10 +1,10 @@
 # Entrega 2 · Diseño del sistema
 
 **Asignatura:** Análisis y Diseño de Aplicaciones · Grupo A · 2026–27  
-**Equipo:** [nombre del equipo]  
-**Integrantes:** [nombres y apellidos]  
-**Fecha:** [dd/mm/aaaa]  
-**Repositorio:** [URL]
+**Equipo:** [Sapitos]  
+**Integrantes:** [Francisco Jiménez Tirado][ Emilio José Aragón Ortegosa] [Marco Gallego Zafra][Ismael García Zamudio][Miguel Vargas Peña][Francisco Sánchez Gámez][Iván González Doña]
+**Fecha:** [27/11/2026]  
+**Repositorio:** [https://github.com/FrankiPato/ADA-sapitos.git]
 
 > **Plantilla de índice para componer el PDF manualmente.** Sustituid el texto de ejemplo por vuestro trabajo e incorporad manualmente los diagramas renderizados y el contenido de los archivos de documentación. El archivo Markdown no se transforma automáticamente en PDF.
 
