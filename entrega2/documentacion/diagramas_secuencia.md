@@ -25,10 +25,10 @@ En todos usamos la misma notación que en clase: `actor` para los actores, `boun
 ## Descripción de CU-12 (factura rectificativa)
 
 1. El usuario pide rectificar una factura emitida e indica el motivo.
-2. `ServicioFacturacion` crea la rectificativa y pide la aprobación, porque las rectificativas siempre la necesitan (RB-13).
+2. `ServicioFacturacion` crea la rectificativa y pide la aprobación, porque las rectificativas siempre la necesitan (RB-13). También se notifica al usuario del estado de la aprobación para confirmar su existencia.
 3. Cuando el administrador la aprueba, se emite con un número de la serie, la original pasa a estado RECTIFICADA y la rectificativa se envía al cliente.
 4. Si se rechaza, la rectificativa no se emite y la original no cambia (FE-1).
-5. La factura original nunca se modifica (RB-10).
+5. La factura original nunca se modifica (RB-10) y en ambos casos se confirma al administrador la resolución.
 
 ## Descripción de CU-13 (conciliar pagos)
 
