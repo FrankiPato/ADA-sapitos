@@ -4,13 +4,12 @@
 
 El diagrama (`diagramas/arquitectura.puml`) muestra la **arquitectura lógica en capas** del sistema, no su despliegue en servidores. Hemos elegido una arquitectura en capas sobre un modelo cliente-servidor: los usuarios usan la aplicación desde el navegador y toda la lógica está en el servidor.
 
-Hay cinco capas, y cada una solo usa la que tiene debajo:
+Hay cuatro capas, y cada una solo usa la que tiene debajo:
 
 1. **Presentación:** la interfaz web que usan los empleados y la API REST que usan otros sistemas de Turbine.
 2. **Negocio:** el planificador y los servicios con las reglas de negocio. Son las clases de control del diagrama de clases.
 3. **Integración:** los adaptadores que se comunican con Stripe y con el servicio de mensajería (email y WhatsApp), que están simulados.
-4. **Persistencia:** los repositorios, que son los únicos que acceden a la base de datos.
-5. **Datos:** la base de datos (el modelo físico de datos) y el almacén donde se guardan los PDF de las facturas.
+4. **Persistencia:** los repositorios, los cuales son la base de datos (el modelo físico de datos) y el almacén donde se guardan los PDF de las facturas.
 
 ## Responsabilidades
 
