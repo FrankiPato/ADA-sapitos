@@ -199,9 +199,6 @@ El diagrama representa la **arquitectura lógica en capas** del sistema sobre un
 * Las pantallas representadas en los **diagramas de secuencia** se integran dentro de la `Interfaz web` de la capa de presentación.
 * El elemento `BaseDatos` de los diagramas de secuencia engloba a los `Repositorios` y a la `Base de datos` relacional descrita en el **modelo físico de datos**.
 
-```[cite: 34, 35, 36, 37, 38, 39, 40, 41]
-
-```
 
 ## 7. Informe Scrum
 
