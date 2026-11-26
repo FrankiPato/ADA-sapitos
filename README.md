@@ -2,10 +2,4 @@ Este proyecto está orientado a la planificación y diseño de una aplicación w
 
 Miembros del grupo Sapitos
 
-Aragón Ortegosa, Emilio José
-Gallego Zafra, Marco
-García Zamudio, Ismael
-González Doña, Iván
-Jiménez Tirado, Francisco
-Sánchez Gámez, Francisco
-Vargas Peña, Miguel
+Integrantes: Emilio José Aragón Ortegosa, Marco Gallego Zafra, Ismael García Zamudio, Iván González Doña, Francisco Jiménez Tirado, Francisco Sánchez Gámez y Miguel Vargas Peña.
