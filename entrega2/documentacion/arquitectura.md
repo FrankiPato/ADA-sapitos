@@ -8,8 +8,8 @@ Hay cuatro capas, y cada una solo usa la que tiene debajo:
 
 1. **Presentación:** la interfaz web que usan los empleados y la API REST que usan otros sistemas de Turbine.
 2. **Negocio:** el planificador y los servicios con las reglas de negocio. Son las clases de control del diagrama de clases.
-3. **Integración:** los adaptadores que se comunican con Stripe y con el servicio de mensajería (email y WhatsApp), que están simulados.
-4. **Persistencia:** los repositorios, los cuales son la base de datos (el modelo físico de datos) y el almacén donde se guardan los PDF de las facturas.
+3. **Integración (capa final):** los adaptadores que se comunican con Stripe y con el servicio de mensajería (email y WhatsApp), que están simulados.
+4. **Persistencia (capa final):** los repositorios, los cuales son la base de datos (el modelo físico de datos) y el almacén donde se guardan los PDF de las facturas.
 
 ## Responsabilidades
 
