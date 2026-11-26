@@ -46,7 +46,7 @@ Se han elaborado cuatro diagramas de secuencia correspondientes a los casos de u
 * **Caso de uso:** CU-06 — *Gestionar suscripción (alta y pausa)* (Diagrama 2: Clientes y suscripciones).
 * **Escenario:** Alta de una nueva suscripción a mitad de mes con cálculo de prorrateo, contemplando validación previa de datos fiscales, posible excepción comercial (extensión con CU-21) y activación inmediata frente a fecha de inicio futura.
 
-![CU-06 Gestionar suscripción - alta a mitad de mes con prorrateo](diagramas/secuencias/CU-06.png)
+![CU-06 Gestionar suscripción - alta a mitad de mes con prorrateo](entrega2/diagramas/secuencias/img/CU-06.png)
 
 **Descripción del flujo:**
 
@@ -64,7 +64,7 @@ Se han elaborado cuatro diagramas de secuencia correspondientes a los casos de u
 * **Caso de uso:** CU-12 — *Crear factura rectificativa* (Diagrama 3: Facturación y envíos), incluyendo CU-21 (*Solicitar aprobación*) y la posterior resolución mediante CU-22 (*Aprobar o rechazar solicitudes*).
 * **Escenario:** Creación, solicitud de aprobación y emisión (o rechazo) de una factura rectificativa vinculada a una factura original ya emitida.
 
-![CU-12 Crear factura rectificativa - escenario principal](diagramas/secuencias/CU-12.png)
+![CU-12 Crear factura rectificativa - escenario principal](entrega2/diagramas/secuencias/img/CU-12.png)
 
 **Descripción del flujo:**
 
@@ -82,7 +82,7 @@ Se han elaborado cuatro diagramas de secuencia correspondientes a los casos de u
 * **Caso de uso:** CU-13 — *Conciliar pagos* (Diagrama 4: Cobros y aprobaciones), contemplando la extensión hacia CU-14 (*Asociar pago manualmente*) cuando no existe coincidencia exacta.
 * **Escenario:** Ejecución diaria automatizada de conciliación de pagos contra Stripe (simulado), cubriendo indisponibilidad del servicio externo, idempotencia ante pagos duplicados y los tres casos posibles de conciliación.
 
-![CU-13 Conciliar pagos - pago correcto, importe distinto y pago sin referencia](diagramas/secuencias/CU-13.png)
+![CU-13 Conciliar pagos - pago correcto, importe distinto y pago sin referencia](entrega2/diagramas/secuencias/img/CU-13.png)
 
 **Descripción del flujo:**
 
@@ -102,7 +102,7 @@ Se han elaborado cuatro diagramas de secuencia correspondientes a los casos de u
 * **Caso de uso:** CU-17 — *Gestionar baja de cliente* (Diagrama 2: Clientes y suscripciones).
 * **Escenario:** Solicitud manual de baja de un cliente que mantiene facturas pendientes de cobro, abarcando la verificación de asignación, advertencia de deuda, confirmación/cancelación y ejecución efectiva diferida mediante el planificador.
 
-![CU-17 Gestionar baja de cliente - cliente con facturas pendientes](diagramas/secuencias/CU-17.png)
+![CU-17 Gestionar baja de cliente - cliente con facturas pendientes](entrega2/diagramas/secuencias/img/CU-17.png)
 
 **Descripción del flujo:**
 
@@ -141,7 +141,7 @@ El diagrama representa la **arquitectura lógica en capas** del sistema sobre un
 3. **Capa de integración:** Agrupa los adaptadores que aíslan la comunicación con servicios externos simulados (`Adaptador de mensajería` y `Adaptador de pagos`).
 4. **Capa de persistencia:** Formada por los `Repositorios` que gestionan el acceso a la base de datos relacional y al almacén de archivos PDF de las facturas.
 
-![Arquitectura lógica por capas - Sistema de facturación y cobros de Turbine](diagramas/arquitectura.png)
+![Arquitectura lógica por capas - Sistema de facturación y cobros de Turbine](entrega2/diagramas/arquitectura.png)
 
 ---
 
