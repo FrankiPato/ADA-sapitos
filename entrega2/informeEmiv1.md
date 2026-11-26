@@ -46,7 +46,7 @@ Se han elaborado cuatro diagramas de secuencia correspondientes a los casos de u
 * **Caso de uso:** CU-06 — *Gestionar suscripción (alta y pausa)* (Diagrama 2: Clientes y suscripciones).
 * **Escenario:** Alta de una nueva suscripción a mitad de mes con cálculo de prorrateo, contemplando validación previa de datos fiscales, posible excepción comercial (extensión con CU-21) y activación inmediata frente a fecha de inicio futura.
 
-![CU-06 Gestionar suscripción - alta a mitad de mes con prorrateo](entrega2/diagramas/secuencias/img/CU-06.png)
+![CU-06 Gestionar suscripción - alta a mitad de mes con prorrateo](diagramas/secuencias/img/CU-06.png)
 
 **Descripción del flujo:**
 
