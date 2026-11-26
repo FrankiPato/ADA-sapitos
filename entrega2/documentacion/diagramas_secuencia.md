@@ -20,6 +20,7 @@ En todos usamos la misma notación que en clase: `actor` para los actores, `boun
 3. Se crea la suscripción y se calcula el importe prorrateado del primer mes, que se muestra antes de confirmar (FR-17). Por ejemplo, un alta el 14/11 con 890 €/mes son 890 × 17 / 30 = 504,33 €.
 4. Si hay una excepción comercial, se pide aprobación (FA-4, RB-13).
 5. Si la fecha de inicio es futura, el cliente queda pendiente de activación (FA-1). Si empieza hoy, se activa y se genera la factura proporcional.
+6. Se guarda la suscripción en la base de datos y se le da la confirmación al usuario.
 
 ## Descripción de CU-12 (factura rectificativa)
 
