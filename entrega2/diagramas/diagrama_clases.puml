@@ -1,107 +1,7 @@
 ' Diagrama UML de clases - Sistema de facturación y cobros de Turbine
 ' Grupo Sapitos - Entrega 2
-' Se divide en una vista general y tres vistas de detalle para que se pueda leer bien.
+' Se divide en tres vistas detalladas para que se pueda leer bien.
 ' La explicación de cada vista está en documentacion/diagrama_clases.md
-
-' =====================================================================
-' Vista general: clases del dominio, solo nombres y relaciones
-' =====================================================================
-@startuml CL_0_vista_general
-title Diagrama de clases. Vista general del modelo de dominio
-skinparam shadowing false
-skinparam classAttributeIconSize 0
-skinparam class {
-  BackgroundColor #FFFFCC
-  BorderColor #A80036
-  ArrowColor #A80036
-}
-skinparam packageStyle rectangle
-hide members
-hide circle
-
-package "Usuarios" {
-  class UsuarioOperativo
-  class Administrador
-  class Superadministrador
-}
-package "Clientes y suscripciones" {
-  class Cliente
-  class AsignacionCliente
-  class Contacto
-  class ClienteContacto
-  class Suscripcion
-  class Pausa
-  class Baja
-  class RangoTarifa
-  class RevisionTarifa
-  class ExcepcionComercial
-}
-package "Facturación" {
-  abstract class Factura
-  class FacturaPuntual
-  class FacturaRecurrente
-  class FacturaProporcional
-  class FacturaRectificativa
-  class LineaFactura
-  class Serie
-  class Concepto
-  class Impuesto
-}
-package "Cobros y comunicaciones" {
-  class Pago
-  class Conciliacion
-  class Envio
-  class PlantillaMensaje
-  class Incidencia
-  class Comentario
-}
-package "Control" {
-  class SolicitudAprobacion
-  class Notificacion
-  class RegistroAuditoria
-}
-
-UsuarioOperativo <|-- Administrador
-Administrador <|-- Superadministrador
-
-Cliente "1" -- "0..*" AsignacionCliente
-UsuarioOperativo "1" -- "0..*" AsignacionCliente
-Cliente "1" -- "1..*" ClienteContacto
-Contacto "1" -- "1..*" ClienteContacto
-Cliente "1" *-- "0..*" Suscripcion
-Suscripcion "1" *-- "0..*" Pausa
-Cliente "1" -- "0..*" Baja
-Suscripcion "0..*" --> "1" RangoTarifa
-Suscripcion "1" -- "0..*" RevisionTarifa
-Suscripcion "1" -- "0..*" ExcepcionComercial
-
-Factura <|-- FacturaPuntual
-Factura <|-- FacturaRecurrente
-Factura <|-- FacturaProporcional
-Factura <|-- FacturaRectificativa
-Cliente "1" -- "0..*" Factura
-Suscripcion "1" -- "0..*" FacturaRecurrente
-Suscripcion "1" -- "0..1" FacturaProporcional
-FacturaRectificativa "0..*" --> "1" Factura : rectifica
-Factura "1" *-- "1..*" LineaFactura
-Factura "0..*" --> "0..1" Serie
-LineaFactura "0..*" --> "0..1" Concepto
-LineaFactura "0..*" --> "1" Impuesto
-
-Pago "1" -- "0..*" Conciliacion
-Factura "1" -- "0..*" Conciliacion
-Factura "1" *-- "0..*" Envio
-Envio "0..*" --> "1" Contacto
-Envio "0..*" --> "0..1" PlantillaMensaje
-Cliente "1" -- "0..*" Incidencia
-Factura "0..*" -- "0..*" Incidencia
-Incidencia "1" *-- "0..*" Comentario
-
-UsuarioOperativo "1" -- "0..*" SolicitudAprobacion : solicita
-Administrador "0..1" -- "0..*" SolicitudAprobacion : resuelve
-UsuarioOperativo "1" -- "0..*" Notificacion
-UsuarioOperativo "0..1" -- "0..*" RegistroAuditoria
-@enduml
 
 
 ' =====================================================================
@@ -116,6 +16,7 @@ skinparam class {
   BorderColor #A80036
   ArrowColor #A80036
 }
+skinparam packageStyle rectangle
 hide circle
 left to right direction
 
@@ -248,25 +149,42 @@ class ExcepcionComercial {
   + aplicaEn(fecha : Date) : boolean
 }
 
-class SolicitudAprobacion
+package "Facturación, cobros y comunicaciones" {
+  class Factura
+  class Incidencia
+  class Envio
+  class FacturaProporcional
+  class FacturaRecurrente
+}
+
+package "Control y registros del sistema" {
+  class SolicitudAprobacion
+}
 
 UsuarioOperativo <|-- Administrador
 Administrador <|-- Superadministrador
 
-Cliente "0..*" -- "1..*" UsuarioOperativo : -responsables
+Cliente "0..*" -- "1..*" UsuarioOperativo : responsables
 (Cliente, UsuarioOperativo) .. AsignacionCliente
-Cliente "1..*" -- "1..*" Contacto : -contactos
+Cliente "1..*" -- "1..*" Contacto : contactos
 (Cliente, Contacto) .. ClienteContacto
 
-Cliente "1" *-- "0..*" Suscripcion : -suscripciones
-Suscripcion "1" *-- "0..*" Pausa : -pausas
-Cliente "1" -- "0..*" Baja : -bajas
-Suscripcion "0..*" --> "1" RangoTarifa : -rango
-Suscripcion "1" -- "0..*" RevisionTarifa : -revisiones
-RevisionTarifa "0..*" --> "1" RangoTarifa : -rangoPropuesto
-Suscripcion "1" *-- "0..*" ExcepcionComercial : -excepciones
-RevisionTarifa "0..*" --> "1" SolicitudAprobacion : -aprobacion
-ExcepcionComercial "0..*" --> "1" SolicitudAprobacion : -aprobacion
+Cliente "1" *-- "0..*" Suscripcion : suscripciones
+Suscripcion "1" *-- "0..*" Pausa : pausas
+Cliente "1" -- "0..*" Baja : bajas
+Suscripcion "0..*" --> "1" RangoTarifa : rango
+Suscripcion "1" -- "0..*" RevisionTarifa : revisiones
+RevisionTarifa "0..*" --> "1" RangoTarifa : rangoPropuesto
+Suscripcion "1" *-- "0..*" ExcepcionComercial : excepciones
+
+Cliente "1" -- "0..*" Factura : facturas
+Cliente "1" -- "0..*" Incidencia : incidencias
+Envio "0..*" --> "1" Contacto : destinatario
+Suscripcion "1" -- "0..*" FacturaRecurrente : suscripcion
+Suscripcion "1" -- "0..1" FacturaProporcional : suscripcion
+
+RevisionTarifa "0..*" --> "1" SolicitudAprobacion : aprobacion
+ExcepcionComercial "0..*" --> "1" SolicitudAprobacion : aprobacion
 
 note bottom of Suscripcion
   Prorrateo: tarifa mensual x días
@@ -292,6 +210,7 @@ skinparam class {
   BorderColor #A80036
   ArrowColor #A80036
 }
+skinparam packageStyle rectangle
 hide circle
 
 abstract class Factura {
@@ -417,35 +336,36 @@ class Comentario {
   - texto : String
   - fecha : DateTime
 }
-
-class Cliente
-class Suscripcion
-class Contacto
+package "Usuarios, clientes y suscripciones" {
+  class Cliente
+  class Suscripcion
+  class Contacto
+}
 
 Factura <|-- FacturaPuntual
 Factura <|-- FacturaRecurrente
 Factura <|-- FacturaProporcional
 Factura <|-- FacturaRectificativa
 
-Cliente "1" -- "0..*" Factura : -facturas
-Suscripcion "1" -- "0..*" FacturaRecurrente : -suscripcion
-Suscripcion "1" -- "0..1" FacturaProporcional : -suscripcion
-FacturaRectificativa "0..*" --> "1" Factura : -facturaRectificada
-Factura "1" *-- "1..*" LineaFactura : -lineas
-Factura "0..*" --> "0..1" Serie : -serie
-LineaFactura "0..*" --> "0..1" Concepto : -concepto
-LineaFactura "0..*" --> "1" Impuesto : -impuesto
+Cliente "1" -- "0..*" Factura : facturas
+Suscripcion "1" -- "0..*" FacturaRecurrente : suscripcion
+Suscripcion "1" -- "0..1" FacturaProporcional : suscripcion
+FacturaRectificativa "0..*" --> "1" Factura : facturaRectificada
+Factura "1" *-- "1..*" LineaFactura : lineas
+Factura "0..*" --> "0..1" Serie : serie
+LineaFactura "0..*" --> "0..1" Concepto : concepto
+LineaFactura "0..*" --> "1" Impuesto : impuesto
 
-Pago "0..*" -- "0..*" Factura : -facturas
+Pago "0..*" -- "0..*" Factura : facturas
 (Pago, Factura) .. Conciliacion
 
-Factura "1" *-- "0..*" Envio : -envios
-Envio "0..*" --> "1" Contacto : -destinatario
-Envio "0..*" --> "0..1" PlantillaMensaje : -plantilla
+Factura "1" *-- "0..*" Envio : envios
+Envio "0..*" --> "1" Contacto : destinatario
+Envio "0..*" --> "0..1" PlantillaMensaje : plantilla
 
-Cliente "1" -- "0..*" Incidencia : -incidencias
-Factura "0..*" -- "0..*" Incidencia : -facturasAfectadas
-Incidencia "1" *-- "0..*" Comentario : -comentarios
+Cliente "1" -- "0..*" Incidencia : incidencias
+Factura "0..*" -- "0..*" Incidencia : facturasAfectadas
+Incidencia "1" *-- "0..*" Comentario : comentarios
 
 note right of Factura
   Una vez emitida no se modifica:
@@ -574,6 +494,11 @@ class ImportacionCSV {
   - filasRechazadas : int
 }
 
+package "Usuarios, clientes y suscripciones" {
+  class RevisionTarifa
+  class ExcepcionComercial
+}
+
 Planificador "1" o-- "1" ServicioFacturacion : lanza
 Planificador "1" o-- "1" ServicioCobros : lanza
 Planificador "1" o-- "1" ServicioClientes : lanza
@@ -590,6 +515,9 @@ ServicioFacturacion ..> Parametro : usa
 ServicioFacturacion ..> RegistroAuditoria : crea
 ServicioCobros ..> RegistroAuditoria : crea
 ServicioAprobaciones ..> RegistroAuditoria : crea
+
+RevisionTarifa "0..*" --> "1" SolicitudAprobacion : aprobacion
+ExcepcionComercial "0..*" --> "1" SolicitudAprobacion : aprobacion
 
 note top of Planificador
   Es la parte interna del sistema que hace
