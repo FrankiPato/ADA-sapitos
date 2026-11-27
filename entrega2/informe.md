@@ -72,7 +72,87 @@ Insertad aquí el diagrama exportado de `diagramas/modelo_datos.puml` y la expli
 
 ## 4. Diagrama UML de clases
 
-Insertad el diagrama exportado de `diagramas/diagrama_clases.puml` y la explicación de `documentacion/diagrama_clases.md`.
+# Diagrama UML de clases
+ 
+## Alcance
+ 
+Este diagrama recoge la estructura estática del sistema de facturación y cobros de Turbine: por un lado, las clases del dominio (clientes, suscripciones, facturas, pagos, etc.) y, por otro, las clases de control, que concentran la aplicación de las reglas de negocio. Los sistemas externos (Stripe y el servicio de mensajería, ambos simulados) no se modelan como clases; se representan en el diagrama de arquitectura.
+ 
+En total hay 40 clases: 29 de dominio, 5 de registro del sistema y 6 de control. Al no caber con claridad en una sola página, el modelo se ha repartido en tres vistas detalladas (`diagramas/diagrama_clases.puml`):
+ 
+| Vista | Contenido |
+|---|---|
+| Vista 1 | Usuarios, clientes, contactos, suscripciones, pausas, bajas y tarifas |
+| Vista 2 | Facturas, líneas, series, impuestos, pagos, conciliaciones, envíos e incidencias |
+| Vista 3 | Clases de control (planificador y servicios) y registro del sistema (notificaciones, auditoría, procesos, parámetros e importaciones) |
+ 
+Si una clase se ve sin atributos en una vista, es porque su detalle está en otra: se dibuja dentro de su paquete únicamente para poder mostrar la relación.
+ 
+### Vista 1: usuarios, clientes y suscripciones
+ 
+![Diagrama de clases. Vista 1: usuarios, clientes y suscripciones](diagramas/Vista1_clases.png)
+ 
+### Vista 2: facturación, cobros y comunicaciones
+ 
+![Diagrama de clases. Vista 2: facturación, cobros y comunicaciones](diagramas/Vista2_clases.png)
+ 
+### Vista 3: clases de control y registro del sistema
+ 
+![Diagrama de clases. Vista 3: clases de control y registro del sistema](diagramas/Vista3_clases.png)
+ 
+## Decisiones de diseño
+ 
+- **Jerarquía de roles.** `Administrador` extiende a `UsuarioOperativo` y `Superadministrador` extiende a `Administrador`. Reproduce la generalización de los diagramas de casos de uso: cada rol puede realizar todo lo que hace el rol del que hereda (RB-18, A-01).
+- **`Factura` es una clase abstracta** con cuatro especializaciones: puntual, recurrente, proporcional y rectificativa. Las cuatro comparten la mayor parte de sus características, pero cada una añade datos propios (periodo, días facturados, factura rectificada).
+- **Copia de los datos fiscales en la factura.** Al emitirla, la factura almacena los datos fiscales del cliente, ya que una factura emitida debe permanecer inalterable aunque luego se modifiquen los datos del cliente o la plantilla (RB-10, FR-32).
+- **Composiciones.** `Factura`–`LineaFactura`, `Factura`–`Envio`, `Cliente`–`Suscripcion`, `Suscripcion`–`Pausa`, `Suscripcion`–`ExcepcionComercial` e `Incidencia`–`Comentario`: en todos los casos, las partes carecen de sentido sin el conjunto al que pertenecen.
+- **Clases asociación.** `AsignacionCliente` (fechas de una asignación o sustitución, FR-07 y UR-19), `ClienteContacto` (función que desempeña un contacto en cada empresa, FR-82) y `Conciliacion` (importe de un pago aplicado a una factura, FR-43 y FR-47).
+- **Relación muchos a muchos entre `Pago` y `Factura`**, resuelta mediante `Conciliacion`: un mismo pago puede saldar varias facturas y una factura puede abonarse con varios pagos. La factura solo pasa a pagada cuando el total queda cubierto (RB-12).
+- **Seis clases de control** reparten las reglas de negocio por áreas: `ServicioClientes` (clientes, suscripciones, pausas y bajas), `ServicioFacturacion`, `ServicioCobros` (pagos, recordatorios e incidencias), `ServicioAprobaciones`, `ServicioEnvios` y `Planificador`. Se ha optado por pocas clases con responsabilidades bien definidas, en lugar de una clase por cada caso de uso.
+- **`Planificador`** es el componente interno que materializa al actor "Planificador del sistema" de los casos de uso: a diario dispara las tareas de facturación, cobros, bajas y pausas. Se vincula con los servicios mediante agregación (A-18).
+- **Los sistemas externos no son clases.** Stripe y la mensajería se utilizan desde `ServicioCobros` y `ServicioEnvios` y se reflejan en el diagrama de arquitectura (A-08, NFR-24).
+- **`EjecucionProceso` con combinación única de proceso y periodo**, de modo que, si el proceso del día 1 se lanza dos veces, no se generen facturas duplicadas (NFR-11).
+- **`Envio` con combinación única de factura, tipo y fecha prevista**, para evitar que un mismo mensaje se envíe dos veces aunque el Servicio de mensajería tarde en responder (RB-23).
+- **Aplazamientos acordados.** Se modelan como una `Incidencia` de tipo `APLAZAMIENTO` con `fechaReanudacion`, que detiene los recordatorios de las facturas afectadas hasta esa fecha (FR-83, RB-22).
+- **Las operaciones** expresan las responsabilidades de cada clase; no son las firmas definitivas de la implementación.
+### Enumeraciones
+ 
+Para no recargar el diagrama, las enumeraciones figuran como tipo de los atributos y sus valores se listan a continuación:
+ 
+| Enumeración | Valores |
+|---|---|
+| Rol | OPERATIVO, ADMINISTRADOR, SUPERADMINISTRADOR |
+| EstadoCliente | PENDIENTE_ACTIVACION, ACTIVO, PAUSADO, BAJA_SOLICITADA, INACTIVO (RB-20) |
+| EstadoSuscripcion | PENDIENTE, ACTIVA, PAUSADA, FINALIZADA |
+| EstadoFactura | BORRADOR, PENDIENTE_APROBACION, EMITIDA, ENVIADA, ENVIO_FALLIDO, VENCIDA, PAGADA, EN_DISPUTA, DIFERENCIA_IMPORTE, RECTIFICADA, ANULADA, INCOBRABLE (RB-09) |
+| EstadoPago | ASOCIADO, PENDIENTE_ASOCIAR, CON_DIFERENCIA |
+| TipoIncidencia | DISPUTA, INCIDENCIA, APLAZAMIENTO |
+| TipoSolicitud | DESCUENTO, IMPORTE_ALTO, CAMBIO_IMPORTE, RECTIFICATIVA, INCOBRABLE, CAMBIO_TARIFA, EXCEPCION |
+| TipoProceso | FACTURACION_MENSUAL, RECORDATORIOS, CONCILIACION, BAJAS_Y_PAUSAS, COPIA_SEGURIDAD |
+| Otras | TipoAsignacion, FuncionContacto, Idioma, OrigenBaja, TipoExcepcion, TipoSerie, TipoConciliacion, EstadoIncidencia, TipoEnvio, Canal, ResultadoEnvio, TipoPlantilla, EstadoSolicitud, TipoNotificacion |
+ 
+## Trazabilidad
+ 
+| Requisito / CU | Clases y operaciones | Motivo |
+|---|---|---|
+| FR-01 a FR-08, RB-18 · CU-01, CU-02, CU-03 | `UsuarioOperativo.iniciarSesion`, `recuperarContrasena`, `Administrador`, `Superadministrador`, `AsignacionCliente` | Acceso, roles y permisos según el cliente asignado |
+| FR-09 a FR-15, FR-71, FR-72, FR-82, RB-01, RB-19, RB-20 · CU-04, CU-05, CU-24 | `Cliente`, `Contacto`, `ClienteContacto`, `ServicioClientes.importarCSV`, `ImportacionCSV` | Gestión de clientes y contactos, e importación masiva |
+| FR-16 a FR-20, FR-52 a FR-56, RB-05, RB-14, RB-15 · CU-06, CU-17, CU-18 | `Suscripcion.calcularProrrateo`, `Pausa`, `Baja`, `ServicioClientes` | Alta con prorrateo, pausas y bajas |
+| FR-57, FR-58, FR-81, RB-02, RB-03 · CU-20 | `RangoTarifa`, `RevisionTarifa`, `ExcepcionComercial` | Tarifas y revisión anual |
+| FR-21 a FR-34, FR-80, RB-04, RB-09 a RB-11, RB-16 · CU-07, CU-08, CU-09, CU-12 | `Factura` y subclases, `LineaFactura`, `Serie`, `Impuesto`, `ServicioFacturacion` | Facturas puntuales, recurrentes, proporcionales y rectificativas |
+| FR-42 a FR-48, RB-12 · CU-13, CU-14 | `Pago`, `Conciliacion`, `ServicioCobros.consultarPagos`, `asociarPago` | Consulta de pagos y conciliación |
+| FR-35 a FR-41, RB-07, RB-08, RB-23 · CU-10, CU-11 | `Envio`, `PlantillaMensaje`, `ServicioEnvios`, `ServicioCobros.enviarRecordatoriosDelDia` | Envío de facturas y recordatorios sin duplicados |
+| FR-49, FR-50, FR-83, RB-22 · CU-15 | `Incidencia`, `Comentario`, `ServicioCobros.registrarAplazamiento` | Disputas, incidencias y aplazamientos |
+| FR-51, FR-58 a FR-61, RB-13 · CU-16, CU-21, CU-22 | `SolicitudAprobacion`, `ServicioAprobaciones` | Aprobaciones con separación de funciones |
+| FR-62 a FR-68 · CU-23, CU-25 | `Notificacion`, `ServicioEnvios.notificarResponsable`, `Administrador.consultarDashboard`, `generarInforme` | Avisos, panel de control e informes |
+| FR-73 a FR-75, RB-17, NFR-21 · CU-26, CU-27 | `Parametro`, `Superadministrador.modificarParametro`, `RegistroAuditoria`, `EjecucionProceso` | Configuración, auditoría y seguimiento de procesos |
+| FR-23, FR-39, FR-42, A-18 · CU-09, CU-11, CU-13 | `Planificador`, `EjecucionProceso` | Procesos que se activan por fecha u hora |
+ 
+## Consistencia con otros modelos
+ 
+- **Modelo de datos.** Las clases del dominio (vistas 1 y 2) se corresponden con tablas del diagrama ER que llevan el mismo nombre. No todas las clases pasan a ser tablas: las seis clases de control no almacenan datos. La jerarquía de `Factura` se guarda en una única tabla `FACTURA` con una columna `tipo`, y la de roles en la tabla `USUARIO` con una columna `rol`. Las clases asociación se convierten en tablas intermedias.
+- **Secuencias.** Los objetos de los diagramas de secuencia son instancias de estas clases y los mensajes que intercambian son sus operaciones.
+- **Arquitectura.** Cada clase de control equivale a un componente de la capa de negocio. La comunicación con Stripe y con el servicio de mensajería se representa en la capa de integración de ese diagrama.
 
 ## 5. Diagramas UML de secuencia
 
