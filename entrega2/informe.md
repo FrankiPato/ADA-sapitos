@@ -71,8 +71,6 @@ Se mantienen seis hipótesis provisionales que no alteran el diseño actual, per
 Insertad aquí el diagrama exportado de `diagramas/modelo_datos.puml` y la explicación de `documentacion/modelo_datos.md`. Incluid relaciones, PK/FK y decisiones relevantes.
 
 ## 4. Diagrama UML de clases
-
-# Diagrama UML de clases
  
 ## Alcance
  
