@@ -18,6 +18,7 @@ entity "USUARIO" as Usuario {
 entity "CLIENTE" as Cliente {
   * id_cliente : INTEGER <<PK>>
   --
+  id_importacion : INTEGER
   * nombre_comercial : VARCHAR(150)
   * razon_social : VARCHAR(200)
   * id_fiscal : VARCHAR(30) <<UNIQUE>>
@@ -137,6 +138,11 @@ entity "EXCEPCION_COMERCIAL" as Excepcion {
   fecha_hasta : DATE
 }
 
+entity "IMPORTACION_CSV" as Importacion {
+  * id_importacion : INTEGER <<PK>>
+  --
+}
+
 Cliente ||--o{ Asignacion : tiene
 Usuario ||--o{ Asignacion : gestiona
 Cliente ||--|{ ClienteContacto : tiene
@@ -152,6 +158,7 @@ Solicitud ||--o{ Revision : aprueba
 Solicitud ||--o{ Excepcion : aprueba
 Usuario ||--o{ Solicitud : solicita
 Usuario |o--o{ Solicitud : resuelve
+Importacion ||--o{ Cliente: importa
 @enduml
 
 
