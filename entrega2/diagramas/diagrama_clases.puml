@@ -1,7 +1,110 @@
 ' Diagrama UML de clases - Sistema de facturación y cobros de Turbine
 ' Grupo Sapitos - Entrega 2
-' Se divide en tres vistas detalladas para que se pueda leer bien.
+' Se divide en una vista general y tres vistas de detalle.
 ' La explicación de cada vista está en documentacion/diagrama_clases.md
+
+' =====================================================================
+' Vista general: clases del dominio, nombres y relaciones
+' =====================================================================
+@startuml CL_0_vista_general
+title Diagrama de clases. Vista general del modelo de dominio
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #FFFFCC
+  BorderColor #A80036
+  ArrowColor #A80036
+}
+skinparam packageStyle rectangle
+hide members
+hide circle
+
+package "Usuarios" {
+  class UsuarioOperativo
+  class Administrador
+  class Superadministrador
+}
+package "Clientes y suscripciones" {
+  class Cliente
+  class AsignacionCliente
+  class Contacto
+  class ClienteContacto
+  class Suscripcion
+  class Pausa
+  class Baja
+  class RangoTarifa
+  class RevisionTarifa
+  class ExcepcionComercial
+}
+package "Facturación" {
+  abstract class Factura
+  class FacturaPuntual
+  class FacturaRecurrente
+  class FacturaProporcional
+  class FacturaRectificativa
+  class LineaFactura
+  class Serie
+  class Concepto
+  class Impuesto
+}
+package "Cobros y comunicaciones" {
+  class Pago
+  class Conciliacion
+  class Envio
+  class PlantillaMensaje
+  class Incidencia
+  class Comentario
+}
+package "Control" {
+  class SolicitudAprobacion
+  class Notificacion
+  class RegistroAuditoria
+}
+
+UsuarioOperativo <|-- Administrador
+Administrador <|-- Superadministrador
+
+Cliente "0..*" -- "1..*" UsuarioOperativo
+(Cliente, UsuarioOperativo) .. AsignacionCliente
+Cliente "1..*" -- "1..*" Contacto
+(Cliente, Contacto) .. ClienteContacto
+Cliente "1" *-- "0..*" Suscripcion
+Suscripcion "1" *-- "0..*" Pausa
+Cliente "1" -- "0..*" Baja
+Suscripcion "0..*" --> "1" RangoTarifa
+Suscripcion "1" -- "0..*" RevisionTarifa
+RevisionTarifa "0..*" --> "1" RangoTarifa
+Suscripcion "1" *-- "0..*" ExcepcionComercial
+RevisionTarifa "0..*" --> "1" SolicitudAprobacion
+ExcepcionComercial "0..*" --> "1" SolicitudAprobacion
+
+Factura <|-- FacturaPuntual
+Factura <|-- FacturaRecurrente
+Factura <|-- FacturaProporcional
+Factura <|-- FacturaRectificativa
+Cliente "1" -- "0..*" Factura
+Suscripcion "1" -- "0..*" FacturaRecurrente
+Suscripcion "1" -- "0..1" FacturaProporcional
+FacturaRectificativa "0..*" --> "1" Factura : rectifica
+Factura "1" *-- "1..*" LineaFactura
+Factura "0..*" --> "0..1" Serie
+LineaFactura "0..*" --> "0..1" Concepto
+LineaFactura "0..*" --> "1" Impuesto
+
+Pago "0..*" -- "0..*" Factura
+(Pago, Factura) .. Conciliacion
+Factura "1" *-- "0..*" Envio
+Envio "0..*" --> "1" Contacto
+Envio "0..*" --> "0..1" PlantillaMensaje
+Cliente "1" -- "0..*" Incidencia
+Factura "0..*" -- "0..*" Incidencia
+Incidencia "1" *-- "0..*" Comentario
+
+UsuarioOperativo "1" -- "0..*" SolicitudAprobacion : solicita
+Administrador "0..1" -- "0..*" SolicitudAprobacion : resuelve
+UsuarioOperativo "1" -- "0..*" Notificacion : recibe
+UsuarioOperativo "0..1" -- "0..*" RegistroAuditoria : realiza
+@enduml
 
 
 ' =====================================================================
@@ -496,6 +599,8 @@ class ImportacionCSV {
 }
 
 package "Usuarios, clientes y suscripciones" {
+  class UsuarioOperativo
+  class Administrador
   class RevisionTarifa
   class ExcepcionComercial
 }
@@ -519,6 +624,10 @@ ServicioAprobaciones ..> RegistroAuditoria : crea
 
 RevisionTarifa "0..*" --> "1" SolicitudAprobacion : aprobacion
 ExcepcionComercial "0..*" --> "1" SolicitudAprobacion : aprobacion
+UsuarioOperativo "1" -- "0..*" SolicitudAprobacion : solicita
+Administrador "0..1" -- "0..*" SolicitudAprobacion : resuelve
+UsuarioOperativo "1" -- "0..*" Notificacion : recibe
+UsuarioOperativo "0..1" -- "0..*" RegistroAuditoria : realiza
 
 note top of Planificador
   Es la parte interna del sistema que hace
