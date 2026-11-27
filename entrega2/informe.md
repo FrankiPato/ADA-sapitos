@@ -76,10 +76,11 @@ Insertad aquí el diagrama exportado de `diagramas/modelo_datos.puml` y la expli
  
 Este diagrama recoge la estructura estática del sistema de facturación y cobros de Turbine: por un lado, las clases del dominio (clientes, suscripciones, facturas, pagos, etc.) y, por otro, las clases de control, que concentran la aplicación de las reglas de negocio. Los sistemas externos (Stripe y el servicio de mensajería, ambos simulados) no se modelan como clases; se representan en el diagrama de arquitectura.
  
-En total hay 40 clases: 29 de dominio, 5 de registro del sistema y 6 de control. Al no caber con claridad en una sola página, el modelo se ha repartido en tres vistas detalladas (`diagramas/diagrama_clases.puml`):
+En total hay 40 clases: 29 de dominio, 5 de registro del sistema y 6 de control. Al no caber con claridad en una sola página, el modelo se ha repartido en una vista general y tres vistas asignadas para uno o más bloques (`diagramas/diagrama_clases.puml`):
  
 | Vista | Contenido |
 |---|---|
+| Vista general | Solo se ven las relaciones entre clases sin entrar en mucho detalle |
 | Vista 1 | Usuarios, clientes, contactos, suscripciones, pausas, bajas y tarifas |
 | Vista 2 | Facturas, líneas, series, impuestos, pagos, conciliaciones, envíos e incidencias |
 | Vista 3 | Clases de control (planificador y servicios) y registro del sistema (notificaciones, auditoría, procesos, parámetros e importaciones) |
