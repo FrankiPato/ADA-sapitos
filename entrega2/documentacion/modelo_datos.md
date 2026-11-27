@@ -4,7 +4,7 @@
 
 El modelo recoge las tablas de la base de datos del sistema de facturación y cobros de Turbine. Sale de las clases del dominio y de registro del diagrama de clases: cada una de esas clases es una tabla, y las relaciones muchos a muchos se resuelven con tablas intermedias. Las clases de control (`Planificador` y los servicios) no guardan datos, así que no tienen tabla.
 
-Son 29 tablas. Para que se lean bien las hemos dividido en tres diagramas (`diagramas/modelo_datos.puml`). Cuando una tabla aparece en un diagrama solo con su clave primaria es porque está completa en otro.
+Son 29 tablas. Para que se lean bien las hemos dividido en tres diagramas (`diagramas/Modelo_datos_ER/modelo_datos.puml`). Cuando una tabla aparece en un diagrama solo con su clave primaria es porque está completa en otro.
 
 | Diagrama | Tablas |
 |---|---|
