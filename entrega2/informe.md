@@ -85,6 +85,10 @@ En total hay 40 clases: 29 de dominio, 5 de registro del sistema y 6 de control.
 | Vista 3 | Clases de control (planificador y servicios) y registro del sistema (notificaciones, auditoría, procesos, parámetros e importaciones) |
  
 Si una clase se ve sin atributos en una vista, es porque su detalle está en otra: se dibuja dentro de su paquete únicamente para poder mostrar la relación.
+
+### Vista general
+ 
+![Diagrama de clases. Vista general](diagramas/Vista_general_clases.png)
  
 ### Vista 1: usuarios, clientes y suscripciones
  
