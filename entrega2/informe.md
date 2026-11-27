@@ -76,7 +76,7 @@ Insertad aquí el diagrama exportado de `diagramas/modelo_datos.puml` y la expli
  
 Este diagrama recoge la estructura estática del sistema de facturación y cobros de Turbine: por un lado, las clases del dominio (clientes, suscripciones, facturas, pagos, etc.) y, por otro, las clases de control, que concentran la aplicación de las reglas de negocio. Los sistemas externos (Stripe y el servicio de mensajería, ambos simulados) no se modelan como clases; se representan en el diagrama de arquitectura.
  
-En total hay 40 clases: 29 de dominio, 5 de registro del sistema y 6 de control. Al no caber con claridad en una sola página, el modelo se ha repartido en una vista general y tres vistas asignadas para uno o más bloques (`diagramas/diagrama_clases.puml`):
+En total hay 40 clases: 29 de dominio, 5 de registro del sistema y 6 de control. Al no caber con claridad en una sola página, el modelo se ha repartido en una vista general y tres vistas asignadas para uno o más bloques (`diagramas/Clases/diagrama_clases.puml`):
  
 | Vista | Contenido |
 |---|---|
@@ -89,19 +89,19 @@ Si una clase se ve sin atributos en una vista, es porque su detalle está en otr
 
 ### Vista general
  
-![Diagrama de clases. Vista general](diagramas/Vista_general_clases.png)
+![Diagrama de clases. Vista general](diagramas/Clases/Vista_general_clases.png)
  
 ### Vista 1: usuarios, clientes y suscripciones
  
-![Diagrama de clases. Vista 1: usuarios, clientes y suscripciones](diagramas/Vista1_clases.png)
+![Diagrama de clases. Vista 1: usuarios, clientes y suscripciones](diagramas/Clases/Vista1_clases.png)
  
 ### Vista 2: facturación, cobros y comunicaciones
  
-![Diagrama de clases. Vista 2: facturación, cobros y comunicaciones](diagramas/Vista2_clases.png)
+![Diagrama de clases. Vista 2: facturación, cobros y comunicaciones](diagramas/Clases/Vista2_clases.png)
  
 ### Vista 3: clases de control y registro del sistema
  
-![Diagrama de clases. Vista 3: clases de control y registro del sistema](diagramas/Vista3_clases.png)
+![Diagrama de clases. Vista 3: clases de control y registro del sistema](diagramas/Clases/Vista3_clases.png)
  
 ## Decisiones de diseño
  
