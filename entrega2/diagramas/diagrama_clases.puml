@@ -397,6 +397,7 @@ skinparam class {
   BorderColor #A80036
   ArrowColor #A80036
 }
+skinparam packageStyle rectangle
 hide circle
 
 class Planificador {
