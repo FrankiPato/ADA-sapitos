@@ -262,6 +262,8 @@ package "Facturación, cobros y comunicaciones" {
 
 package "Control y registros del sistema" {
   class SolicitudAprobacion
+  class Notificacion
+  class RegistroAuditoria
 }
 
 UsuarioOperativo <|-- Administrador
@@ -288,6 +290,10 @@ Suscripcion "1" -- "0..1" FacturaProporcional : suscripcion
 
 RevisionTarifa "0..*" --> "1" SolicitudAprobacion : aprobacion
 ExcepcionComercial "0..*" --> "1" SolicitudAprobacion : aprobacion
+UsuarioOperativo "1" -- "0..*" SolicitudAprobacion : solicita
+Administrador "0..1" -- "0..*" SolicitudAprobacion : resuelve
+UsuarioOperativo "1" -- "0..*" Notificacion : recibe
+UsuarioOperativo "0..1" -- "0..*" RegistroAuditoria : realiza
 
 note bottom of Suscripcion
   Prorrateo: tarifa mensual x días
