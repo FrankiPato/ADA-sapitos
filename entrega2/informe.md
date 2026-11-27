@@ -8,7 +8,19 @@
 
 ## 1. Introducción y alcance
 
-Ejemplo ficticio: «Este informe presenta el diseño de un sistema de gestión de pedidos a partir de RF-01 y CU-01». Sustituidlo por el alcance real de vuestro proyecto.
+Este informe presenta el diseño del sistema de facturación y cobros de Turbine, una aplicación web de uso interno con la que el personal administrativo podrá registrar clientes, generar facturas puntuales y recurrentes, enviarlas automáticamente y hacer el seguimiento de los cobros.
+
+El diseño parte de la Entrega 1 actualizada: los requisitos (83 requisitos funcionales, 30 no funcionales y 23 reglas de negocio) y los 27 casos de uso, repartidos en cinco bloques (acceso y administración, clientes y suscripciones, facturación y envíos, cobros y aprobaciones, y consulta e integración externa). Antes de diseñar hemos corregido la Entrega 1 con las observaciones del profesor y del cliente; los cambios se recogen en el capítulo 2.
+
+El informe incluye:
+
+- El modelo físico de datos, con las tablas, claves y relaciones de la base de datos (capítulo 3).
+- El diagrama de clases, dividido en una vista general y tres vistas de detalle (capítulo 4).
+- Cuatro diagramas de secuencia de los escenarios más relevantes: alta con prorrateo (CU-06), factura rectificativa (CU-12), conciliación de pagos (CU-13) y baja de un cliente con deuda (CU-17) (capítulo 5).
+- La arquitectura lógica del sistema, organizada en capas (capítulo 6).
+- El informe Scrum de esta entrega (capítulo 7).
+
+Queda fuera de esta entrega la implementación, que corresponde a la Entrega 3. Stripe y el servicio de email y WhatsApp se tratan como sistemas externos simulados, tal como autorizó el cliente. Los fuentes de todos los diagramas (PlantUML) y sus explicaciones están en la carpeta `entrega2/` del repositorio.
 
 ## 2. Actualizaciones de la Entrega 1
 
