@@ -68,7 +68,89 @@ Se mantienen seis hipótesis provisionales que no alteran el diseño actual, per
 
 ## 3. Modelo físico de datos (Entidad–Relación)
 
-Insertad aquí el diagrama exportado de `diagramas/modelo_datos.puml` y la explicación de `documentacion/modelo_datos.md`. Incluid relaciones, PK/FK y decisiones relevantes.
+## Alcance
+ 
+Este modelo describe las tablas de la base de datos del sistema de facturación y cobros de Turbine. Se deriva de las clases de dominio y de registro del diagrama de clases: cada una de ellas se convierte en una tabla, y las relaciones muchos a muchos se resuelven mediante tablas intermedias. Las clases de control (`Planificador` y los servicios) no almacenan información, por lo que no tienen tabla propia.
+ 
+El resultado son 29 tablas. Para facilitar su lectura, se han repartido en tres diagramas (`diagramas/Modelo_datos_ER/modelo_datos.puml`). Si una tabla aparece en un diagrama únicamente con su clave primaria, es porque su definición completa está en otro.
+ 
+| Diagrama | Tablas |
+|---|---|
+| 1. Usuarios, clientes y suscripciones | USUARIO, CLIENTE, ASIGNACION_CLIENTE, CONTACTO, CLIENTE_CONTACTO, RANGO_TARIFA, SUSCRIPCION, PAUSA, BAJA, SOLICITUD_APROBACION, REVISION_TARIFA, EXCEPCION_COMERCIAL |
+| 2. Facturación, cobros y comunicaciones | FACTURA, LINEA_FACTURA, SERIE, CONCEPTO, IMPUESTO, PAGO, CONCILIACION, PLANTILLA_MENSAJE, ENVIO, INCIDENCIA, INCIDENCIA_FACTURA, COMENTARIO |
+| 3. Control y registro del sistema | NOTIFICACION, REGISTRO_AUDITORIA, EJECUCION_PROCESO, PARAMETRO, IMPORTACION_CSV |
+ 
+En los diagramas, el símbolo `*` marca las columnas obligatorias (NOT NULL).
+
+### Parte 1: Usuarios, clientes y suscripciones
+ 
+![Modelo físico de datos. Parte 1: Usuarios, clientes y suscripciones](diagramas/Modelo_datos_ER/Modelo_datos_p1.png)
+
+### Parte 2: Facturación, cobros y comunicaciones
+
+![Modelo físico de datos. Parte 2: Facturación, cobros y comunicaciones](diagramas/Modelo_datos_ER/Modelo_datos_p2.png)
+
+### Parte 3: Control y registro del sistema
+
+![Modelo físico de datos. Parte 3: Control y registro del sistema](diagramas/Modelo_datos_ER/Modelo_datos_p3.png)
+ 
+## Justificación del modelo
+ 
+- **Jerarquías en una única tabla.** Los tres roles de usuario conviven en `USUARIO`, diferenciados por la columna `rol`, y los cuatro tipos de factura conviven en `FACTURA`, diferenciados por la columna `tipo`. Las columnas que solo aplican a ciertos tipos (periodo, días facturados, factura rectificada, motivo de la rectificación) admiten valores vacíos. Se ha elegido esta opción frente a una tabla por tipo porque la gran mayoría de columnas son comunes y las consultas sobre facturas resultan más simples.
+- **Tablas intermedias.** `ASIGNACION_CLIENTE` (usuario–cliente, con fechas para registrar sustituciones), `CLIENTE_CONTACTO` (cliente–contacto, con la función del contacto), `CONCILIACION` (pago–factura, con el importe aplicado) e `INCIDENCIA_FACTURA` (una incidencia o aplazamiento puede afectar a varias facturas).
+- **Relaciones principales:**
+  - `CLIENTE (1)` — `SUSCRIPCION (0..N)`: un cliente puede acumular varias suscripciones a lo largo del tiempo, por ejemplo si causa baja y luego se reactiva.
+  - `CLIENTE (1)` — `FACTURA (0..N)` y `SUSCRIPCION (0..1)` — `FACTURA (0..N)`: las facturas puntuales no están asociadas a ninguna suscripción.
+  - `FACTURA (1)` — `LINEA_FACTURA (1..N)`: toda factura contiene como mínimo una línea.
+  - `FACTURA (0..1)` — `FACTURA (0..N)`: una factura rectificativa referencia a la factura que corrige.
+  - `PAGO` y `FACTURA` mantienen una relación muchos a muchos a través de `CONCILIACION`.
+  - `USUARIO (1)` — `SOLICITUD_APROBACION (0..N)` en el papel de solicitante, y `USUARIO (0..1)` en el de aprobador, ya que mientras la solicitud está pendiente aún no existe aprobador.
+- **Copia de los datos fiscales.** `FACTURA.datos_fiscales_emitidos` conserva los datos del cliente tal y como estaban al emitir la factura, de forma que esta no varíe aunque el cliente se modifique después (RB-10, FR-32).
+- **Sin borrado físico.** Los clientes, contactos y usuarios no se eliminan: se desactivan o anonimizan mediante las columnas `estado`, `activo` y `anonimizado` (RB-19, FR-12).
+## Reglas y restricciones
+ 
+La notación de los diagramas no permite reflejar todas las restricciones, por lo que se recogen a continuación:
+ 
+| Restricción | Regla |
+|---|---|
+| `USUARIO.email` y `CLIENTE.id_fiscal` con valores únicos | FR-11 |
+| `UNIQUE (FACTURA.id_serie, FACTURA.numero)`: el número no se repite dentro de una misma serie | RB-11 |
+| `UNIQUE (FACTURA.id_suscripcion, FACTURA.periodo_desde)`: como máximo una factura recurrente por suscripción y mes | NFR-11 |
+| `PAGO.referencia_externa` única: un pago de Stripe no puede registrarse dos veces | FR-44 |
+| `UNIQUE (ENVIO.id_factura, id_contacto, canal, tipo, fecha_prevista)`: el mismo mensaje no se envía dos veces | RB-23 |
+| `UNIQUE (EJECUCION_PROCESO.proceso, periodo)`: un proceso automático no se ejecuta dos veces para el mismo periodo | NFR-11 |
+| `FACTURA.estado` limitado a los estados de RB-09, y `CLIENTE.estado` a los de RB-20 | RB-09, RB-20 |
+| `FACTURA.tipo` ∈ {PUNTUAL, RECURRENTE, PROPORCIONAL, RECTIFICATIVA}; `USUARIO.rol` ∈ {OPERATIVO, ADMINISTRADOR, SUPERADMINISTRADOR} | RB-18 |
+| `INCIDENCIA.tipo` ∈ {DISPUTA, INCIDENCIA, APLAZAMIENTO}; cuando es APLAZAMIENTO, `fecha_reanudacion` es obligatoria | FR-83, RB-22 |
+| `LINEA_FACTURA.cantidad > 0` y `descuento` comprendido entre 0 y 100 | FR-21 |
+| Importes en `DECIMAL` con 2 decimales, sin utilizar tipos de coma flotante | RB-16, NFR-14 |
+| `SOLICITUD_APROBACION.id_aprobador` distinto de `id_solicitante` cuando el importe supera el umbral (se valida en la aplicación) | FR-61 |
+| `REGISTRO_AUDITORIA` solo admite inserciones: sus filas no se modifican ni se eliminan | NFR-21 |
+| Una factura emitida es inmutable; únicamente pueden cambiar su `estado` y `recordatorios_pausados` | RB-10 |
+ 
+## Trazabilidad
+ 
+| Requisitos/casos | Tablas/columnas | Observación |
+|---|---|---|
+| FR-01 a FR-08, RB-18 · CU-01, CU-02, CU-03 | USUARIO, ASIGNACION_CLIENTE | Usuarios, roles y clientes asignados (incluidas las sustituciones, UR-19) |
+| FR-09 a FR-15, FR-82, RB-01, RB-19, RB-20 · CU-04, CU-24 | CLIENTE, CONTACTO, CLIENTE_CONTACTO | Información de los clientes y de sus contactos |
+| FR-71, FR-72 · CU-05 | IMPORTACION_CSV | Resumen de cada importación |
+| FR-16 a FR-20, FR-52 a FR-56, RB-05, RB-14, RB-15 · CU-06, CU-17, CU-18 | SUSCRIPCION, PAUSA, BAJA | Alta con prorrateo, pausas y bajas |
+| FR-57, FR-58, FR-81, RB-02, RB-03 · CU-20 | RANGO_TARIFA, REVISION_TARIFA, EXCEPCION_COMERCIAL | Tarifas, revisión anual y excepciones comerciales |
+| FR-21 a FR-33, FR-80, RB-04, RB-09 a RB-11, RB-16 · CU-07, CU-08, CU-09, CU-12 | FACTURA, LINEA_FACTURA, SERIE, CONCEPTO, IMPUESTO | Facturas de todos los tipos, con sus líneas y su numeración |
+| FR-42 a FR-48, RB-12 · CU-13, CU-14 | PAGO, CONCILIACION | Pagos recibidos y su vinculación con las facturas |
+| FR-35 a FR-41, RB-07, RB-23 · CU-10, CU-11 | ENVIO, PLANTILLA_MENSAJE | Registro de cada envío y de su resultado |
+| FR-49, FR-50, FR-83, RB-22 · CU-15 | INCIDENCIA, INCIDENCIA_FACTURA, COMENTARIO, FACTURA.recordatorios_pausados | Disputas, incidencias y aplazamientos |
+| FR-51, FR-59 a FR-61, RB-13 · CU-16, CU-21, CU-22 | SOLICITUD_APROBACION | Solicitudes y su resolución |
+| FR-62, FR-63 · CU-23 | NOTIFICACION | Avisos internos |
+| FR-73 a FR-75, RB-17, NFR-21 · CU-26, CU-27 | PARAMETRO, REGISTRO_AUDITORIA, EJECUCION_PROCESO | Configuración, auditoría y seguimiento de los procesos |
+ 
+## Decisiones abiertas
+ 
+- **Plazo de conservación de los datos** (Q-11): debe confirmarlo la gestoría. Se almacenará como un registro de `PARAMETRO`.
+- **Datos fiscales exigidos a clientes de otros países** (Q-13): por ahora solo son obligatorias las columnas de razón social, identificador fiscal y dirección. Si la gestoría solicita más información, se añadirán nuevas columnas a `CLIENTE`.
+- **Tabla de rangos de tarifa** (Q-10): las filas de `RANGO_TARIFA` se cargarán cuando Turbine facilite su tabla vigente.
+- **Alternativa descartada:** una tabla independiente para cada tipo de factura. Se rechazó porque casi todas las columnas eran comunes y habría complicado tanto las consultas como los informes.
 
 ## 4. Diagrama UML de clases
  
